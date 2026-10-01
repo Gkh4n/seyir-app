@@ -288,6 +288,15 @@ textarea{min-height:110px;resize:vertical}
   .profileCharacterVisual{aspect-ratio:16/11!important}
 }
 
+
+/* --- Home continuity + score cleanup --- */
+.scores.single{justify-content:flex-start}
+.myCardScore{margin-left:auto;color:#a99fff;font-weight:800}
+@media(min-width:1100px){
+  .homeSection #trendingGrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+  .homeSection .card{min-width:0}
+}
+
 </style>
 </head>
 <body>
@@ -470,7 +479,7 @@ function openFromCode(code){
 }
 function card(x){
   var mine=personalScore(x);
-  return '<article class="card" data-open="'+h(openCode(x))+'"><div class="poster" style="--poster:'+x.poster+'"><span class="letter">'+h(x.title[0]||'S')+'</span><span class="tag">'+h(x.type)+'</span><div class="meta"><b>'+h(x.title)+'</b><span>'+h(x.year)+(x.genre?' · '+h(x.genre):'')+'</span></div></div><div class="scores '+(mine==null?'single':'')+'"><span>Genel <b>'+publicScore(x.public)+'</b></span>'+(mine==null?'':'<span>Ben <b>'+mine.toFixed(1)+'</b></span>')+'</div></article>'
+  return '<article class="card" data-open="'+h(openCode(x))+'"><div class="poster" style="--poster:'+x.poster+'"><span class="letter">'+h(x.title[0]||'S')+'</span><span class="tag">'+h(x.type)+'</span><div class="meta"><b>'+h(x.title)+'</b><span>'+h(x.year)+(x.genre?' · '+h(x.genre):'')+'</span></div></div><div class="scores '+(mine==null?'single':'')+'"><span>Genel <b>'+publicScore(x.public)+'</b></span>'+(mine==null?'':'<span class="myCardScore">★ '+mine.toFixed(1)+'</span>')+'</div></article>'
 }
 function section(title,sub,items,id){
   return '<section><div class="head"><div><h2>'+h(title)+'</h2><div class="muted">'+h(sub)+'</div></div></div><div class="grid"'+(id?' id="'+id+'"':'')+'>'+items.map(card).join('')+'</div></section>'
@@ -483,7 +492,7 @@ function homeSpotlightHtml(data){
   return '<div class="homeSpotlightBg" style="--spot:'+backdrop+'"></div><div class="homeSpotlightBody"><span class="spotTag">Haftanın öne çıkanı</span><h3>'+h(s.title)+'</h3><div class="spotMeta"><span>'+h(s.type)+'</span><span>·</span><span>'+h(s.year)+'</span><span>·</span><span class="spotScore">★ '+publicScore(s.public)+'</span></div></div>'
 }
 function homeTrendingHtml(data){
-  var items=(data&&data.results||[]).slice(0,10).map(tmdbToItem);
+  var items=(data&&data.results||[]).map(tmdbToItem);
   return items.map(card).join('')
 }
 function home(){
