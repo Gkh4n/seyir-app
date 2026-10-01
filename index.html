@@ -144,8 +144,8 @@ function profileStats(){
   return '<div class="stats"><div class="stat"><strong>'+vals.length+'</strong><span class="muted">Puanlanan yapım</span></div><div class="stat"><strong>'+saved.favorites.length+'</strong><span class="muted">Favori</span></div><div class="stat"><strong>'+saved.watchlist.length+'</strong><span class="muted">İzleme listesi</span></div><div class="stat"><strong>'+avg+'</strong><span class="muted">Puan ortalaması</span></div></div>'
 }
 function cataloguePage(type){
-  var items=fallbackCatalogue.filter(function(x){return x.type===type});
-  return '<div class="eyebrow">'+(type==='Dizi'?'Bölüm bölüm analiz':'Film günlüğün')+'</div><h1 style="font-size:44px;margin:8px 0">'+type+'ler</h1><p class="muted">Arama alanından TMDB kataloğundaki gerçek yapımlara ulaşabilirsin.</p>'+section(type+' örnekleri','TMDB bağlanana kadar gösterilen başlangıç verileri',items)
+  var mediaType=type==='Dizi'?'tv':'movie';
+  return '<div class="eyebrow">'+(type==='Dizi'?'Bölüm bölüm analiz':'Film günlüğün')+'</div><h1 style="font-size:44px;margin:8px 0">'+type+'ler</h1><p class="muted">TMDB kataloğundaki popüler '+type.toLocaleLowerCase('tr-TR')+'leri keşfet.</p><section><div class="head"><div><h2>Popüler '+type+'ler</h2><div class="muted">TMDB gerçek verileri</div></div></div><div id="catalogGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section><div id="catalogMeta" class="tmdbNote"></div>'
 }
 function listItems(keys){return keys.map(getItem).filter(Boolean)}
 function lists(){
@@ -204,6 +204,8 @@ function render(){
   document.querySelectorAll('[data-route]').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-route')===base)});
   bind();
   if(base==='home')loadHomeRemote();
+  if(base==='series')loadCatalogue('tv');
+  if(base==='movies')loadCatalogue('movie');
   if(base==='tmdb'){
     var p=location.hash.replace('#','').split('/');
     loadTmdbDetail(p[1],p[2]);
@@ -251,6 +253,25 @@ function bindPersonalControls(x){
     rememberItem(x);persist();render()
   }})
 }
+async function loadCatalogue(type){
+  var grid=document.getElementById('catalogGrid');
+  var meta=document.getElementById('catalogMeta');
+  if(!grid)return;
+  try{
+    var data=await api({action:'catalog',type:type});
+    var items=(data.results||[]).slice(0,20).map(tmdbToItem);
+    grid.innerHTML=items.length?items.map(card).join(''):'<div class="loading" style="grid-column:1/-1">İçerik bulunamadı.</div>';
+    if(meta)meta.textContent=items.length+' gerçek '+(type==='tv'?'dizi':'film')+' gösteriliyor.';
+    bindOpeners()
+  }catch(err){
+    var fallbackType=type==='tv'?'Dizi':'Film';
+    var items=fallbackCatalogue.filter(function(x){return x.type===fallbackType});
+    grid.innerHTML=items.map(card).join('');
+    if(meta)meta.textContent='TMDB kataloğu şu an alınamadı; örnek veriler gösteriliyor.';
+    bindOpeners()
+  }
+}
+
 async function loadHomeRemote(){
   var status=document.getElementById('tmdbStatus');
   try{
