@@ -144,18 +144,46 @@ module.exports = async function handler(req, res) {
       return send(res, 200, data);
     }
 
-    if (action === "people") {
-      const data = await tmdb("/person/popular", { page: 1 });
-      const results = (data.results || [])
-        .filter(person => person.profile_path && person.known_for_department === "Acting")
-        .slice(0, 24)
-        .map(person => ({
-          id: person.id,
-          name: person.name,
-          profile_path: person.profile_path,
-          popularity: Number(person.popularity || 0),
-          known_for: (person.known_for || []).slice(0, 2).map(item => item.title || item.name).filter(Boolean)
-        }));
+    if (action === "profile_avatars") {
+      const curated = [
+        { id: 1399, show: "Game of Thrones", people: ["Kit Harington", "Peter Dinklage", "Emilia Clarke"] },
+        { id: 1396, show: "Breaking Bad", people: ["Bryan Cranston", "Aaron Paul"] },
+        { id: 70523, show: "Dark", people: ["Louis Hofmann", "Lisa Vicari"] },
+        { id: 1405, show: "Dexter", people: ["Michael C. Hall", "Jennifer Carpenter"] },
+        { id: 2288, show: "Prison Break", people: ["Wentworth Miller", "Dominic Purcell"] },
+        { id: 63174, show: "Lucifer", people: ["Tom Ellis", "Lauren German"] },
+        { id: 66732, show: "Stranger Things", people: ["Millie Bobby Brown", "Finn Wolfhard"] },
+        { id: 1402, show: "The Walking Dead", people: ["Andrew Lincoln", "Norman Reedus"] },
+        { id: 62560, show: "Mr. Robot", people: ["Rami Malek", "Christian Slater"] },
+        { id: 1622, show: "Supernatural", people: ["Jensen Ackles", "Jared Padalecki"] },
+        { id: 76479, show: "The Boys", people: ["Antony Starr", "Karl Urban"] },
+        { id: 60059, show: "Better Call Saul", people: ["Bob Odenkirk", "Rhea Seehorn"] }
+      ];
+
+      const castLists = await Promise.all(
+        curated.map(entry =>
+          tmdb(`/tv/${entry.id}/credits`)
+            .then(data => ({ entry, cast: data.cast || [] }))
+            .catch(() => ({ entry, cast: [] }))
+        )
+      );
+
+      const results = [];
+      for (const group of castLists) {
+        for (const wanted of group.entry.people) {
+          const person = group.cast.find(c => c.name === wanted);
+          if (!person || !person.profile_path) continue;
+          results.push({
+            id: person.id,
+            actor: person.name,
+            character: person.character || person.name,
+            show: group.entry.show,
+            show_id: group.entry.id,
+            profile_path: person.profile_path
+          });
+        }
+      }
+
       return send(res, 200, { results });
     }
 
