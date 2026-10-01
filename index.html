@@ -38,25 +38,6 @@ textarea{min-height:110px;resize:vertical}
 <button data-route="home">⌂<br>Keşfet</button><button data-route="series">▤<br>Diziler</button><button data-route="movies">▶<br>Filmler</button><button data-route="anime">✦<br>Anime</button><button data-route="lists">♡<br>Listeler</button><button data-route="profile">◉<br>Profil</button>
 </nav>
 <script>
-var fallbackCatalogue=[
-{id:'dark',key:'dark',source:'local',type:'Dizi',title:'Dark',year:'2017–2020',genre:'Bilim Kurgu',public:8.7,mine:9.4,poster:'linear-gradient(145deg,#0d5967,#24213f 58%,#090b10)'},
-{id:'dexter',key:'dexter',source:'local',type:'Dizi',title:'Dexter',year:'2006–2013',genre:'Suç',public:8.6,mine:9.2,poster:'linear-gradient(145deg,#7a2430,#251417 58%,#090b10)'},
-{id:'lost',key:'lost',source:'local',type:'Dizi',title:'Lost',year:'2004–2010',genre:'Gizem',public:8.3,mine:9.1,poster:'linear-gradient(145deg,#668a92,#263033 58%,#090b10)'},
-{id:'supernatural',key:'supernatural',source:'local',type:'Dizi',title:'Supernatural',year:'2005–2020',genre:'Fantastik',public:8.4,mine:9.0,poster:'linear-gradient(145deg,#6b4d26,#241c15 58%,#090b10)'},
-{id:'prisonbreak',key:'prisonbreak',source:'local',type:'Dizi',title:'Prison Break',year:'2005–2017',genre:'Aksiyon',public:8.3,mine:8.9,poster:'linear-gradient(145deg,#686965,#252626 58%,#090b10)'},
-{id:'interstellar',key:'interstellar',source:'local',type:'Film',title:'Interstellar',year:'2014',genre:'Bilim Kurgu',public:8.7,mine:9.8,poster:'linear-gradient(145deg,#3e5a76,#171c26 58%,#090b10)'},
-{id:'prestige',key:'prestige',source:'local',type:'Film',title:'The Prestige',year:'2006',genre:'Gizem',public:8.5,mine:9.3,poster:'linear-gradient(145deg,#8c5b32,#2c211b 58%,#090b10)'},
-{id:'inception',key:'inception',source:'local',type:'Film',title:'Inception',year:'2010',genre:'Bilim Kurgu',public:8.8,mine:9.1,poster:'linear-gradient(145deg,#3c586b,#1d252e 58%,#090b10)'},
-{id:'parasite',key:'parasite',source:'local',type:'Film',title:'Parasite',year:'2019',genre:'Gerilim',public:8.5,mine:8.3,poster:'linear-gradient(145deg,#4f6549,#1b201a 58%,#090b10)'},
-{id:'shutter',key:'shutter',source:'local',type:'Film',title:'Shutter Island',year:'2010',genre:'Gerilim',public:8.2,mine:9.0,poster:'linear-gradient(145deg,#5c7782,#252c30 58%,#090b10)'}
-];
-
-var fallbackEpisodes={
-dark:[['S1B1','Sırlar',8.3,8.8],['S1B2','Yalanlar',8.5,9.0],['S1B3','Geçmiş ve Şimdi',8.7,9.1],['S1B4','Çifte Hayatlar',8.6,9.2],['S1B5','Gerçekler',8.8,9.4],['S1B6','Sic Mundus',9.1,9.7],['S1B7','Kavşak',9.0,9.6],['S1B8','Ne Ekersen',9.2,9.8],['S1B9','Her Şey Şimdi',9.3,9.9],['S1B10','Alfa ve Omega',9.5,10]],
-dexter:[['S1B1','Dexter',8.7,9.2],['S1B2','Crocodile',8.4,8.8],['S1B3','Popping Cherry',8.5,9.0],['S1B4','Return to Sender',8.8,9.4],['S1B5','Seeing Red',9.2,9.8]],
-lost:[['S1B1','Pilot 1',9.2,9.8],['S1B2','Pilot 2',9.0,9.6],['S1B3','Tabula Rasa',8.4,9.0],['S1B4','Walkabout',9.3,9.8],['S1B5','White Rabbit',8.5,9.1]]
-};
-
 var saved=JSON.parse(localStorage.getItem('seyir-state')||'null')||{};
 if(!saved.ratings)saved.ratings={};
 if(!saved.favorites)saved.favorites=[];
@@ -64,13 +45,19 @@ if(!saved.watchlist)saved.watchlist=[];
 if(!saved.items)saved.items={};
 if(!saved.episodeRatings)saved.episodeRatings={};
 if(!saved.movieLogs)saved.movieLogs={};
-if(!saved.dataVersion){
-  var noRealData=Object.keys(saved.ratings).length===0&&Object.keys(saved.items).length===0&&Object.keys(saved.episodeRatings).length===0&&Object.keys(saved.movieLogs).length===0;
-  if(noRealData){
-    saved.favorites=[];
-    saved.watchlist=[];
-  }
-  saved.dataVersion=2;
+if(!saved.dataVersion||saved.dataVersion<3){
+  var demoKeys=['dark','dexter','lost','supernatural','prisonbreak','interstellar','prestige','inception','parasite','shutter'];
+  demoKeys.forEach(function(key){
+    delete saved.ratings[key];
+    delete saved.items[key];
+    delete saved.movieLogs[key];
+    saved.favorites=saved.favorites.filter(function(k){return k!==key});
+    saved.watchlist=saved.watchlist.filter(function(k){return k!==key});
+  });
+  Object.keys(saved.episodeRatings).forEach(function(key){
+    if(demoKeys.some(function(d){return key.indexOf(d+'-')===0}))delete saved.episodeRatings[key]
+  });
+  saved.dataVersion=3;
   localStorage.setItem('seyir-state',JSON.stringify(saved));
 }
 
@@ -117,10 +104,7 @@ function rememberItem(x){
     persist();
   }
 }
-function getItem(key){
-  var local=fallbackCatalogue.find(function(x){return x.key===key});
-  return local||saved.items[key]||null;
-}
+function getItem(key){return saved.items[key]||null}
 async function api(params){
   var qs=new URLSearchParams(params);
   var res=await fetch('/api/tmdb?'+qs.toString());
@@ -128,25 +112,31 @@ async function api(params){
   if(!res.ok)throw new Error(data.error||'API isteği başarısız');
   return data;
 }
-function openCode(x){return x.source==='tmdb'?'tmdb:'+x.mediaType+':'+x.tmdbId:'local:'+x.key}
+function openCode(x){return 'tmdb:'+x.mediaType+':'+x.tmdbId}
 function openFromCode(code){
   var p=code.split(':');
   if(p[0]==='tmdb')location.hash='tmdb/'+p[1]+'/'+p[2];
-  else location.hash='detail/'+p[1];
 }
 function card(x){
   var mine=personalScore(x);
-  return '<article class="card" data-open="'+h(openCode(x))+'"><div class="poster" style="--poster:'+x.poster+'"><span class="letter">'+h(x.title[0]||'S')+'</span><span class="tag">'+h(x.type)+'</span><div class="meta"><b>'+h(x.title)+'</b><span>'+h(x.year)+' · '+h(x.genre||'')+'</span></div></div><div class="scores"><span>TMDB <b>'+publicScore(x.public)+'</b></span><span>Ben <b>'+(mine==null?'—':mine.toFixed(1))+'</b></span></div></article>'
+  return '<article class="card" data-open="'+h(openCode(x))+'"><div class="poster" style="--poster:'+x.poster+'"><span class="letter">'+h(x.title[0]||'S')+'</span><span class="tag">'+h(x.type)+'</span><div class="meta"><b>'+h(x.title)+'</b><span>'+h(x.year)+' · '+h(x.genre||'')+'</span></div></div><div class="scores"><span>Genel <b>'+publicScore(x.public)+'</b></span><span>Ben <b>'+(mine==null?'—':mine.toFixed(1))+'</b></span></div></article>'
 }
 function section(title,sub,items,id){
   return '<section><div class="head"><div><h2>'+h(title)+'</h2><div class="muted">'+h(sub)+'</div></div></div><div class="grid"'+(id?' id="'+id+'"':'')+'>'+items.map(card).join('')+'</div></section>'
 }
 function home(){
-  var diffs=fallbackCatalogue.slice().sort(function(a,b){return Math.abs((personalScore(b)||0)-b.public)-Math.abs((personalScore(a)||0)-a.public)}).slice(0,4);
-  return '<div class="hero"><div class="box copy"><div class="eyebrow">✦ İzleme zevkinin haritası</div><h1>Ne izlediğini değil, <span>nasıl sevdiğini</span> gör.</h1><p>Dizi ve filmleri puanla, bölüm bölüm takip et ve kendi zevk profilini genel izleyiciyle karşılaştır.</p><div class="search"><input id="q" placeholder="Dizi veya film ara…"><button id="searchBtn">Ara</button></div><div id="searchResults" class="searchResults"></div><div id="tmdbStatus" class="tmdbNote">TMDB bağlantısı kontrol ediliyor…</div></div><aside class="box taste"><div><div class="muted">ZEVK UYUM PROFİLİ</div><strong>82<small>/100</small></strong><div class="bar"><i></i></div></div><p class="muted">Bu skor ileride gerçek puan geçmişinden otomatik hesaplanacak.</p></aside></div>'+
-  section('Bu hafta öne çıkanlar','TMDB haftalık popüler verileri yükleniyor',fallbackCatalogue.slice(0,5),'trendingGrid')+
+  var rated=ratedItems();
+  var diffs=rated.slice().filter(function(x){return Number(x.public)>0}).sort(function(a,b){
+    return Math.abs(Number(saved.ratings[b.key])-Number(b.public||0))-Math.abs(Number(saved.ratings[a.key])-Number(a.public||0))
+  }).slice(0,4);
+  var avg=rated.length?rated.reduce(function(s,x){return s+Number(saved.ratings[x.key]||0)},0)/rated.length:0;
+  var profileCard=rated.length
+    ?'<div><div class="muted">KİŞİSEL SEYİR PROFİLİ</div><strong>'+avg.toFixed(1)+'<small>/10</small></strong><div class="bar"><i style="width:'+Math.min(100,avg*10)+'%"></i></div></div><p class="muted">'+rated.length+' yapıma verdiğin puanların ortalaması.</p>'
+    :'<div><div class="muted">KİŞİSEL SEYİR PROFİLİ</div><strong style="font-size:34px">Henüz oluşmadı</strong></div><p class="muted">Yapımlara puan verdikçe profilin gerçek verilerinden oluşacak.</p>';
+  return '<div class="hero"><div class="box copy"><div class="eyebrow">✦ İzleme zevkinin haritası</div><h1>Ne izlediğini değil, <span>nasıl sevdiğini</span> gör.</h1><p>Dizi, film ve animeleri puanla; bölüm bölüm takip et ve kendi zevk profilini genel izleyiciyle karşılaştır.</p><div class="search"><input id="q" placeholder="Dizi, film veya anime ara…"><button id="searchBtn">Ara</button></div><div id="searchResults" class="searchResults"></div><div id="tmdbStatus" class="tmdbNote">Katalog bağlantısı kontrol ediliyor…</div></div><aside class="box taste">'+profileCard+'</aside></div>'+
+  '<section><div class="head"><div><h2>Bu hafta öne çıkanlar</h2><div class="muted">Güncel popüler yapımlar</div></div></div><div id="trendingGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section>'+
   '<section><div class="head"><div><h2>Profil özeti</h2><div class="muted">Kişisel verilerinden hesaplanan özet</div></div></div>'+profileStats()+'</section>'+
-  '<section class="split"><div class="panel"><h3>Genel izleyiciyle en çok ayrıştıkların</h3><div class="rows">'+diffs.map(function(x){var mine=personalScore(x)||0;var d=mine-x.public;return '<div class="row" data-open="'+h(openCode(x))+'"><span><b>'+h(x.title)+'</b><br><small class="muted">TMDB '+publicScore(x.public)+' · Sen '+mine.toFixed(1)+'</small></span><span class="delta '+(d<0?'neg':'')+'">'+(d>0?'+':'')+d.toFixed(1)+'</span></div>'}).join('')+'</div></div><div class="panel"><h3>Seyir kimliğin</h3><p class="muted">Puan verdikçe tür, dönem, yönetmen ve oyuncu tercihlerinden kişisel zevk profilin oluşacak.</p></div></section>'
+  '<section class="split"><div class="panel"><h3>Genel izleyiciyle en çok ayrıştıkların</h3><div class="rows">'+(diffs.length?diffs.map(function(x){var mine=Number(saved.ratings[x.key]);var d=mine-Number(x.public||0);return '<div class="row" data-open="'+h(openCode(x))+'"><span><b>'+h(x.title)+'</b><br><small class="muted">Genel '+publicScore(x.public)+' · Sen '+mine.toFixed(1)+'</small></span><span class="delta '+(d<0?'neg':'')+'">'+(d>0?'+':'')+d.toFixed(1)+'</span></div>'}).join(''):'<p class="muted">Puan verdikçe burada gerçek karşılaştırmaların görünecek.</p>')+'</div></div><div class="panel"><h3>Seyir kimliğin</h3><p class="muted">Puan verdikçe tür, dönem, yönetmen ve oyuncu tercihlerinden kişisel zevk profilin oluşacak.</p></div></section>'
 }
 function profileStats(){
   var vals=Object.keys(saved.ratings).map(function(k){return Number(saved.ratings[k])}).filter(function(n){return isFinite(n)});
@@ -155,11 +145,11 @@ function profileStats(){
 }
 function cataloguePage(kind){
   var cfg={
-    tv:{eyebrow:'Bölüm bölüm analiz',title:'Diziler',desc:'TMDB kataloğundaki gerçek dizileri keşfet.',placeholder:'Dizi ara…',heading:'Popüler Diziler'},
-    movie:{eyebrow:'Film günlüğün',title:'Filmler',desc:'TMDB kataloğundaki gerçek filmleri keşfet.',placeholder:'Film ara…',heading:'Popüler Filmler'},
+    tv:{eyebrow:'Bölüm bölüm analiz',title:'Diziler',desc:'Gerçek dizi kataloğunu keşfet.',placeholder:'Dizi ara…',heading:'Popüler Diziler'},
+    movie:{eyebrow:'Film günlüğün',title:'Filmler',desc:'Gerçek film kataloğunu keşfet.',placeholder:'Film ara…',heading:'Popüler Filmler'},
     anime:{eyebrow:'Anime dünyası',title:'Animeler',desc:'Japon anime dizi ve filmlerini tek yerde keşfet.',placeholder:'Anime ara…',heading:'Popüler Animeler'}
   }[kind];
-  return '<div class="eyebrow">'+cfg.eyebrow+'</div><h1 style="font-size:44px;margin:8px 0">'+cfg.title+'</h1><p class="muted">'+cfg.desc+'</p><div class="catalogSearch"><input id="catalogQ" placeholder="'+cfg.placeholder+'"><button id="catalogSearchBtn">Ara</button></div><div id="catalogSearchResults" class="catalogSearchResults"></div><div class="catalogHint">Yazdıkça yalnızca bu kategoride arama yapılır.</div><section><div class="head"><div><h2>'+cfg.heading+'</h2><div class="muted">TMDB gerçek verileri</div></div></div><div id="catalogGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section><div id="catalogMeta" class="tmdbNote"></div>'
+  return '<div class="eyebrow">'+cfg.eyebrow+'</div><h1 style="font-size:44px;margin:8px 0">'+cfg.title+'</h1><p class="muted">'+cfg.desc+'</p><div class="catalogSearch"><input id="catalogQ" placeholder="'+cfg.placeholder+'"><button id="catalogSearchBtn">Ara</button></div><div id="catalogSearchResults" class="catalogSearchResults"></div><div class="catalogHint">Yazdıkça yalnızca bu kategoride arama yapılır.</div><section><div class="head"><div><h2>'+cfg.heading+'</h2><div class="muted">Güncel katalog</div></div></div><div id="catalogGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section><div id="catalogMeta" class="tmdbNote"></div>'
 }
 function listItems(keys){return keys.map(getItem).filter(Boolean)}
 function ratedItems(){
@@ -203,8 +193,8 @@ function profile(){
   var bars=dist.map(function(n,i){return '<div class="ratingBar"><span>'+(i+1)+'</span><div class="ratingTrack"><div class="ratingFill" style="width:'+((n/maxDist)*100)+'%"></div></div><span>'+n+'</span></div>'}).join('');
   return '<div class="profileCover"><div class="profileTop"><div class="avatar">S</div><div class="profileMeta"><h1>Seyir profilin</h1><p>Puanların ve listelerinden oluşan gerçek kişisel özet.</p><div class="profileBadge">● Veriler şimdilik bu cihazda saklanıyor</div></div></div></div>'+
   '<section>'+profileStats()+'</section>'+
-  '<section><div class="insightGrid"><div class="insightCard"><span>Puanlama tarzın</span><strong>'+h(biasLabel)+'</strong>'+(withPublic.length?'<small class="muted">'+(bias>=0?'+':'')+bias.toFixed(1)+' TMDB farkı</small>':'')+'</div><div class="insightCard"><span>En yüksek puanın</span><strong>'+(top?h(top.title)+' · '+Number(saved.ratings[top.key]).toFixed(1):'—')+'</strong></div><div class="insightCard"><span>Bölüm puanların</span><strong>'+epCount+'</strong><small class="muted">'+loggedMovies+' film günlüğü kaydı</small></div></div></section>'+
-  '<section class="split"><div class="panel"><h3>En çok ayrıştıkların</h3><div class="rows">'+(diffs.length?diffs.map(function(x){var d=Number(saved.ratings[x.key])-Number(x.public||0);return '<div class="row" data-open="'+h(openCode(x))+'"><span><b>'+h(x.title)+'</b><br><small class="muted">'+h(x.type)+' · Sen '+Number(saved.ratings[x.key]).toFixed(1)+' · TMDB '+publicScore(x.public)+'</small></span><b class="delta '+(d<0?'neg':'')+'">'+(d>0?'+':'')+d.toFixed(1)+'</b></div>'}).join(''):'<p class="muted">Puan verdikçe genel izleyiciyle en çok ayrıştığın yapımlar burada görünecek.</p>')+'</div></div><div class="panel"><h3>Puan dağılımın</h3>'+(ratingVals.length?'<div class="ratingBars">'+bars+'</div>':'<p class="muted">Dağılımı görmek için birkaç yapıma puan ver.</p>')+'</div></section>'+
+  '<section><div class="insightGrid"><div class="insightCard"><span>Puanlama tarzın</span><strong>'+h(biasLabel)+'</strong>'+(withPublic.length?'<small class="muted">'+(bias>=0?'+':'')+bias.toFixed(1)+' Genel farkı</small>':'')+'</div><div class="insightCard"><span>En yüksek puanın</span><strong>'+(top?h(top.title)+' · '+Number(saved.ratings[top.key]).toFixed(1):'—')+'</strong></div><div class="insightCard"><span>Bölüm puanların</span><strong>'+epCount+'</strong><small class="muted">'+loggedMovies+' film günlüğü kaydı</small></div></div></section>'+
+  '<section class="split"><div class="panel"><h3>En çok ayrıştıkların</h3><div class="rows">'+(diffs.length?diffs.map(function(x){var d=Number(saved.ratings[x.key])-Number(x.public||0);return '<div class="row" data-open="'+h(openCode(x))+'"><span><b>'+h(x.title)+'</b><br><small class="muted">'+h(x.type)+' · Sen '+Number(saved.ratings[x.key]).toFixed(1)+' · Genel '+publicScore(x.public)+'</small></span><b class="delta '+(d<0?'neg':'')+'">'+(d>0?'+':'')+d.toFixed(1)+'</b></div>'}).join(''):'<p class="muted">Puan verdikçe genel izleyiciyle en çok ayrıştığın yapımlar burada görünecek.</p>')+'</div></div><div class="panel"><h3>Puan dağılımın</h3>'+(ratingVals.length?'<div class="ratingBars">'+bars+'</div>':'<p class="muted">Dağılımı görmek için birkaç yapıma puan ver.</p>')+'</div></section>'+
   '<section class="panel"><h3>Arşiv özeti</h3><div class="rows"><div class="row"><span>Puanladığın diziler</span><b>'+(typeCounts.Dizi||0)+'</b></div><div class="row"><span>Puanladığın filmler</span><b>'+(typeCounts.Film||0)+'</b></div><div class="row"><span>Favoriler</span><b>'+saved.favorites.length+'</b></div><div class="row"><span>İzleme listesi</span><b>'+saved.watchlist.length+'</b></div></div></section>'
 }
 function chart(data){
@@ -220,26 +210,18 @@ function chart(data){
   var dots=data.map(function(e,i){return e[3]!=null?'<circle cx="'+pointX(i)+'" cy="'+y(e[3])+'" r="3.5" fill="#8a7dff"/>':''}).join('');
   return '<svg viewBox="0 0 '+w+' '+hgt+'" preserveAspectRatio="none"><line x1="'+p+'" y1="'+y(5)+'" x2="'+(w-p)+'" y2="'+y(5)+'" stroke="#2d3442"/><path d="'+path(2)+'" fill="none" stroke="#ffc85a" stroke-width="3"/><path d="'+path(3)+'" fill="none" stroke="#8a7dff" stroke-width="3"/>'+dots+'</svg>'
 }
-function localDetail(id){
-  var x=fallbackCatalogue.find(function(a){return a.key===id});
-  if(!x)return home();
-  currentItem=x;
-  var eps=fallbackEpisodes[id]||[];
-  return detailShell(x,'',eps)
-}
 function detailShell(x,extra,eps){
   var mine=personalScore(x);
   var sliderValue=mine==null?5:mine;
-  var body='<div class="detail"><div class="detailposter" style="--poster:'+x.poster+'" data-letter="'+h(x.title[0]||'S')+'"></div><div><div class="eyebrow">'+h(x.type)+' · '+h(x.genre||'')+'</div><h1>'+h(x.title)+'</h1><div class="muted">'+h(x.year)+'</div>'+extra+'<div class="bigscore"><div class="scorebox"><span class="muted">TMDB puanı</span><strong style="color:#ffc85a">'+publicScore(x.public)+'</strong></div><div class="scorebox"><span class="muted">Benim puanım</span><strong id="mineScore" style="color:#a89fff">'+(mine==null?'—':mine.toFixed(1))+'</strong></div></div><div class="slider"><div class="ratingHead"><span>Kendi puanını seç</span><b id="sliderLive">'+Number(sliderValue).toFixed(1)+'</b></div><input id="ratingSlider" type="range" min="1" max="10" step=".1" value="'+sliderValue+'"><div class="sliderScale"><span>1</span><span>5</span><span>10</span></div></div><div class="actions"><button class="primary" id="saveRating">Puanı kaydet</button><button class="secondary" data-fav="'+h(x.key)+'">'+(saved.favorites.indexOf(x.key)>-1?'♥ Favorilerde':'♡ Favoriye ekle')+'</button><button class="secondary" data-watch="'+h(x.key)+'">'+(saved.watchlist.indexOf(x.key)>-1?'✓ Listemde':'＋ İzleme listesi')+'</button></div></div></div>';
+  var body='<div class="detail"><div class="detailposter" style="--poster:'+x.poster+'" data-letter="'+h(x.title[0]||'S')+'"></div><div><div class="eyebrow">'+h(x.type)+' · '+h(x.genre||'')+'</div><h1>'+h(x.title)+'</h1><div class="muted">'+h(x.year)+'</div>'+extra+'<div class="bigscore"><div class="scorebox"><span class="muted">Genel puan</span><strong style="color:#ffc85a">'+publicScore(x.public)+'</strong></div><div class="scorebox"><span class="muted">Benim puanım</span><strong id="mineScore" style="color:#a89fff">'+(mine==null?'—':mine.toFixed(1))+'</strong></div></div><div class="slider"><div class="ratingHead"><span>Kendi puanını seç</span><b id="sliderLive">'+Number(sliderValue).toFixed(1)+'</b></div><input id="ratingSlider" type="range" min="1" max="10" step=".1" value="'+sliderValue+'"><div class="sliderScale"><span>1</span><span>5</span><span>10</span></div></div><div class="actions"><button class="primary" id="saveRating">Puanı kaydet</button><button class="secondary" data-fav="'+h(x.key)+'">'+(saved.favorites.indexOf(x.key)>-1?'♥ Favorilerde':'♡ Favoriye ekle')+'</button><button class="secondary" data-watch="'+h(x.key)+'">'+(saved.watchlist.indexOf(x.key)>-1?'✓ Listemde':'＋ İzleme listesi')+'</button></div></div></div>';
   if(x.type==='Dizi'&&eps){
-    body+='<section class="split"><div class="panel"><h3>Bölüm puan grafiği</h3><div class="muted" style="margin-bottom:8px">Sarı: TMDB · Mor: sen</div><div class="chart">'+chart(eps)+'</div></div><div class="panel"><h3>1. sezon bölümleri</h3><div class="episodes">'+eps.map(function(e){return '<div class="ep"><span class="muted">'+h(e[0])+'</span><b>'+h(e[1])+'</b><span style="color:#ffc85a">'+publicScore(e[2])+'</span><span class="mineep" style="color:#a89fff">'+(e[3]==null?'—':Number(e[3]).toFixed(1))+'</span></div>'}).join('')+'</div></div></section>'
+    body+='<section class="split"><div class="panel"><h3>Bölüm puan grafiği</h3><div class="muted" style="margin-bottom:8px">Sarı: genel puan · Mor: sen</div><div class="chart">'+chart(eps)+'</div></div><div class="panel"><h3>1. sezon bölümleri</h3><div class="episodes">'+eps.map(function(e){return '<div class="ep"><span class="muted">'+h(e[0])+'</span><b>'+h(e[1])+'</b><span style="color:#ffc85a">'+publicScore(e[2])+'</span><span class="mineep" style="color:#a89fff">'+(e[3]==null?'—':Number(e[3]).toFixed(1))+'</span></div>'}).join('')+'</div></div></section>'
   }
   return body
 }
-function remoteLoading(){return '<div class="loading">TMDB verileri yükleniyor…</div>'}
+function remoteLoading(){return '<div class="loading">Genel verileri yükleniyor…</div>'}
 function route(){
   var hash=location.hash.replace('#','');
-  if(hash.indexOf('detail/')===0)return localDetail(hash.split('/')[1]);
   if(hash.indexOf('tmdb/')===0)return remoteLoading();
   if(hash==='series')return cataloguePage('tv');
   if(hash==='movies')return cataloguePage('movie');
@@ -338,7 +320,7 @@ async function loadCatalogue(type){
     var fallbackType=type==='tv'?'Dizi':'Film';
     var items=type==='anime'?[]:fallbackCatalogue.filter(function(x){return x.type===fallbackType});
     grid.innerHTML=items.map(card).join('');
-    if(meta)meta.textContent='TMDB kataloğu şu an alınamadı; örnek veriler gösteriliyor.';
+    if(meta)meta.textContent='Genel kataloğu şu an alınamadı; örnek veriler gösteriliyor.';
     bindOpeners()
   }
 }
@@ -375,14 +357,14 @@ async function loadHomeRemote(){
   var status=document.getElementById('tmdbStatus');
   try{
     var st=await api({action:'status'});
-    if(status)status.textContent=st.configured?'✓ TMDB bağlı — arama gerçek katalogda çalışıyor.':'TMDB anahtarı henüz eklenmedi; örnek katalog gösteriliyor.';
+    if(status)status.textContent=st.configured?'✓ Genel bağlı — arama gerçek katalogda çalışıyor.':'Genel anahtarı henüz eklenmedi; örnek katalog gösteriliyor.';
     if(!st.configured)return;
     var data=await api({action:'trending'});
     var items=(data.results||[]).slice(0,10).map(tmdbToItem);
     var grid=document.getElementById('trendingGrid');
     if(grid&&items.length){grid.innerHTML=items.map(card).join('');bindOpeners()}
   }catch(err){
-    if(status)status.textContent='TMDB şu an kullanılamıyor; örnek verilerle devam ediliyor.'
+    if(status)status.textContent='Genel şu an kullanılamıyor; örnek verilerle devam ediliyor.'
   }
 }
 function normalizeText(v){
@@ -417,7 +399,7 @@ async function search(forcedQuery){
     if(mySeq!==searchSeq)return;
     var low=normalizeText(q);
     var hits=fallbackCatalogue.filter(function(x){return normalizeText(x.title).indexOf(low)>-1||normalizeText(x.genre).indexOf(low)>-1});
-    box.innerHTML='<div class="notice">TMDB şu an kullanılamıyor. Örnek katalogda arandı.</div>'+hits.map(searchResultRow).join('');
+    box.innerHTML='<div class="notice">Genel şu an kullanılamıyor. Örnek katalogda arandı.</div>'+hits.map(searchResultRow).join('');
     bindOpeners()
   }
 }
@@ -441,7 +423,7 @@ async function loadTmdbDetail(type,id){
       var count=Math.max(1,Number(d.number_of_seasons||1));
       var options='';
       for(var i=1;i<=count;i++)options+='<option value="'+i+'">'+i+'. sezon</option>';
-      app.innerHTML+='<section class="panel"><div class="head"><div><h2>Bölüm analizi</h2><div class="muted">Her bölüm için TMDB puanı ve senin puanın</div></div></div><div class="seasonToolbar"><select id="seasonSelect" class="seasonSelect">'+options+'</select></div><div id="seasonArea" class="loading">Sezon yükleniyor…</div></section>';
+      app.innerHTML+='<section class="panel"><div class="head"><div><h2>Bölüm analizi</h2><div class="muted">Her bölüm için Genel puan ve senin puanın</div></div></div><div class="seasonToolbar"><select id="seasonSelect" class="seasonSelect">'+options+'</select></div><div id="seasonArea" class="loading">Sezon yükleniyor…</div></section>';
     }else{
       var log=saved.movieLogs[x.key]||{rewatches:0,note:''};
       app.innerHTML+='<section class="panel"><h3>Film günlüğüm</h3><div class="split"><div><label class="muted">Kaç kez izledin?</label><input id="rewatches" class="fieldInput" type="number" min="0" max="99" value="'+Number(log.rewatches||0)+'"></div><div><label class="muted">Kısa notun</label><textarea id="movieNote" placeholder="Bu film sende ne bıraktı?">'+h(log.note||'')+'</textarea></div></div><div class="actions"><button id="saveMovieLog" class="primary">Günlüğü kaydet</button></div></section>'
@@ -460,7 +442,7 @@ async function loadTmdbDetail(type,id){
       }
     }
   }catch(err){
-    app.innerHTML='<div class="notice">TMDB verisi alınamadı. Vercel üzerinde TMDB_API_KEY eklenmiş olmalı.</div>'
+    app.innerHTML='<div class="notice">Genel verisi alınamadı. Vercel üzerinde TMDB_API_KEY eklenmiş olmalı.</div>'
   }
 }
 async function loadSeason(x,season){
@@ -480,7 +462,7 @@ async function loadSeason(x,season){
     var best=rated.slice().sort(function(a,b){return b[2]-a[2]})[0]||null;
     var worst=rated.slice().sort(function(a,b){return a[2]-b[2]})[0]||null;
     var summary='<div class="seasonStats"><div class="seasonStat"><span>Sezon ortalaması</span><b>'+publicScore(avg)+'</b></div><div class="seasonStat good"><span>En iyi bölüm</span><b>'+(best?h(best[0])+' · '+publicScore(best[2]):'—')+'</b></div><div class="seasonStat bad"><span>En düşük bölüm</span><b>'+(worst?h(worst[0])+' · '+publicScore(worst[2]):'—')+'</b></div></div>';
-    area.innerHTML=summary+'<div class="split"><div><div class="chart">'+chart(rows)+'</div><div class="tmdbNote">Sarı: TMDB bölüm puanı · Mor: senin verdiğin bölüm puanı</div></div><div class="episodes">'+rows.map(function(e){return '<div class="ep"><span class="muted">'+h(e[0])+'</span><b>'+h(e[1])+'</b><span style="color:#ffc85a">'+publicScore(e[2])+'</span><input class="episodeRating" data-ep="'+h(e[4])+'" type="number" min="1" max="10" step=".1" placeholder="—" value="'+(e[3]==null?'':e[3].toFixed(1))+'"></div>'}).join('')+'</div></div>';
+    area.innerHTML=summary+'<div class="split"><div><div class="chart">'+chart(rows)+'</div><div class="tmdbNote">Sarı: genel puan bölüm puanı · Mor: senin verdiğin bölüm puanı</div></div><div class="episodes">'+rows.map(function(e){return '<div class="ep"><span class="muted">'+h(e[0])+'</span><b>'+h(e[1])+'</b><span style="color:#ffc85a">'+publicScore(e[2])+'</span><input class="episodeRating" data-ep="'+h(e[4])+'" type="number" min="1" max="10" step=".1" placeholder="—" value="'+(e[3]==null?'':e[3].toFixed(1))+'"></div>'}).join('')+'</div></div>';
     document.querySelectorAll('[data-ep]').forEach(function(inp){inp.onchange=function(){
       var v=Number(inp.value);
       if(v>=1&&v<=10)saved.episodeRatings[inp.getAttribute('data-ep')]=v;
