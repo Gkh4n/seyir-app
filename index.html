@@ -1024,6 +1024,7 @@ function renderProfileAvatarOptions(people){
         aspect_ratio:Number(person.aspect_ratio||1.78)
       };
       persist();
+      saveSocialAvatar(person);
       var wrap=document.getElementById('profileAvatarButton');
       if(wrap)wrap.innerHTML='<img id="profileAvatarImage" class="profileAvatarImage" src="'+h(profileAvatarUrl(saved.profileAvatar,'w500'))+'" alt="'+h(person.character)+'">';
       closeProfileAvatarModal()
@@ -1064,15 +1065,131 @@ function bindProfileAvatarPicker(){
   if(close)close.onclick=function(e){e.preventDefault();closeProfileAvatarModal()};
   if(modal)modal.onclick=function(e){if(e.target===modal)closeProfileAvatarModal()}
 }
+
+function profileAuthLanding(){
+  return '<div class="accountLanding"><div class="accountLandingGlow"></div><div class="socialModalKicker">SEYİR TOPLULUĞU</div><h1>Kendi profilini oluştur.</h1><p>Dizi ve filmler hakkında yorum yap, diğer kullanıcıların profillerini gör, yorumlara yanıt ver ve ifadelerle tepki göster.</p><div class="accountLandingActions"><button class="primary" data-open-auth="register">Kayıt ol</button><button class="secondary" data-open-auth="login">Giriş yap</button></div></div>'
+}
+function socialProfileAvatar(profile,size){
+  if(profile&&profile.avatar_image_path)return 'https://image.tmdb.org/t/p/'+(size||'w342')+profile.avatar_image_path;
+  return ''
+}
+function publicProfileShell(username){
+  return '<div id="publicProfilePage" class="publicProfilePage"><div class="profileEmpty">Profil yükleniyor…</div></div>'
+}
+async function loadPublicProfile(username){
+  var area=document.getElementById('publicProfilePage');
+  if(!area||!seyirDb)return;
+  var p=await seyirDb.from('seyir_profiles').select('*').ilike('username',username).maybeSingle();
+  if(p.error||!p.data){area.innerHTML='<div class="profileEmpty">Bu kullanıcı bulunamadı.</div>';return}
+  var profile=p.data;
+  var count=await seyirDb.from('seyir_comments').select('id',{count:'exact',head:true}).eq('user_id',profile.user_id);
+  var avatar=socialProfileAvatar(profile,'w500');
+  var cover=avatar?"url('"+avatar+"')":"linear-gradient(135deg,#171a20,#0d1016 58%,#171326)";
+  area.innerHTML='<section class="publicProfileHero"><div class="publicProfileCover" style="--public-cover:'+cover+'"></div><div class="publicProfileBody"><div class="publicAvatar">'+(avatar?'<img src="'+h(avatar)+'" alt="'+h(profile.display_name)+'">':'<span>'+h((profile.display_name||profile.username||'S').charAt(0).toUpperCase())+'</span>')+'</div><div><div class="socialModalKicker">@'+h(profile.username)+'</div><h1>'+h(profile.display_name||profile.username)+'</h1><p>'+h(profile.bio||'Henüz biyografi eklenmemiş.')+'</p><span class="publicProfileMeta">'+Number(count.count||0)+' yorum</span></div></div></section>'
+}
+function socialCommentsShell(x){
+  return '<section class="socialCommentsSection"><div class="socialCommentsHead"><div><div class="socialModalKicker">TOPLULUK</div><h2>Yorumlar</h2><p>'+h(x.title)+' hakkında konuş.</p></div></div>'+(currentUser?'<div class="commentComposer"><textarea id="newSocialComment" maxlength="1000" placeholder="Yorumunu yaz…"></textarea><div><span id="commentComposerCount">0 / 1000</span><button id="submitSocialComment" class="primary">Yorum yap</button></div></div>':'<div class="commentLoginPrompt"><span>Yorum yapmak ve tepkilere katılmak için profilinle giriş yap.</span><button class="secondary" data-open-auth="login">Giriş yap</button><button class="primary" data-open-auth="register">Kayıt ol</button></div>')+'<div id="socialCommentsList" class="socialCommentsList"><div class="loading">Yorumlar yükleniyor…</div></div></section>'
+}
+function commentAvatar(profile){
+  var url=socialProfileAvatar(profile,'w185');
+  return url?'<img src="'+h(url)+'" alt="">':'<span>'+h(((profile&&profile.display_name)||(profile&&profile.username)||'S').charAt(0).toUpperCase())+'</span>'
+}
+function reactionLabel(type){
+  return {like:'👍',love:'❤️',haha:'😂',sad:'😢'}[type]||'👍'
+}
+function formatCommentTime(value){
+  try{
+    var d=new Date(value),diff=(Date.now()-d.getTime())/1000;
+    if(diff<60)return 'şimdi';
+    if(diff<3600)return Math.floor(diff/60)+' dk';
+    if(diff<86400)return Math.floor(diff/3600)+' sa';
+    if(diff<604800)return Math.floor(diff/86400)+' gün';
+    return d.toLocaleDateString('tr-TR')
+  }catch(e){return ''}
+}
+function renderSocialCommentRow(comment,profiles,reactions,children,level){
+  var profile=profiles[comment.user_id]||{};
+  var own=currentUser&&currentUser.id===comment.user_id;
+  var reacts=reactions.filter(function(r){return r.comment_id===comment.id});
+  var counts={like:0,love:0,haha:0,sad:0};
+  reacts.forEach(function(r){if(counts[r.reaction]!=null)counts[r.reaction]++});
+  var mine=currentUser?reacts.find(function(r){return r.user_id===currentUser.id}):null;
+  var replies=(children[comment.id]||[]).map(function(c){return renderSocialCommentRow(c,profiles,reactions,children,(level||0)+1)}).join('');
+  return '<article class="socialComment '+((level||0)>0?'reply':'')+'" data-comment-id="'+comment.id+'"><button class="commentAvatar" data-user-profile="'+h(profile.username||'')+'">'+commentAvatar(profile)+'</button><div class="commentBody"><div class="commentMeta"><button data-user-profile="'+h(profile.username||'')+'"><b>'+h(profile.display_name||profile.username||'Kullanıcı')+'</b><span>@'+h(profile.username||'')+'</span></button><time>'+formatCommentTime(comment.created_at)+'</time></div><p>'+h(comment.body)+'</p><div class="commentActions"><div class="reactionStrip">'+['like','love','haha','sad'].map(function(type){var n=counts[type];return '<button class="reactionBtn '+(mine&&mine.reaction===type?'active':'')+'" data-comment-react="'+comment.id+'" data-reaction="'+type+'">'+reactionLabel(type)+(n?'<span>'+n+'</span>':'')+'</button>'}).join('')+'</div>'+(currentUser?'<button class="replyToggle" data-reply-to="'+comment.id+'">Yanıtla</button>':'')+(own?'<button class="deleteComment" data-delete-comment="'+comment.id+'">Sil</button>':'')+'</div><div class="replyComposer" id="reply-'+comment.id+'"></div>'+replies+'</div></article>'
+}
+async function loadSocialComments(x){
+  var area=document.getElementById('socialCommentsList');
+  if(!area||!seyirDb||!x)return;
+  var type=x.mediaType==='movie'?'movie':'tv';
+  var commentsRes=await seyirDb.from('seyir_comments').select('*').eq('media_type',type).eq('media_id',x.tmdbId).order('created_at',{ascending:true});
+  if(commentsRes.error){area.innerHTML='<div class="profileEmpty">Yorumlar şu an yüklenemedi.</div>';return}
+  var comments=commentsRes.data||[];
+  if(!comments.length){area.innerHTML='<div class="socialEmpty">İlk yorumu sen yap.</div>';bindCommentUI(x);return}
+  var userIds=[...new Set(comments.map(function(c){return c.user_id}))];
+  var ids=comments.map(function(c){return c.id});
+  var profilesRes=await seyirDb.from('seyir_profiles').select('user_id,username,display_name,bio,avatar_image_path,avatar_character,avatar_show').in('user_id',userIds);
+  var reactionsRes=await seyirDb.from('seyir_comment_reactions').select('*').in('comment_id',ids);
+  var profiles={};
+  (profilesRes.data||[]).forEach(function(p){profiles[p.user_id]=p});
+  var reactions=reactionsRes.data||[];
+  var children={};
+  var roots=[];
+  comments.forEach(function(c){
+    if(c.parent_id){if(!children[c.parent_id])children[c.parent_id]=[];children[c.parent_id].push(c)}
+    else roots.push(c)
+  });
+  area.innerHTML=roots.map(function(c){return renderSocialCommentRow(c,profiles,reactions,children,0)}).join('');
+  bindCommentUI(x)
+}
+function bindCommentUI(x){
+  document.querySelectorAll('[data-open-auth]').forEach(function(b){b.onclick=function(){openAuthModal(b.getAttribute('data-open-auth')||'login')}});
+  document.querySelectorAll('[data-user-profile]').forEach(function(b){b.onclick=function(){
+    var u=b.getAttribute('data-user-profile');if(u)location.hash='user/'+encodeURIComponent(u)
+  }});
+  var ta=document.getElementById('newSocialComment');
+  var counter=document.getElementById('commentComposerCount');
+  if(ta&&counter)ta.oninput=function(){counter.textContent=ta.value.length+' / 1000'};
+  var submit=document.getElementById('submitSocialComment');
+  if(submit)submit.onclick=async function(){
+    var body=(ta.value||'').trim();if(!body||!currentUser)return;
+    submit.disabled=true;
+    var r=await seyirDb.from('seyir_comments').insert({user_id:currentUser.id,media_type:x.mediaType==='movie'?'movie':'tv',media_id:x.tmdbId,body:body});
+    submit.disabled=false;
+    if(!r.error){ta.value='';if(counter)counter.textContent='0 / 1000';loadSocialComments(x)}
+  };
+  document.querySelectorAll('[data-reply-to]').forEach(function(b){b.onclick=function(){
+    if(!currentUser){openAuthModal('login');return}
+    var id=b.getAttribute('data-reply-to'),host=document.getElementById('reply-'+id);
+    host.innerHTML='<div class="inlineReply"><textarea maxlength="1000" placeholder="Yanıtını yaz…"></textarea><button class="primary">Gönder</button></div>';
+    var input=host.querySelector('textarea'),send=host.querySelector('button');
+    input.focus();
+    send.onclick=async function(){
+      var body=input.value.trim();if(!body)return;
+      send.disabled=true;
+      var r=await seyirDb.from('seyir_comments').insert({user_id:currentUser.id,media_type:x.mediaType==='movie'?'movie':'tv',media_id:x.tmdbId,parent_id:id,body:body});
+      if(!r.error)loadSocialComments(x);else send.disabled=false
+    }
+  }});
+  document.querySelectorAll('[data-comment-react]').forEach(function(b){b.onclick=async function(){
+    if(!currentUser){openAuthModal('login');return}
+    var id=b.getAttribute('data-comment-react'),reaction=b.getAttribute('data-reaction');
+    var active=b.classList.contains('active');
+    if(active)await seyirDb.from('seyir_comment_reactions').delete().eq('comment_id',id).eq('user_id',currentUser.id);
+    else await seyirDb.from('seyir_comment_reactions').upsert({comment_id:id,user_id:currentUser.id,reaction:reaction},{onConflict:'comment_id,user_id'});
+    loadSocialComments(x)
+  }});
+  document.querySelectorAll('[data-delete-comment]').forEach(function(b){b.onclick=async function(){
+    if(!confirm('Yorum silinsin mi?'))return;
+    await seyirDb.from('seyir_comments').delete().eq('id',b.getAttribute('data-delete-comment'));
+    loadSocialComments(x)
+  }})
+}
 function profile(){
+  if(!currentUser)return profileAuthLanding();
+  var p=currentSeyirProfile||{};
   var editIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.25V20h2.75L17.8 8.95l-2.75-2.75L4 17.25Zm15.7-10.4a1 1 0 0 0 0-1.4l-1.15-1.15a1 1 0 0 0-1.4 0l-.9.9L19 7.95l.7-1.1Z" fill="currentColor"/></svg>';
-  var cover=saved.profileAvatar&&saved.profileAvatar.image_path
-    ?"url('https://image.tmdb.org/t/p/w1280"+saved.profileAvatar.image_path+"')"
-    :"linear-gradient(135deg,#171a20,#0d1016 58%,#171326)";
-  var character=saved.profileAvatar
-    ?'<span class="profileCharacterMeta">'+h(saved.profileAvatar.character)+' · '+h(saved.profileAvatar.show)+'</span>'
-    :'<span class="profileCharacterMeta">Profil karakterini seç</span>';
-  return '<div class="profilePage"><section class="profileHeaderCard"><div class="profileCover" style="--profile-cover:'+cover+'"><div class="profileCoverShade"></div></div><div class="profileHeaderBody"><div class="profileAvatarWrap"><button id="profileAvatarButton" class="profileAvatarBig" aria-label="Profil karakterini değiştir">'+profileAvatarMarkup()+'</button><span class="profileAvatarEdit">'+editIcon+'</span></div><div class="profileHeaderText"><h1>Gökhan</h1><p>Dizi, film ve anime arşivim.</p>'+character+'</div></div></section><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div>'+profileAvatarModalHtml()+'</div>'
+  var cover=saved.profileAvatar&&saved.profileAvatar.image_path?"url('https://image.tmdb.org/t/p/w1280"+saved.profileAvatar.image_path+"')":"linear-gradient(135deg,#171a20,#0d1016 58%,#171326)";
+  return '<div class="profilePage"><section class="profileHeaderCard"><div class="profileCover" style="--profile-cover:'+cover+'"><div class="profileCoverShade"></div></div><div class="profileHeaderBody"><div class="profileAvatarWrap"><button id="profileAvatarButton" class="profileAvatarBig" aria-label="Profil karakterini değiştir">'+profileAvatarMarkup()+'</button><span class="profileAvatarEdit">'+editIcon+'</span></div><div class="profileHeaderText"><div class="profileNameRow"><div><h1>'+h(p.display_name||p.username||'Seyir Kullanıcısı')+'</h1><span class="profileUsername">@'+h(p.username||'')+'</span></div><div class="profileAccountActions"><button class="secondary" id="editSeyirProfile">Profili düzenle</button><button class="profileGhostButton" id="logoutSeyir">Çıkış</button></div></div><p>'+h(p.bio||'Dizi, film ve anime arşivim.')+'</p>'+(saved.profileAvatar?'<span class="profileCharacterMeta">'+h(saved.profileAvatar.character)+' · '+h(saved.profileAvatar.show)+'</span>':'<span class="profileCharacterMeta">Profil karakterini seç</span>')+'</div></div></section><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div>'+profileAvatarModalHtml()+'</div>'
 }
 
 function profileSeriesGroups(){
@@ -1239,6 +1356,7 @@ function remoteLoading(){return '<div class="loading">Genel verileri yükleniyor
 function route(){
   var hash=location.hash.replace('#','');
   if(hash.indexOf('tmdb/')===0)return remoteLoading();
+  if(hash.indexOf('user/')===0)return publicProfileShell(decodeURIComponent(hash.split('/').slice(1).join('/')));
   if(hash==='series')return cataloguePage('tv');
   if(hash==='movies')return cataloguePage('movie');
   if(hash==='anime')return cataloguePage('anime');
@@ -1259,6 +1377,10 @@ function render(){
   if(base==='series')loadCatalogue('tv');
   if(base==='movies')loadCatalogue('movie');
   if(base==='anime')loadCatalogue('anime');
+  if(base==='user'){
+    var userName=decodeURIComponent(location.hash.replace('#user/',''));
+    loadPublicProfile(userName)
+  }
   if(base==='profile'&&(activeProfileTab==='progress'))loadProfileProgress();
   if(base==='profile'&&activeProfileTab==='series')loadProfileSeriesCards();
   if(base==='tmdb'){
@@ -1274,6 +1396,9 @@ function bind(){
   bindProfileAvatarPicker();
   bindProfileLinks();
   bindListTabs();
+  document.querySelectorAll('[data-open-auth]').forEach(function(b){b.onclick=function(){openAuthModal(b.getAttribute('data-open-auth')||'login')}});
+  var editProfile=document.getElementById('editSeyirProfile');if(editProfile)editProfile.onclick=openProfileSettingsModal;
+  var logoutBtn=document.getElementById('logoutSeyir');if(logoutBtn)logoutBtn.onclick=logoutSeyir;
   var sb=document.getElementById('searchBtn');
   if(sb)sb.onclick=search;
   var q=document.getElementById('q');
@@ -1627,8 +1752,10 @@ async function loadTmdbDetail(type,id){
       app.innerHTML+='<section class="panel"><h3>Film günlüğüm</h3><div class="split"><div><label class="muted">Kaç kez izledin?</label><input id="rewatches" class="fieldInput" type="number" min="0" max="99" value="'+Number(log.rewatches||0)+'"></div><div><label class="muted">Kısa notun</label><textarea id="movieNote" placeholder="Bu film sende ne bıraktı?">'+h(log.note||'')+'</textarea></div></div><div class="actions"><button id="saveMovieLog" class="primary">Günlüğü kaydet</button></div></section>'
     }
 
+    app.innerHTML+=socialCommentsShell(x);
     bindPersonalControls(x);
     bindOpeners();
+    loadSocialComments(x);
 
     if(type==='tv'){
       var select=document.getElementById('seasonSelect');
@@ -1923,7 +2050,9 @@ window.onhashchange=async function(){
   if(['home','series','movies','anime'].indexOf(base)>-1)await ensureRouteCache(base);
   render()
 };
-(function boot(){
+(async function boot(){
+  await initSocial();
+  ensureSocialOverlay();
   render();
   setTimeout(prefetchCoreViews,80)
 })();
