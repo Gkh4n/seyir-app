@@ -83,6 +83,12 @@ textarea{min-height:110px;resize:vertical}
 @media(max-width:800px){.profileStatsHero{grid-template-columns:repeat(3,1fr)}.profileTwoCol{grid-template-columns:1fr}.profileGridCompact{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:680px){.profilePage{max-width:none}.profileHero{margin:-24px -14px 0;min-height:245px;padding:128px 20px 20px}.profileAvatarBig{width:76px;height:76px;font-size:27px}.profileIdentity{gap:13px}.profileIdentityText h1{font-size:27px}.profileHeroMeta{gap:9px}.profileTabs{top:60px;margin:0 -14px;padding:0 10px}.profileTab{padding:14px 10px 12px;font-size:11px}.profileTabContent{padding-top:22px}.profileStatsHero{grid-template-columns:repeat(2,1fr);gap:8px}.profileStatBig{padding:14px}.profileStatBig strong{font-size:26px}.favoriteRail{grid-auto-columns:132px}.ratingDistribution{height:130px;gap:4px}.profilePanel{padding:15px}.profileGridCompact{grid-template-columns:repeat(2,1fr);gap:9px}}
 
+
+.profileSeriesToolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap}.profileSeriesSearch{flex:1;min-width:180px;max-width:360px;border:1px solid rgba(255,255,255,.07);background:#11151d;border-radius:999px;padding:9px 13px;color:#fff;outline:none}.profileSeriesSort{border:1px solid rgba(255,255,255,.07);background:#11151d;color:#aeb7c5;border-radius:999px;padding:9px 12px}
+.profileSeriesGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 18px}.profileSeriesCard{min-width:0;cursor:pointer}.profileSeriesTitle{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}.profileSeriesVisual{display:grid;grid-template-columns:106px minmax(0,1fr);gap:7px;align-items:stretch}.profileSeriesPoster{aspect-ratio:2/3;border-radius:10px;background:var(--series-card-poster);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.07);box-shadow:0 10px 28px rgba(0,0,0,.22)}.profileMiniChart{min-height:100%;padding:7px;border-radius:10px;background:#15191f;border:1px solid rgba(255,255,255,.04);display:grid;grid-template-columns:repeat(10,minmax(7px,1fr));grid-auto-rows:minmax(8px,1fr);gap:3px;align-content:start;overflow:hidden}.profileMiniCell{border-radius:3px;background:#282d35;min-width:0}.profileMiniCell.s95{background:#08643a}.profileMiniCell.s90{background:#12834b}.profileMiniCell.s80{background:#20b86a}.profileMiniCell.s70{background:#e6b72e}.profileMiniCell.s60{background:#ee8b20}.profileMiniCell.s50{background:#d94a3e}.profileMiniCell.s00{background:#673878}.profileMiniCell.more{display:grid;place-items:center;color:#8f98a8;font-size:7px;background:#20252d}.profileSeriesMeta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:7px;color:#929cab;font-size:11px}.profileSeriesMeta .mineAvg{color:#ffb35c}.profileSeriesFav{color:#ff7f9c}.profileSeriesProgress{color:#9ea7b6;font-size:10px;margin-top:3px}
+@media(max-width:680px){.profileSeriesGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}.profileSeriesVisual{grid-template-columns:82px minmax(0,1fr);gap:5px}.profileMiniChart{padding:5px;gap:2px;grid-template-columns:repeat(8,minmax(6px,1fr))}.profileSeriesTitle{font-size:12px}.profileSeriesMeta{font-size:10px;gap:5px}.profileSeriesProgress{font-size:9px}}
+@media(max-width:390px){.profileSeriesGrid{grid-template-columns:1fr}.profileSeriesVisual{grid-template-columns:100px minmax(0,1fr)}.profileMiniChart{grid-template-columns:repeat(10,minmax(6px,1fr))}}
+
 </style>
 </head>
 <body>
@@ -352,7 +358,11 @@ function profileListsTabHtml(){
 function profileProgressTabHtml(){
   return '<section class="profileSection"><div class="profileSectionTitle"><div><h2>Devam ettiklerin</h2><p>Puan verdiğin bölümler ve dizilerin toplam bölüm sayısı karşılaştırılır</p></div></div><div id="profileProgressList" class="profileProgressList"><div class="loading">İlerleme hesaplanıyor…</div></div></section>'
 }
+function profileSeriesTabHtml(){
+  return '<section class="profileSection"><div class="profileSectionTitle"><div><h2>Dizilerim</h2><p>Bölüm puanlarından oluşan kişisel mini haritaların</p></div></div><div class="profileSeriesToolbar"><input id="profileSeriesSearch" class="profileSeriesSearch" placeholder="Dizi ara…"><select id="profileSeriesSort" class="profileSeriesSort"><option value="rated">En çok puanlanan</option><option value="avg">En yüksek ortalama</option><option value="title">A–Z</option></select></div><div id="profileSeriesGrid" class="profileSeriesGrid"><div class="loading" style="grid-column:1/-1">Dizi kartların hazırlanıyor…</div></div></section>'
+}
 function profileTabHtml(tab){
+  if(tab==='series')return profileSeriesTabHtml();
   if(tab==='stats')return profileStatsTabHtml();
   if(tab==='favorites')return profileFavoritesTabHtml();
   if(tab==='lists')return profileListsTabHtml();
@@ -362,7 +372,94 @@ function profileTabHtml(tab){
 function profile(){
   var data=profileRatingData();
   var totalRatings=data.all.length;
-  return '<div class="profilePage"><div class="profileHero"><div class="profileIdentity"><div class="profileAvatarBig">S</div><div class="profileIdentityText"><h1>Seyir Profilim</h1><p>Dizi, film ve bölüm puanlarından oluşan kişisel seyir arşivin.</p><div class="profileHeroMeta"><span><b>'+data.works.length+'</b> yapım</span><span><b>'+data.episodes.length+'</b> bölüm</span><span><b>'+totalRatings+'</b> toplam puan</span></div></div></div></div><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='favorites'?'active':'')+'" data-profile-tab="favorites">Favoriler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div></div>'
+  return '<div class="profilePage"><div class="profileHero"><div class="profileIdentity"><div class="profileAvatarBig">S</div><div class="profileIdentityText"><h1>Seyir Profilim</h1><p>Dizi, film ve bölüm puanlarından oluşan kişisel seyir arşivin.</p><div class="profileHeroMeta"><span><b>'+data.works.length+'</b> yapım</span><span><b>'+data.episodes.length+'</b> bölüm</span><span><b>'+totalRatings+'</b> toplam puan</span></div></div></div></div><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats"> data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='favorites'?'active':'')+'" data-profile-tab="favorites">Favoriler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div></div>'
+}
+function profileSeriesGroups(){
+  var groups={};
+  Object.keys(saved.episodeRatings).forEach(function(key){
+    var m=key.match(/^(tmdb-tv-\d+)-s(\d+)e(\d+)$/);
+    if(!m)return;
+    var showKey=m[1];
+    if(!groups[showKey])groups[showKey]={key:showKey,ratings:[],byEpisode:{}};
+    var rating=Number(saved.episodeRatings[key]);
+    if(isFinite(rating)){
+      groups[showKey].ratings.push(rating);
+      groups[showKey].byEpisode['s'+Number(m[2])+'e'+Number(m[3])]=rating
+    }
+  });
+  return Object.keys(groups).map(function(k){
+    var g=groups[k];
+    g.item=getItem(k);
+    g.count=g.ratings.length;
+    g.avg=g.count?g.ratings.reduce(function(a,b){return a+b},0)/g.count:0;
+    return g
+  }).filter(function(g){return g.item&&g.item.mediaType==='tv'})
+}
+function miniRatingClass(v){
+  if(v==null)return '';
+  return scoreClass(Number(v))
+}
+function buildMiniSeriesChart(g,d){
+  var cells=[];
+  (d.seasons||[]).filter(function(s){return Number(s.season_number)>0}).forEach(function(s){
+    var count=Math.max(0,Number(s.episode_count||0));
+    for(var e=1;e<=count;e++){
+      cells.push({season:Number(s.season_number),episode:e,rating:g.byEpisode['s'+Number(s.season_number)+'e'+e]})
+    }
+  });
+  var total=cells.length;
+  var limit=80;
+  var shown=cells.slice(0,limit);
+  var out=shown.map(function(c){
+    return '<i class="profileMiniCell '+miniRatingClass(c.rating)+'" title="S'+c.season+'B'+c.episode+(c.rating!=null?' · '+Number(c.rating).toFixed(1):'')+'"></i>'
+  }).join('');
+  if(total>limit)out+='<i class="profileMiniCell more">+'+(total-limit)+'</i>';
+  return {html:out,total:total}
+}
+function renderProfileSeriesCards(rows){
+  var area=document.getElementById('profileSeriesGrid');
+  if(!area)return;
+  var q=(document.getElementById('profileSeriesSearch')||{}).value||'';
+  var sort=(document.getElementById('profileSeriesSort')||{}).value||'rated';
+  q=normalizeText(q.trim());
+  var list=rows.filter(function(r){return !q||normalizeText(r.item.title).indexOf(q)>-1});
+  list.sort(function(a,b){
+    if(sort==='avg')return b.avg-a.avg||b.count-a.count;
+    if(sort==='title')return a.item.title.localeCompare(b.item.title,'tr');
+    return b.count-a.count||b.avg-a.avg
+  });
+  if(!list.length){area.innerHTML='<div class="profileEmpty" style="grid-column:1/-1">Bu aramaya uyan dizi yok.</div>';return}
+  area.innerHTML=list.map(function(r){
+    var mineSeries=saved.ratings[r.item.key]!=null?Number(saved.ratings[r.item.key]):null;
+    var fav=saved.favorites.indexOf(r.item.key)>-1;
+    return '<article class="profileSeriesCard" data-open="'+h(openCode(r.item))+'"><div class="profileSeriesTitle">'+h(r.item.title)+'</div><div class="profileSeriesVisual"><div class="profileSeriesPoster" style="--series-card-poster:'+r.item.poster+'"></div><div class="profileMiniChart">'+r.chart.html+'</div></div><div class="profileSeriesMeta"><span>'+r.count+' bölüm</span><span>·</span><span class="mineAvg">★ '+(r.avg?r.avg.toFixed(1):(mineSeries!=null?mineSeries.toFixed(1):'—'))+'</span>'+(fav?'<span class="profileSeriesFav">♥</span>':'')+'</div><div class="profileSeriesProgress">'+r.count+'/'+r.chart.total+' bölüm puanlandı</div></article>'
+  }).join('');
+  bindOpeners()
+}
+async function loadProfileSeriesCards(){
+  var area=document.getElementById('profileSeriesGrid');
+  if(!area)return;
+  var groups=profileSeriesGroups();
+  if(!groups.length){area.innerHTML='<div class="profileEmpty" style="grid-column:1/-1">Henüz bölüm puanladığın bir dizi yok.</div>';return}
+  try{
+    var rows=await Promise.all(groups.map(async function(g){
+      try{
+        var d=await api({action:'details',type:'tv',id:g.item.tmdbId});
+        g.chart=buildMiniSeriesChart(g,d);
+        return g
+      }catch(err){
+        g.chart={html:'',total:g.count};
+        return g
+      }
+    }));
+    renderProfileSeriesCards(rows);
+    var search=document.getElementById('profileSeriesSearch');
+    var sort=document.getElementById('profileSeriesSort');
+    if(search)search.oninput=function(){renderProfileSeriesCards(rows)};
+    if(sort)sort.onchange=function(){renderProfileSeriesCards(rows)}
+  }catch(err){
+    area.innerHTML='<div class="profileEmpty" style="grid-column:1/-1">Dizi kartları şu an yüklenemedi.</div>'
+  }
 }
 function profileProgressGroups(){
   var groups={};
@@ -458,6 +555,7 @@ function render(){
   if(base==='movies')loadCatalogue('movie');
   if(base==='anime')loadCatalogue('anime');
   if(base==='profile'&&(activeProfileTab==='overview'||activeProfileTab==='progress'))loadProfileProgress();
+  if(base==='profile'&&activeProfileTab==='series')loadProfileSeriesCards();
   if(base==='tmdb'){
     var p=location.hash.replace('#','').split('/');
     loadTmdbDetail(p[1],p[2]);
@@ -532,7 +630,8 @@ function bind(){
       area.innerHTML=profileTabHtml(activeProfileTab);
       bindOpeners();
       document.querySelectorAll('#profileTabContent [data-route]').forEach(function(b){b.onclick=function(){var r=b.getAttribute('data-route');location.hash=r}});
-      if(activeProfileTab==='overview'||activeProfileTab==='progress')loadProfileProgress()
+      if(activeProfileTab==='overview'||activeProfileTab==='progress')loadProfileProgress();
+      if(activeProfileTab==='series')loadProfileSeriesCards()
     }
   }});
   document.querySelectorAll('[data-list-tab]').forEach(function(btn){btn.onclick=function(){
