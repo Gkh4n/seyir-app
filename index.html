@@ -297,6 +297,139 @@ textarea{min-height:110px;resize:vertical}
   .homeSection .card{min-width:0}
 }
 
+
+/* --- Profile identity cover layout --- */
+.profileIdentityHero{
+  position:relative;
+  margin:0;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:24px;
+  overflow:hidden;
+  background:#090d14;
+  box-shadow:0 22px 70px rgba(0,0,0,.24)
+}
+.profileCoverArt{
+  height:250px;
+  background:
+    radial-gradient(circle at 78% 18%,rgba(104,90,202,.20),transparent 30%),
+    radial-gradient(circle at 17% 0%,rgba(50,88,125,.17),transparent 34%),
+    linear-gradient(180deg,#202020 0%,#1c1d20 62%,#17191d 100%);
+  border-bottom:1px solid rgba(255,255,255,.045)
+}
+.profileCoverArt:after{
+  content:'';
+  position:absolute;
+  left:0;right:0;top:0;height:250px;
+  background:linear-gradient(135deg,transparent 0 62%,rgba(255,255,255,.018) 62% 63%,transparent 63%);
+  pointer-events:none
+}
+.profileIdentityBar{
+  position:relative;
+  min-height:145px;
+  display:flex;
+  align-items:flex-end;
+  gap:28px;
+  padding:0 34px 30px 34px;
+  background:linear-gradient(180deg,#0a0e15 0%,#080b11 100%)
+}
+.profileIdentityBar .profileAvatarWrap{
+  flex:0 0 auto;
+  width:156px!important;
+  height:156px!important;
+  margin-top:-62px
+}
+.profileIdentityBar .profileAvatarBig{
+  width:156px!important;
+  height:156px!important;
+  padding:4px!important;
+  border-radius:50%!important;
+  background:linear-gradient(135deg,#8b7cff,#596dff)!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.48),0 0 0 5px #090d14!important
+}
+.profileIdentityBar .profileAvatarImage{
+  width:100%!important;
+  height:100%!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  border:0!important
+}
+.profileIdentityBar .profileAvatarFallback{
+  border:0!important
+}
+.profileIdentityBar .profileAvatarEdit{
+  right:2px!important;
+  bottom:8px!important;
+  width:34px!important;
+  height:34px!important;
+  border-radius:50%!important;
+  background:#161d29!important;
+  border:3px solid #090d14!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.4)!important
+}
+.profileIdentityCopy{
+  min-width:0;
+  padding-bottom:4px
+}
+.profileIdentityCopy h1{
+  margin:0;
+  font-size:42px;
+  line-height:1.02;
+  letter-spacing:-.04em;
+  color:#f7f8fb;
+  font-weight:800
+}
+.profileIdentityCopy p{
+  margin:10px 0 0;
+  color:#a0a8b6;
+  font-size:17px;
+  line-height:1.45
+}
+.profileChosenCharacter{
+  margin-top:10px;
+  color:#737f92;
+  font-size:11px;
+  line-height:1.35
+}
+.profilePage>.profileTabs{
+  margin-top:0!important;
+  border-radius:0 0 18px 18px
+}
+
+/* old dashboard header must never leak through */
+.profileHero,.profileHeroShell,.profileHeroIdentity,.profileHeroMetrics,.profileHeroStats{display:none!important}
+
+@media(max-width:680px){
+  .profileIdentityHero{border-radius:20px}
+  .profileCoverArt{height:165px}
+  .profileCoverArt:after{height:165px}
+  .profileIdentityBar{
+    min-height:112px;
+    gap:16px;
+    padding:0 18px 20px 18px
+  }
+  .profileIdentityBar .profileAvatarWrap{
+    width:104px!important;
+    height:104px!important;
+    margin-top:-44px
+  }
+  .profileIdentityBar .profileAvatarBig{
+    width:104px!important;
+    height:104px!important;
+    padding:3px!important;
+    box-shadow:0 14px 32px rgba(0,0,0,.44),0 0 0 4px #090d14!important
+  }
+  .profileIdentityBar .profileAvatarEdit{
+    width:29px!important;
+    height:29px!important;
+    right:-1px!important;
+    bottom:2px!important
+  }
+  .profileIdentityCopy h1{font-size:30px}
+  .profileIdentityCopy p{font-size:13px;margin-top:6px}
+  .profileChosenCharacter{font-size:9px;margin-top:7px}
+}
+
 </style>
 </head>
 <body>
@@ -323,6 +456,8 @@ if(!saved.items)saved.items={};
 if(!saved.episodeRatings)saved.episodeRatings={};
 if(!saved.movieLogs)saved.movieLogs={};
 if(!saved.profileAvatar)saved.profileAvatar=null;
+if(!saved.profileName)saved.profileName='Gökhan';
+if(!saved.profileBio)saved.profileBio='Dizi, film ve anime arşivim.';
 if(saved.profileAvatar&&(!saved.profileAvatar.image_path||Number(saved.profileAvatar.aspect_ratio||0)<1.25))saved.profileAvatar=null;
 if(!saved.dataVersion||saved.dataVersion<4){
   var demoKeys=['dark','dexter','lost','supernatural','prisonbreak','interstellar','prestige','inception','parasite','shutter'];
@@ -743,11 +878,8 @@ function bindProfileAvatarPicker(){
   if(modal)modal.onclick=function(e){if(e.target===modal)closeProfileAvatarModal()}
 }
 function profile(){
-  var data=profileRatingData();
-  var avg=data.all.length?data.all.reduce(function(a,b){return a+b},0)/data.all.length:0;
   var editIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.25V20h2.75L17.8 8.95l-2.75-2.75L4 17.25Zm15.7-10.4a1 1 0 0 0 0-1.4l-1.15-1.15a1 1 0 0 0-1.4 0l-.9.9L19 7.95l.7-1.1Z" fill="currentColor"/></svg>';
-  var character=saved.profileAvatar?'<div class="profileCharacterName"><b>'+h(saved.profileAvatar.character)+'</b><span>'+h(saved.profileAvatar.show)+'</span></div>':'<div class="profileCharacterName"><b>Karakterini seç</b><span>Profilini kişiselleştir</span></div>';
-  return '<div class="profilePage"><div class="profileHero"><div class="profileHeroShell"><div class="profileHeroIdentity"><div class="profileAvatarWrap"><button id="profileAvatarButton" class="profileAvatarBig" aria-label="Profil karakterini değiştir">'+profileAvatarMarkup()+'</button><span class="profileAvatarEdit">'+editIcon+'</span></div><div class="profileIdentityText"><span class="profileHeroKicker">KİŞİSEL SEYİR PROFİLİ</span><h1>Seyir Profilim</h1><p>İzlediklerin, puanların ve kişisel seyir arşivin.</p>'+character+'</div></div><div class="profileHeroMetrics"><div class="profileHeroMetric"><span>Puanlanan yapım</span><strong>'+data.works.length+'</strong><small>Dizi + film</small></div><div class="profileMetricDivider"></div><div class="profileHeroMetric"><span>Puanlanan bölüm</span><strong>'+data.episodes.length+'</strong><small>Toplam değerlendirme</small></div><div class="profileMetricDivider"></div><div class="profileHeroMetric"><span>Ortalama puanın</span><strong>'+(data.all.length?avg.toFixed(1):'—')+'</strong><small>10 üzerinden</small></div></div></div></div><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div>'+profileAvatarModalHtml()+'</div>'
+  return '<div class="profilePage"><section class="profileIdentityHero"><div class="profileCoverArt"></div><div class="profileIdentityBar"><div class="profileAvatarWrap"><button id="profileAvatarButton" class="profileAvatarBig" aria-label="Profil karakterini değiştir">'+profileAvatarMarkup()+'</button><span class="profileAvatarEdit">'+editIcon+'</span></div><div class="profileIdentityCopy"><h1>'+h(saved.profileName)+'</h1><p>'+h(saved.profileBio)+'</p>'+(saved.profileAvatar?'<div class="profileChosenCharacter">'+h(saved.profileAvatar.character)+' · '+h(saved.profileAvatar.show)+'</div>':'<div class="profileChosenCharacter">Profil karakterini seç</div>')+'</div></div></section><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div>'+profileAvatarModalHtml()+'</div>'
 }
 
 function profileSeriesGroups(){
