@@ -458,8 +458,7 @@ function profileOverviewHtml(){
   '<section class="profileSection"><div class="profileSectionTitle"><div><h2>Puanladığım diziler</h2><p>Diziler yalnızca kendi aralarında, senin puanına göre sıralanır</p></div></div>'+profileRatedRailHtml('tv')+'</section>'+
   '<section class="profileSection"><div class="profileSectionTitle"><div><h2>Puanladığım filmler</h2><p>Filmler yalnızca kendi aralarında, senin puanına göre sıralanır</p></div></div>'+profileRatedRailHtml('movie')+'</section>'+
   '<section class="profileSection"><div class="profileSectionTitle"><div><h2>İstatistikler</h2><p>Gerçek puan ve arşiv verilerinden hesaplanır</p></div></div>'+profileStatsCardsHtml()+'</section>'+
-  '<section class="profileSection"><div class="profilePanel"><div class="profileSectionTitle"><div><h2>Puan dağılımın</h2><p>Yapım ve bölüm puanlarının 1–10 dağılımı</p></div></div>'+profileDistributionHtml()+'</div></section>'+
-  '<section class="profileSection"><div class="profileSectionTitle"><div><h2>Devam ettiklerin</h2><p>Puanladığın bölümler üzerinden gerçek ilerleme</p></div></div><div id="profileProgressList" class="profileProgressList"><div class="loading">İlerleme hesaplanıyor…</div></div></section>'
+  '<section class="profileSection"><div class="profilePanel"><div class="profileSectionTitle"><div><h2>Puan dağılımın</h2><p>Yapım ve bölüm puanlarının 1–10 dağılımı</p></div></div>'+profileDistributionHtml()+'</div></section>'
 }
 function profileStatsTabHtml(){
   var rated=ratedItems();
@@ -761,7 +760,7 @@ function render(){
   if(base==='series')loadCatalogue('tv');
   if(base==='movies')loadCatalogue('movie');
   if(base==='anime')loadCatalogue('anime');
-  if(base==='profile'&&(activeProfileTab==='overview'||activeProfileTab==='progress'))loadProfileProgress();
+  if(base==='profile'&&(activeProfileTab==='progress'))loadProfileProgress();
   if(base==='profile'&&activeProfileTab==='series')loadProfileSeriesCards();
   if(base==='tmdb'){
     var p=location.hash.replace('#','').split('/');
@@ -847,7 +846,7 @@ function bind(){
       bindProfileLinks();
       bindListTabs();
       document.querySelectorAll('#profileTabContent [data-route]').forEach(function(b){b.onclick=function(){var r=b.getAttribute('data-route');location.hash=r}});
-      if(activeProfileTab==='overview'||activeProfileTab==='progress')loadProfileProgress();
+      if(activeProfileTab==='progress')loadProfileProgress();
       if(activeProfileTab==='series')loadProfileSeriesCards()
     }
   }});
