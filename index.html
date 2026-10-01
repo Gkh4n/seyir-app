@@ -461,6 +461,7 @@ textarea{min-height:110px;resize:vertical}
 }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <header class="top">
@@ -475,6 +476,162 @@ textarea{min-height:110px;resize:vertical}
 <button data-route="home">⌂<br>Keşfet</button><button data-route="series">▤<br>Diziler</button><button data-route="movies">▶<br>Filmler</button><button data-route="anime">✦<br>Anime</button><button data-route="profile">◉<br>Profil</button>
 </nav>
 <script>
+var SEYIR_SUPABASE_URL='https://vysddydaqjxdfoaziyrv.supabase.co';
+var SEYIR_SUPABASE_KEY='sb_publishable_3QXB59ogdtiPnVHEMpvKIw_4dFLra_e';
+var seyirDb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SEYIR_SUPABASE_URL,SEYIR_SUPABASE_KEY):null;
+var currentUser=null;
+var currentSeyirProfile=null;
+var socialAuthBound=false;
+var socialCommentCache={};
+
+async function loadMySeyirProfile(){
+  if(!seyirDb||!currentUser){currentSeyirProfile=null;return null}
+  var q=await seyirDb.from('seyir_profiles').select('*').eq('user_id',currentUser.id).maybeSingle();
+  if(q.error)throw q.error;
+  currentSeyirProfile=q.data||null;
+  if(currentSeyirProfile){
+    saved.profileName=currentSeyirProfile.display_name||currentSeyirProfile.username||'Seyir Kullanıcısı';
+    saved.profileBio=currentSeyirProfile.bio||'';
+    if(currentSeyirProfile.avatar_image_path){
+      saved.profileAvatar={
+        image_path:currentSeyirProfile.avatar_image_path,
+        character:currentSeyirProfile.avatar_character||'',
+        show:currentSeyirProfile.avatar_show||'',
+        aspect_ratio:1.78
+      }
+    }else{
+      saved.profileAvatar=null
+    }
+    persist()
+  }
+  return currentSeyirProfile
+}
+function updateAuthNav(){
+  var btn=document.querySelector('.top .profile');
+  if(btn)btn.textContent=currentUser?(currentSeyirProfile&&currentSeyirProfile.display_name||'Profilim'):'Giriş';
+}
+async function initSocial(){
+  if(!seyirDb)return;
+  try{
+    var s=await seyirDb.auth.getSession();
+    currentUser=s.data&&s.data.session?s.data.session.user:null;
+    if(currentUser)await loadMySeyirProfile()
+  }catch(e){}
+  updateAuthNav();
+  if(!socialAuthBound){
+    socialAuthBound=true;
+    seyirDb.auth.onAuthStateChange(function(event,session){
+      setTimeout(async function(){
+        currentUser=session&&session.user?session.user:null;
+        currentSeyirProfile=null;
+        if(currentUser){try{await loadMySeyirProfile()}catch(e){}}
+        updateAuthNav();
+        ensureSocialOverlay();
+        var base=location.hash.replace('#','').split('/')[0]||'home';
+        if(base==='profile'||base==='user'||base==='tmdb')render()
+      },0)
+    })
+  }
+}
+function ensureSocialOverlay(){
+  var host=document.getElementById('seyirSocialOverlay');
+  if(!host){
+    host=document.createElement('div');
+    host.id='seyirSocialOverlay';
+    document.body.appendChild(host)
+  }
+}
+function authModalMarkup(mode){
+  var register=mode==='register';
+  return '<div class="socialModal open" id="socialAuthModal"><div class="socialModalCard authCard"><button class="socialModalClose" data-close-social>×</button><div class="socialModalKicker">SEYİR HESABI</div><h2>'+(register?'Profilini oluştur':'Tekrar hoş geldin')+'</h2><p>'+(register?'Yorum yap, diğer kullanıcılarla etkileşime geç ve kendi profilini oluştur.':'Profiline ve topluluğa giriş yap.')+'</p><div class="authSwitch"><button data-auth-mode="login" class="'+(!register?'active':'')+'">Giriş yap</button><button data-auth-mode="register" class="'+(register?'active':'')+'">Kayıt ol</button></div><form id="seyirAuthForm">'+(register?'<div class="fieldRow"><label>Kullanıcı adı<input id="authUsername" maxlength="20" autocomplete="username" placeholder="gokhan98" required></label><label>Görünen ad<input id="authDisplayName" maxlength="40" placeholder="Gökhan" required></label></div>':'')+'<label>E-posta<input id="authEmail" type="email" autocomplete="email" required></label><label>Şifre<input id="authPassword" type="password" minlength="6" autocomplete="'+(register?'new-password':'current-password')+'" required></label><div id="authMessage" class="authMessage"></div><button class="primary socialSubmit" type="submit">'+(register?'Profil oluştur':'Giriş yap')+'</button></form></div></div>'
+}
+function openAuthModal(mode){
+  ensureSocialOverlay();
+  document.getElementById('seyirSocialOverlay').innerHTML=authModalMarkup(mode||'login');
+  bindSocialOverlay();
+  document.body.classList.add('socialModalOpen')
+}
+function closeSocialModal(){
+  var host=document.getElementById('seyirSocialOverlay');
+  if(host)host.innerHTML='';
+  document.body.classList.remove('socialModalOpen')
+}
+function bindSocialOverlay(){
+  document.querySelectorAll('[data-close-social]').forEach(function(b){b.onclick=closeSocialModal});
+  document.querySelectorAll('[data-auth-mode]').forEach(function(b){b.onclick=function(){openAuthModal(b.getAttribute('data-auth-mode'))}});
+  var form=document.getElementById('seyirAuthForm');
+  if(form)form.onsubmit=submitSeyirAuth;
+  var save=document.getElementById('saveSeyirProfileSettings');
+  if(save)save.onclick=saveSeyirProfileSettings
+}
+async function submitSeyirAuth(e){
+  e.preventDefault();
+  if(!seyirDb)return;
+  var register=!!document.getElementById('authUsername');
+  var email=document.getElementById('authEmail').value.trim();
+  var password=document.getElementById('authPassword').value;
+  var msg=document.getElementById('authMessage');
+  var submit=e.currentTarget.querySelector('button[type="submit"]');
+  submit.disabled=true;msg.textContent='';
+  try{
+    var res;
+    if(register){
+      var username=document.getElementById('authUsername').value.trim();
+      var displayName=document.getElementById('authDisplayName').value.trim();
+      if(!/^[A-Za-z0-9_]{3,20}$/.test(username))throw new Error('Kullanıcı adı 3–20 karakter olmalı; harf, rakam ve _ kullanabilirsin.');
+      res=await seyirDb.auth.signUp({email:email,password:password,options:{data:{username:username,display_name:displayName}}});
+      if(res.error)throw res.error;
+      if(res.data&&res.data.session){
+        currentUser=res.data.session.user;await loadMySeyirProfile();closeSocialModal();location.hash='profile'
+      }else{
+        msg.textContent='Hesap oluşturuldu. E-postandaki doğrulama bağlantısını açıp giriş yap.'
+      }
+    }else{
+      res=await seyirDb.auth.signInWithPassword({email:email,password:password});
+      if(res.error)throw res.error;
+      currentUser=res.data.user;await loadMySeyirProfile();closeSocialModal();location.hash='profile'
+    }
+  }catch(err){
+    msg.textContent=err&&err.message?err.message:'İşlem tamamlanamadı.'
+  }finally{submit.disabled=false}
+}
+function profileSettingsMarkup(){
+  var p=currentSeyirProfile||{};
+  return '<div class="socialModal open"><div class="socialModalCard profileSettingsCard"><button class="socialModalClose" data-close-social>×</button><div class="socialModalKicker">PROFİL AYARLARI</div><h2>Profilini düzenle</h2><div class="fieldRow"><label>Görünen ad<input id="profileDisplayName" maxlength="40" value="'+h(p.display_name||'')+'"></label><label>Kullanıcı adı<input id="profileUsername" maxlength="20" value="'+h(p.username||'')+'"></label></div><label>Biyografi<textarea id="profileBio" maxlength="180" placeholder="Kendinden kısaca bahset…">'+h(p.bio||'')+'</textarea></label><div id="profileSettingsMessage" class="authMessage"></div><button id="saveSeyirProfileSettings" class="primary socialSubmit">Kaydet</button></div></div>'
+}
+function openProfileSettingsModal(){
+  if(!currentUser){openAuthModal('login');return}
+  ensureSocialOverlay();
+  document.getElementById('seyirSocialOverlay').innerHTML=profileSettingsMarkup();
+  bindSocialOverlay();
+  document.body.classList.add('socialModalOpen')
+}
+async function saveSeyirProfileSettings(){
+  if(!currentUser||!seyirDb)return;
+  var displayName=document.getElementById('profileDisplayName').value.trim();
+  var username=document.getElementById('profileUsername').value.trim();
+  var bio=document.getElementById('profileBio').value.trim();
+  var msg=document.getElementById('profileSettingsMessage');
+  if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){msg.textContent='Kullanıcı adı 3–20 karakter olmalı.';return}
+  var r=await seyirDb.from('seyir_profiles').update({display_name:displayName||username,username:username,bio:bio}).eq('user_id',currentUser.id).select().single();
+  if(r.error){msg.textContent=r.error.code==='23505'?'Bu kullanıcı adı kullanılıyor.':r.error.message;return}
+  currentSeyirProfile=r.data;await loadMySeyirProfile();closeSocialModal();render()
+}
+async function saveSocialAvatar(person){
+  if(!currentUser||!seyirDb)return;
+  var r=await seyirDb.from('seyir_profiles').update({
+    avatar_image_path:person.image_path,
+    avatar_character:person.character||'',
+    avatar_show:person.show||''
+  }).eq('user_id',currentUser.id).select().single();
+  if(!r.error){currentSeyirProfile=r.data}
+}
+async function logoutSeyir(){
+  if(!seyirDb)return;
+  await seyirDb.auth.signOut();
+  currentUser=null;currentSeyirProfile=null;updateAuthNav();location.hash=''
+}
+
 var saved=JSON.parse(localStorage.getItem('seyir-state')||'null')||{};
 if(!saved.ratings)saved.ratings={};
 if(!saved.favorites)saved.favorites=[];
