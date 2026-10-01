@@ -57,7 +57,7 @@ textarea{min-height:110px;resize:vertical}
 .episodeRatingList{display:grid}.episodeRatingRow{display:grid;grid-template-columns:34px minmax(0,1fr) 150px;gap:12px;padding:17px 0;border-bottom:1px solid rgba(255,255,255,.065);align-items:start}.episodeNo{color:#9aa4b5;font-size:14px;padding-top:4px}.episodeRaterMain{min-width:0}.episodeRaterTop{display:grid;grid-template-columns:1fr 150px;gap:14px;align-items:start}.episodeRaterTitle b{display:block;font-size:15px}.episodeRaterTitle span{display:block;margin-top:2px;color:var(--muted);font-size:11px}.episodeRaterOverview{margin:11px 0 0;color:#aeb7c5;font-size:12px;line-height:1.55;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}.episodeRaterStill{aspect-ratio:16/9;border-radius:10px;background:var(--epstill);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.06)}
 .episodeGeneralMeta{display:flex;gap:7px;align-items:center;margin-top:8px;color:var(--muted);font-size:10px}.episodeGeneralMeta b{color:#ffc85a}
 .episodeRateControl{align-self:center}.starRate{display:flex;gap:2px;flex-wrap:nowrap}.starRate button{border:0;background:transparent;color:#343b48;font-size:22px;line-height:1;padding:2px 1px;cursor:pointer;transition:color .14s,text-shadow .14s,transform .14s}.starRate button:hover{transform:scale(1.08)}.starRate.star-s95 button.on{color:#0f9f5a;text-shadow:0 0 10px rgba(15,159,90,.22)}.starRate.star-s90 button.on{color:#20b86a;text-shadow:0 0 10px rgba(32,184,106,.22)}.starRate.star-s80 button.on{color:#55cf8a;text-shadow:0 0 10px rgba(85,207,138,.2)}.starRate.star-s70 button.on{color:#e6b72e;text-shadow:0 0 10px rgba(230,183,46,.18)}.starRate.star-s60 button.on{color:#ee8b20;text-shadow:0 0 10px rgba(238,139,32,.18)}.starRate.star-s50 button.on{color:#d94a3e;text-shadow:0 0 10px rgba(217,74,62,.18)}.starRate.star-s00 button.on{color:#8e55a3;text-shadow:0 0 10px rgba(142,85,163,.2)}.decimalRate{display:flex;align-items:center;justify-content:flex-end;gap:6px}.decimalRate input{width:72px;background:#0b0f16;color:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 8px;text-align:center;outline:none}.clearEpRating{border:0;background:transparent;color:#687284;font-size:10px;cursor:pointer;margin-top:6px;padding:0}.clearEpRating:hover{color:#ff9aaa}
-.episodeSaveBar{display:flex;justify-content:flex-end;align-items:center;gap:12px;padding-top:16px}.episodeSaveState{color:var(--muted);font-size:11px}.episodeSaveBtn{border:0;border-radius:12px;padding:10px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;cursor:pointer}.episodeSaveBtn:disabled{opacity:.38;cursor:default}
+.episodeSaveBar{display:flex;justify-content:flex-end;align-items:center;padding-top:16px}.episodeSaveBar.hidden{display:none}.episodeSaveBtn{border:0;border-radius:12px;padding:10px 16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;cursor:pointer}
 @media(max-width:680px){.episodeRaterHeader{align-items:flex-start}.episodeRatingRow{grid-template-columns:24px 1fr;gap:9px}.episodeRaterMain{grid-column:2}.episodeRaterTop{grid-template-columns:1fr 112px}.episodeRateControl{grid-column:2;margin-top:10px}.episodeRaterStill{border-radius:8px}.starRate button{font-size:20px}.episodeRaterOverview{-webkit-line-clamp:2}.episodeSaveBar{position:static;background:transparent;padding:18px 0 0;z-index:auto}}
 
 </style>
@@ -731,11 +731,11 @@ function setEpisodeRatingPending(x,season,episode,value){
   updateEpisodeSaveBar();
 }
 function updateEpisodeSaveBar(){
+  var bar=document.getElementById('episodeSaveBar');
   var btn=document.getElementById('saveEpisodeRatings');
-  var state=document.getElementById('episodeSaveState');
   var n=Object.keys(pendingEpisodeRatings).length;
-  if(btn)btn.disabled=n===0;
-  if(state)state.textContent=n? n+' değişiklik kaydedilmeyi bekliyor':''
+  if(bar)bar.classList.toggle('hidden',n===0);
+  if(btn)btn.disabled=false
 }
 function renderEpisodeRateControl(x,season,ep){
   var val=currentEpisodeRating(x,season,ep.episode_number);
@@ -757,7 +757,7 @@ function renderSeasonEditor(x,season,d){
   area.innerHTML='<div class="episodeRatingList">'+episodes.map(function(ep){
     var still=ep.still_path?"url('https://image.tmdb.org/t/p/w500"+ep.still_path+"') center/cover":"linear-gradient(135deg,#18202d,#0d1118)";
     return '<div class="episodeRatingRow"><div class="episodeNo">'+ep.episode_number+'</div><div class="episodeRaterMain"><div class="episodeRaterTop"><div class="episodeRaterTitle"><b>'+h(ep.name||('Bölüm '+ep.episode_number))+'</b><span>'+(ep.air_date?h(ep.air_date):'Tarih bilgisi yok')+'</span><div class="episodeGeneralMeta"><span>Genel <b>'+publicScore(ep.vote_average)+'</b></span><span>'+formatVotes(ep.vote_count)+'</span></div></div><div class="episodeRaterStill" style="--epstill:'+still+'"></div></div>'+(ep.overview?'<p class="episodeRaterOverview">'+h(ep.overview)+'</p>':'')+'</div><div class="episodeRateControl">'+renderEpisodeRateControl(x,activeRatingSeason,ep)+'</div></div>'
-  }).join('')+'</div><div class="episodeSaveBar"><span id="episodeSaveState" class="episodeSaveState"></span><button id="saveEpisodeRatings" class="episodeSaveBtn">Değişiklikleri kaydet</button></div>';
+  }).join('')+'</div><div id="episodeSaveBar" class="episodeSaveBar hidden"><button id="saveEpisodeRatings" class="episodeSaveBtn">Değişiklikleri kaydet</button></div>';
   bindEpisodeRatingEditor(x,activeRatingSeason)
 }
 function bindEpisodeRatingEditor(x,season){
