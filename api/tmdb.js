@@ -225,17 +225,20 @@ module.exports = async function handler(req, res) {
           });
           const candidates = (tagged.results || []).filter(image => {
             const media = image.media || {};
+            const ratio = Number(image.aspect_ratio || 0);
             return (image.media_type === "tv" || media.media_type === "tv") &&
               Number(media.id) === Number(person.show_id) &&
-              image.file_path;
+              image.file_path &&
+              ratio >= 1.25 &&
+              ratio <= 2.25;
           });
 
           candidates.sort((a, b) => {
             const ratioA = Number(a.aspect_ratio || 1.78);
             const ratioB = Number(b.aspect_ratio || 1.78);
-            const portraitFitA = Math.abs(ratioA - 0.9);
-            const portraitFitB = Math.abs(ratioB - 0.9);
-            if (portraitFitA !== portraitFitB) return portraitFitA - portraitFitB;
+            const stillFitA = Math.abs(ratioA - 1.78);
+            const stillFitB = Math.abs(ratioB - 1.78);
+            if (stillFitA !== stillFitB) return stillFitA - stillFitB;
             return Number(b.vote_count || 0) - Number(a.vote_count || 0) ||
               Number(b.vote_average || 0) - Number(a.vote_average || 0);
           });
