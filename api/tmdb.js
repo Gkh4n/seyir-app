@@ -73,6 +73,19 @@ module.exports = async function handler(req, res) {
       return send(res, 200, data);
     }
 
+    if (action === "catalog") {
+      if (!["movie", "tv"].includes(type)) {
+        return send(res, 400, { error: "Geçersiz katalog türü." });
+      }
+
+      const data = await tmdb(`/${type}/popular`, { page: 1 });
+      data.results = (data.results || []).map(item => ({
+        ...item,
+        media_type: type
+      }));
+      return send(res, 200, data);
+    }
+
     if (action === "details") {
       if (!["movie", "tv"].includes(type) || !id) {
         return send(res, 400, { error: "Geçersiz yapım bilgisi." });
