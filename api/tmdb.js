@@ -144,6 +144,21 @@ module.exports = async function handler(req, res) {
       return send(res, 200, data);
     }
 
+    if (action === "people") {
+      const data = await tmdb("/person/popular", { page: 1 });
+      const results = (data.results || [])
+        .filter(person => person.profile_path && person.known_for_department === "Acting")
+        .slice(0, 24)
+        .map(person => ({
+          id: person.id,
+          name: person.name,
+          profile_path: person.profile_path,
+          popularity: Number(person.popularity || 0),
+          known_for: (person.known_for || []).slice(0, 2).map(item => item.title || item.name).filter(Boolean)
+        }));
+      return send(res, 200, { results });
+    }
+
     if (action === "trending") {
       const data = await tmdb("/trending/all/week");
       data.results = (data.results || []).filter(
