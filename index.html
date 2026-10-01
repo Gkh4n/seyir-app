@@ -89,6 +89,13 @@ textarea{min-height:110px;resize:vertical}
 @media(max-width:680px){.profileSeriesGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 12px}.profileSeriesVisual{grid-template-columns:82px minmax(0,1fr);gap:5px}.profileMiniChart{padding:5px;gap:2px;grid-template-columns:repeat(8,minmax(6px,1fr))}.profileSeriesTitle{font-size:12px}.profileSeriesMeta{font-size:10px;gap:5px}.profileSeriesProgress{font-size:9px}}
 @media(max-width:390px){.profileSeriesGrid{grid-template-columns:1fr}.profileSeriesVisual{grid-template-columns:100px minmax(0,1fr)}.profileMiniChart{grid-template-columns:repeat(10,minmax(6px,1fr))}}
 
+
+.listsContent{display:grid;gap:32px}.listMediaSection{min-width:0}.listMediaHead{display:flex;justify-content:space-between;align-items:end;gap:12px;margin-bottom:12px}.listMediaHead h2{margin:0;font-size:21px}.listMediaHead p{margin:3px 0 0;color:var(--muted);font-size:10px}.listMediaCount{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 8px;border-radius:999px;background:#181e29;border:1px solid rgba(255,255,255,.06);color:#aeb7c5;font-size:10px}
+.compactListGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:13px}.compactListCard{min-width:0;cursor:pointer}.compactListPoster{position:relative;aspect-ratio:2/3;border-radius:14px;background:var(--compact-poster);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.075);overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.2);transition:.18s}.compactListCard:hover .compactListPoster{transform:translateY(-3px);border-color:rgba(138,125,255,.28);box-shadow:0 17px 38px rgba(0,0,0,.28)}.compactListPoster:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 52%,rgba(5,7,11,.78) 100%);pointer-events:none}.compactListType{position:absolute;top:8px;left:8px;z-index:2;padding:4px 6px;border-radius:999px;background:rgba(7,10,15,.72);border:1px solid rgba(255,255,255,.1);font-size:8px;color:#d3d8e2}.compactListRank{position:absolute;right:8px;top:6px;z-index:2;font-size:17px;font-weight:950;color:#fff;text-shadow:0 3px 10px #000}.compactListInfo{padding:7px 2px 0}.compactListInfo b{display:block;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.compactListInfo small{display:block;margin-top:2px;color:#727d8f;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.compactListScores{display:flex;justify-content:space-between;gap:5px;margin-top:4px;font-size:9px;color:#8c96a7}.compactListScores .public{color:#ffc85a}.compactListScores .mine{color:#afa7ff}.listMediaEmpty{padding:25px 16px;border:1px dashed rgba(255,255,255,.08);border-radius:16px;color:var(--muted);text-align:center;font-size:11px}
+@media(max-width:950px){.compactListGrid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:760px){.compactListGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}}
+@media(max-width:560px){.listsContent{gap:28px}.listMediaHead h2{font-size:19px}.compactListGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.compactListPoster{border-radius:12px}.compactListInfo b{font-size:10px}.compactListScores{font-size:8px}}
+
 </style>
 </head>
 <body>
@@ -301,24 +308,35 @@ function listItems(keys){return keys.map(getItem).filter(Boolean)}
 function ratedItems(){
   return Object.keys(saved.ratings).map(function(key){return getItem(key)}).filter(Boolean).sort(function(a,b){return Number(saved.ratings[b.key]||0)-Number(saved.ratings[a.key]||0)})
 }
-function listTabItems(tab){
-  if(tab==='watchlist')return listItems(saved.watchlist);
-  if(tab==='rated')return ratedItems();
-  return listItems(saved.favorites)
+function listTabItems(tab,mediaType){
+  var items;
+  if(tab==='watchlist')items=listItems(saved.watchlist);
+  else if(tab==='rated')items=ratedItems();
+  else if(tab==='favorites')items=mediaType?favoriteItemsByType(mediaType):listItems(saved.favorites);
+  else items=[];
+  if(mediaType)items=items.filter(function(x){return x.mediaType===mediaType});
+  if(tab==='rated')items=items.slice().sort(function(a,b){return Number(saved.ratings[b.key]||0)-Number(saved.ratings[a.key]||0)});
+  return items
+}
+function compactListCard(x,index,tab){
+  var mine=saved.ratings[x.key]!=null?Number(saved.ratings[x.key]):null;
+  var showRank=tab==='favorites'||tab==='rated';
+  return '<article class="compactListCard" data-open="'+h(openCode(x))+'"><div class="compactListPoster" style="--compact-poster:'+x.poster+'"><span class="compactListType">'+h(x.type)+'</span>'+(showRank?'<span class="compactListRank">'+(index+1)+'</span>':'')+'</div><div class="compactListInfo"><b>'+h(x.title)+'</b><small>'+h(x.year)+(x.genre?' · '+h(x.genre):'')+'</small><div class="compactListScores"><span class="public">★ '+publicScore(x.public)+'</span>'+(mine!=null?'<span class="mine">Sen '+mine.toFixed(1)+'</span>':'<span>—</span>')+'</div></div></article>'
+}
+function listMediaSectionHtml(tab,mediaType){
+  var items=listTabItems(tab,mediaType);
+  var label=mediaType==='tv'?'Diziler':'Filmler';
+  var sub=tab==='favorites'?'Favori '+label.toLocaleLowerCase('tr-TR'):tab==='watchlist'?'İzleme listendeki '+label.toLocaleLowerCase('tr-TR'):'Puanladığın '+label.toLocaleLowerCase('tr-TR');
+  return '<section class="listMediaSection"><div class="listMediaHead"><div><h2>'+label+'</h2><p>'+sub+'</p></div><span class="listMediaCount">'+items.length+'</span></div>'+(items.length?'<div class="compactListGrid">'+items.map(function(x,i){return compactListCard(x,i,tab)}).join('')+'</div>':'<div class="listMediaEmpty">'+(mediaType==='tv'?'Henüz burada bir dizi yok.':'Henüz burada bir film yok.')+'</div>')+'</section>'
 }
 function listGridHtml(tab){
-  var items=listTabItems(tab);
-  if(!items.length){
-    var msg=tab==='favorites'?'Henüz favori eklemedin.':tab==='watchlist'?'İzleme listen şu an boş.':'Henüz hiçbir yapıma kendi puanını vermedin.';
-    return '<div class="emptyState">'+msg+'<br><small>Keşfet, Dizi, Film veya Anime sekmesinden içerik ekleyebilirsin.</small></div>'
-  }
-  return items.map(card).join('')
+  return '<div class="listsContent">'+listMediaSectionHtml(tab,'tv')+listMediaSectionHtml(tab,'movie')+'</div>'
 }
 function lists(){
   var ratedCount=Object.keys(saved.ratings).length;
-  return '<div class="listHero"><div><div class="eyebrow">Kişisel arşiv</div><h1 style="font-size:44px;margin:8px 0 4px">Listelerim</h1><p class="muted">Kaydettiklerini, favorilerini ve puanladığın yapımları tek yerde yönet.</p></div></div>'+
+  return '<div class="listHero"><div><div class="eyebrow">Kişisel arşiv</div><h1 style="font-size:44px;margin:8px 0 4px">Listelerim</h1><p class="muted">Dizilerini ve filmlerini ayrı ayrı yönet.</p></div></div>'+
   '<div class="listTabs"><button class="listTab '+(activeListTab==='favorites'?'active':'')+'" data-list-tab="favorites">♥ Favoriler <span class="listCount">'+saved.favorites.length+'</span></button><button class="listTab '+(activeListTab==='watchlist'?'active':'')+'" data-list-tab="watchlist">＋ İzleme Listesi <span class="listCount">'+saved.watchlist.length+'</span></button><button class="listTab '+(activeListTab==='rated'?'active':'')+'" data-list-tab="rated">★ Puanladıklarım <span class="listCount">'+ratedCount+'</span></button></div>'+
-  '<section style="margin-top:18px"><div id="listGrid" class="grid">'+listGridHtml(activeListTab)+'</div></section>'
+  '<div id="listGrid" style="margin-top:22px">'+listGridHtml(activeListTab)+'</div>'
 }
 function profileRatingData(){
   var workVals=Object.keys(saved.ratings).map(function(k){return Number(saved.ratings[k])}).filter(function(v){return isFinite(v)&&v>=1&&v<=10});
@@ -391,8 +409,9 @@ function profileFavoritesTabHtml(){
   return '<section class="profileSection">'+profileFavoriteGroupsHtml()+'</section>'
 }
 function profileListsTabHtml(){
-  var items=listItems(saved.watchlist);
-  return '<section class="profileSection"><div class="profileSectionTitle"><div><h2>İzleme listesi</h2><p>'+items.length+' yapım seni bekliyor</p></div><button class="secondary" data-route="lists">Tüm listeler</button></div>'+(items.length?'<div class="profileGridCompact">'+items.map(card).join('')+'</div>':'<div class="profileEmpty">İzleme listen şu an boş.</div>')+'</section>'
+  var tv=listTabItems('watchlist','tv');
+  var movies=listTabItems('watchlist','movie');
+  return '<section class="profileSection"><div class="profileSectionTitle"><div><h2>İzleme listelerim</h2><p>Diziler ve filmler ayrı tutulur</p></div><button class="secondary" data-route="lists">Tüm listeler</button></div><div class="favoriteSectionSplit"><div><div class="profileSectionTitle"><div><h2>Diziler</h2><p>'+tv.length+' yapım</p></div></div>'+(tv.length?'<div class="profileGridCompact">'+tv.map(card).join('')+'</div>':'<div class="profileEmpty">İzleme listende dizi yok.</div>')+'</div><div><div class="profileSectionTitle"><div><h2>Filmler</h2><p>'+movies.length+' yapım</p></div></div>'+(movies.length?'<div class="profileGridCompact">'+movies.map(card).join('')+'</div>':'<div class="profileEmpty">İzleme listende film yok.</div>')+'</div></div></section>'
 }
 function profileProgressTabHtml(){
   return '<section class="profileSection"><div class="profileSectionTitle"><div><h2>Devam ettiklerin</h2><p>Puan verdiğin bölümler ve dizilerin toplam bölüm sayısı karşılaştırılır</p></div></div><div id="profileProgressList" class="profileProgressList"><div class="loading">İlerleme hesaplanıyor…</div></div></section>'
