@@ -153,6 +153,19 @@ module.exports = async function handler(req, res) {
       return send(res, 200, data);
     }
 
+    if (action === "recommendations") {
+      if (type !== "tv" || !id) {
+        return send(res, 400, { error: "Geçersiz öneri bilgisi." });
+      }
+
+      const data = await tmdb(`/tv/${id}/recommendations`, { page: 1 });
+      data.results = (data.results || []).map(item => ({
+        ...item,
+        media_type: "tv"
+      }));
+      return send(res, 200, data);
+    }
+
     if (action === "season") {
       if (type !== "tv" || !id || !season) {
         return send(res, 400, { error: "Geçersiz sezon bilgisi." });
