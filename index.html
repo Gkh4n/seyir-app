@@ -9,7 +9,7 @@
 :root{--bg:#090b10;--panel:#121620;--panel2:#171c27;--line:#252c3a;--text:#f4f6fb;--muted:#8e98aa;--accent:#8a7dff;--accent2:#5f8cff;--warn:#ffc85a;--good:#4bd6a1;--bad:#ff7184}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0,#15142d 0,transparent 30%),var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,Arial,sans-serif}button,input{font:inherit}.top{height:68px;display:flex;align-items:center;gap:26px;padding:0 5vw;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(9,11,16,.88);backdrop-filter:blur(18px);z-index:20}.brand{font-weight:900;letter-spacing:.14em;cursor:pointer}.brand b{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));margin-right:8px}.nav{display:flex;gap:6px}.nav button,.profile{border:0;background:transparent;color:var(--muted);padding:10px 12px;border-radius:10px;cursor:pointer}.nav button.active,.nav button:hover{background:#1b202c;color:#fff}.profile{margin-left:auto;color:#fff;border:1px solid var(--line);background:var(--panel)}main{max-width:1220px;margin:auto;padding:36px 24px 90px}.hero{display:grid;grid-template-columns:1.7fr .7fr;gap:18px}.box{border:1px solid var(--line);background:linear-gradient(145deg,rgba(22,26,38,.9),rgba(12,15,22,.9));border-radius:26px}.hero .copy{padding:42px}.eyebrow{color:#b8b0ff;text-transform:uppercase;font-size:12px;letter-spacing:.1em;font-weight:800}.hero h1{font-size:clamp(38px,5vw,68px);line-height:1.02;margin:14px 0 16px}.hero h1 span{background:linear-gradient(90deg,#fff,#9f97ff,#67a7ff);-webkit-background-clip:text;color:transparent}.hero p{max-width:700px;color:#aab3c3;font-size:17px}.search{display:flex;gap:8px;margin-top:24px;padding:7px;border:1px solid var(--line);background:#0b0e14;border-radius:15px}.search input{flex:1;border:0;outline:0;background:transparent;color:#fff;padding:10px}.search button,.primary{border:0;border-radius:11px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;cursor:pointer}.taste{padding:28px;display:flex;flex-direction:column;justify-content:space-between}.taste strong{font-size:70px;line-height:1}.taste small{color:var(--muted)}.bar{height:10px;background:#252a35;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;width:82%;background:linear-gradient(90deg,var(--accent),#57b6ff)}section{margin-top:36px}.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:14px}.head h2{margin:0;font-size:24px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.card{border:1px solid var(--line);background:var(--panel);border-radius:19px;overflow:hidden;cursor:pointer;transition:.2s}.card:hover{transform:translateY(-4px);border-color:#414a5f}.poster{aspect-ratio:2/3;padding:14px;display:flex;align-items:end;position:relative;background:var(--poster);overflow:hidden}.poster:after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 42%,rgba(5,7,11,.95))}.poster .letter{position:absolute;right:-8px;top:-28px;font-size:126px;font-weight:900;color:rgba(255,255,255,.08)}.poster .tag{position:absolute;top:12px;left:12px;background:rgba(6,8,12,.7);border:1px solid rgba(255,255,255,.13);padding:5px 8px;border-radius:99px;font-size:10px}.poster .meta{position:relative;z-index:1}.poster .meta b{display:block;font-size:17px}.poster .meta span{font-size:12px;color:#cad1dc}.scores{display:flex;justify-content:space-between;padding:12px;font-size:12px}.scores b:first-child{color:var(--warn)}.scores b:last-child{color:#a89fff}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat,.panel{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:18px}.stat strong{display:block;font-size:29px}.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}.rows{display:grid;gap:10px}.row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.delta{font-weight:900;color:var(--good)}.delta.neg{color:var(--bad)}.detail{display:grid;grid-template-columns:220px 1fr;gap:26px;align-items:start}.detailposter{aspect-ratio:2/3;border-radius:22px;background:var(--poster);border:1px solid var(--line);position:relative;overflow:hidden}.detailposter:after{content:attr(data-letter);position:absolute;right:-20px;bottom:-32px;font-size:190px;font-weight:900;color:rgba(255,255,255,.08)}.detail h1{font-size:52px;line-height:1;margin:0 0 10px}.bigscore{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.scorebox{min-width:145px;padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}.scorebox strong{display:block;font-size:25px}.slider{margin-top:18px}.slider input{width:100%;accent-color:var(--accent2)}.ratingHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:12px;color:var(--muted)}.ratingHead b{color:#b8b0ff;font-size:14px}.sliderScale{display:flex;justify-content:space-between;font-size:10px;color:#667084;margin-top:3px}.actions{display:flex;gap:9px;margin-top:15px;flex-wrap:wrap}.secondary{background:var(--panel);color:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 13px;cursor:pointer}.chart{height:260px;border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:16px}.chart svg{width:100%;height:100%}.episodes{display:grid;gap:8px}.ep{display:grid;grid-template-columns:55px 1fr auto auto;gap:12px;background:var(--panel2);padding:11px;border-radius:12px}.profileHero{display:flex;gap:18px;align-items:center}.avatar{display:grid;place-items:center;width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:24px;font-weight:900}.searchResults{display:grid;gap:8px;margin-top:12px;max-height:520px;overflow:auto;padding-right:2px}.searchItem{display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:11px;padding:8px;border:1px solid var(--line);background:var(--panel);border-radius:14px;cursor:pointer;transition:.18s}.searchItem:hover{border-color:#46516a;background:#171c27}.searchThumb{width:46px;height:64px;border-radius:9px;background:var(--thumb);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.08)}.searchInfo{min-width:0}.searchInfo b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.searchInfo span{display:block;font-size:12px;margin-top:2px}.searchScore{font-weight:800;color:var(--warn);padding-right:6px}.mobile{display:none}
 @media(max-width:950px){.grid{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.split{grid-template-columns:1fr}.detail{grid-template-columns:150px 1fr}}
-@media(max-width:680px){.nav,.profile{display:none}.top{height:60px;padding:0 16px}.brand{margin:auto 0}.mobile{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:40;background:rgba(17,20,28,.94);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:18px;padding:6px}.mobile button{border:0;background:transparent;color:var(--muted);padding:8px 2px;border-radius:12px;font-size:10px}.mobile button.active{background:#252b38;color:#fff}main{padding:24px 14px 150px}.hero .copy{padding:25px 20px}.hero h1{font-size:39px}.searchResults{max-height:420px}.searchItem{grid-template-columns:42px 1fr auto}.searchThumb{width:42px;height:58px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.stats{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:110px 1fr;align-items:start}.detailposter{margin-top:4px}.detail h1{font-size:31px}.scorebox{min-width:0;flex:1}.ep{grid-template-columns:45px 1fr auto}.ep .mineep{display:none}.seasonStats{grid-template-columns:1fr}.seasonStat{padding:10px 12px}}
+@media(max-width:680px){.nav,.profile{display:none}.top{height:60px;padding:0 16px}.brand{margin:auto 0}.mobile{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:40;background:rgba(17,20,28,.94);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:18px;padding:6px}.mobile button{border:0;background:transparent;color:var(--muted);padding:8px 2px;border-radius:12px;font-size:10px}.mobile button.active{background:#252b38;color:#fff}main{padding:24px 14px 150px}.hero .copy{padding:25px 20px}.hero h1{font-size:39px}.searchResults{max-height:420px}.searchItem{grid-template-columns:42px 1fr auto}.searchThumb{width:42px;height:58px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.stats{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:110px 1fr;align-items:start}.detailposter{margin-top:4px}.detail h1{font-size:31px}.scorebox{min-width:0;flex:1}.ep{grid-template-columns:45px 1fr auto}.ep .mineep{display:none}.seasonStats{grid-template-columns:1fr}.seasonStat{padding:10px 12px}.listHero{display:block}.profileMeta h1{font-size:27px}.insightGrid{grid-template-columns:1fr}.profileCover{padding:20px}}
 
 textarea,.fieldInput,.seasonSelect,.episodeRating{width:100%;background:#0b0e14;color:#fff;border:1px solid var(--line);border-radius:11px;padding:10px;outline:none}
 textarea{min-height:110px;resize:vertical}
@@ -21,7 +21,7 @@ textarea{min-height:110px;resize:vertical}
 .seasonSelect{width:auto;min-width:150px}
 .episodeRating{width:72px;padding:6px 7px}.seasonStats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.seasonStat{border:1px solid var(--line);background:#10141d;border-radius:14px;padding:12px}.seasonStat span{display:block;color:var(--muted);font-size:11px}.seasonStat b{display:block;margin-top:4px;font-size:17px}.seasonStat.good b{color:var(--good)}.seasonStat.bad b{color:var(--bad)}
 .notice{border:1px solid #4a4230;background:#1b1810;color:#f5d98f;border-radius:14px;padding:12px 14px;margin-top:14px}
-.tmdbNote{font-size:11px;color:var(--muted);margin-top:8px}.catalogSearch{display:flex;gap:8px;margin-top:20px;max-width:680px;padding:7px;border:1px solid var(--line);background:#0b0e14;border-radius:15px}.catalogSearch input{flex:1;border:0;outline:0;background:transparent;color:#fff;padding:10px}.catalogSearch button{border:0;border-radius:11px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800}.catalogSearchResults{margin-top:12px;display:grid;gap:8px;max-width:680px}.catalogHint{margin-top:7px;font-size:11px;color:var(--muted)}
+.tmdbNote{font-size:11px;color:var(--muted);margin-top:8px}.listHero{display:flex;justify-content:space-between;gap:18px;align-items:end}.listTabs{display:flex;gap:8px;margin-top:22px;overflow:auto;padding-bottom:2px}.listTab{white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:9px 13px;cursor:pointer}.listTab.active{color:#fff;border-color:#5953a8;background:linear-gradient(135deg,rgba(138,125,255,.18),rgba(95,140,255,.12))}.listCount{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:5px;border-radius:99px;background:#252b38;font-size:10px}.emptyState{grid-column:1/-1;text-align:center;border:1px dashed var(--line);border-radius:18px;padding:36px 18px;color:var(--muted)}.profileCover{padding:26px;background:radial-gradient(circle at 85% 15%,rgba(138,125,255,.22),transparent 32%),linear-gradient(145deg,#151927,#0f121a);border:1px solid var(--line);border-radius:24px}.profileTop{display:flex;align-items:center;gap:16px}.profileMeta h1{margin:0;font-size:34px}.profileMeta p{margin:5px 0 0;color:var(--muted)}.profileBadge{display:inline-flex;align-items:center;gap:6px;margin-top:10px;border:1px solid var(--line);border-radius:999px;padding:6px 9px;color:#c7c0ff;font-size:11px}.insightGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.insightCard{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:17px}.insightCard span{display:block;color:var(--muted);font-size:11px}.insightCard strong{display:block;margin-top:5px;font-size:20px}.ratingBars{display:grid;gap:8px;margin-top:12px}.ratingBar{display:grid;grid-template-columns:28px 1fr 28px;gap:9px;align-items:center;font-size:11px;color:var(--muted)}.ratingTrack{height:8px;background:#232936;border-radius:99px;overflow:hidden}.ratingFill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px}.catalogSearch{display:flex;gap:8px;margin-top:20px;max-width:680px;padding:7px;border:1px solid var(--line);background:#0b0e14;border-radius:15px}.catalogSearch input{flex:1;border:0;outline:0;background:transparent;color:#fff;padding:10px}.catalogSearch button{border:0;border-radius:11px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800}.catalogSearchResults{margin-top:12px;display:grid;gap:8px;max-width:680px}.catalogHint{margin-top:7px;font-size:11px;color:var(--muted)}
 
 </style>
 </head>
@@ -59,13 +59,23 @@ lost:[['S1B1','Pilot 1',9.2,9.8],['S1B2','Pilot 2',9.0,9.6],['S1B3','Tabula Rasa
 
 var saved=JSON.parse(localStorage.getItem('seyir-state')||'null')||{};
 if(!saved.ratings)saved.ratings={};
-if(!saved.favorites)saved.favorites=['dark','interstellar'];
-if(!saved.watchlist)saved.watchlist=['shutter','prisonbreak'];
+if(!saved.favorites)saved.favorites=[];
+if(!saved.watchlist)saved.watchlist=[];
 if(!saved.items)saved.items={};
 if(!saved.episodeRatings)saved.episodeRatings={};
 if(!saved.movieLogs)saved.movieLogs={};
+if(!saved.dataVersion){
+  var noRealData=Object.keys(saved.ratings).length===0&&Object.keys(saved.items).length===0&&Object.keys(saved.episodeRatings).length===0&&Object.keys(saved.movieLogs).length===0;
+  if(noRealData){
+    saved.favorites=[];
+    saved.watchlist=[];
+  }
+  saved.dataVersion=2;
+  localStorage.setItem('seyir-state',JSON.stringify(saved));
+}
 
 var currentItem=null;
+var activeListTab='favorites';
 var searchTimer=null;
 var searchSeq=0;
 
@@ -152,15 +162,50 @@ function cataloguePage(kind){
   return '<div class="eyebrow">'+cfg.eyebrow+'</div><h1 style="font-size:44px;margin:8px 0">'+cfg.title+'</h1><p class="muted">'+cfg.desc+'</p><div class="catalogSearch"><input id="catalogQ" placeholder="'+cfg.placeholder+'"><button id="catalogSearchBtn">Ara</button></div><div id="catalogSearchResults" class="catalogSearchResults"></div><div class="catalogHint">Yazdıkça yalnızca bu kategoride arama yapılır.</div><section><div class="head"><div><h2>'+cfg.heading+'</h2><div class="muted">TMDB gerçek verileri</div></div></div><div id="catalogGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section><div id="catalogMeta" class="tmdbNote"></div>'
 }
 function listItems(keys){return keys.map(getItem).filter(Boolean)}
+function ratedItems(){
+  return Object.keys(saved.ratings).map(function(key){return getItem(key)}).filter(Boolean).sort(function(a,b){return Number(saved.ratings[b.key]||0)-Number(saved.ratings[a.key]||0)})
+}
+function listTabItems(tab){
+  if(tab==='watchlist')return listItems(saved.watchlist);
+  if(tab==='rated')return ratedItems();
+  return listItems(saved.favorites)
+}
+function listGridHtml(tab){
+  var items=listTabItems(tab);
+  if(!items.length){
+    var msg=tab==='favorites'?'Henüz favori eklemedin.':tab==='watchlist'?'İzleme listen şu an boş.':'Henüz hiçbir yapıma kendi puanını vermedin.';
+    return '<div class="emptyState">'+msg+'<br><small>Keşfet, Dizi, Film veya Anime sekmesinden içerik ekleyebilirsin.</small></div>'
+  }
+  return items.map(card).join('')
+}
 function lists(){
-  return '<div class="eyebrow">Kişisel arşiv</div><h1>Listelerim</h1>'+
-  section('Favorilerim','Tekrar dönmek isteyeceğin yapımlar',listItems(saved.favorites))+
-  section('İzleme listem','Sırada bekleyenler',listItems(saved.watchlist))
+  var ratedCount=Object.keys(saved.ratings).length;
+  return '<div class="listHero"><div><div class="eyebrow">Kişisel arşiv</div><h1 style="font-size:44px;margin:8px 0 4px">Listelerim</h1><p class="muted">Kaydettiklerini, favorilerini ve puanladığın yapımları tek yerde yönet.</p></div></div>'+
+  '<div class="listTabs"><button class="listTab '+(activeListTab==='favorites'?'active':'')+'" data-list-tab="favorites">♥ Favoriler <span class="listCount">'+saved.favorites.length+'</span></button><button class="listTab '+(activeListTab==='watchlist'?'active':'')+'" data-list-tab="watchlist">＋ İzleme Listesi <span class="listCount">'+saved.watchlist.length+'</span></button><button class="listTab '+(activeListTab==='rated'?'active':'')+'" data-list-tab="rated">★ Puanladıklarım <span class="listCount">'+ratedCount+'</span></button></div>'+
+  '<section style="margin-top:18px"><div id="listGrid" class="grid">'+listGridHtml(activeListTab)+'</div></section>'
 }
 function profile(){
-  var rated=Object.keys(saved.ratings).map(getItem).filter(Boolean);
-  var diffs=rated.slice().sort(function(a,b){return Math.abs(Number(saved.ratings[b.key])-b.public)-Math.abs(Number(saved.ratings[a.key])-a.public)}).slice(0,5);
-  return '<div class="box" style="padding:24px"><div class="profileHero"><div class="avatar">G</div><div><h1 style="margin:0">Seyir profilin</h1><p class="muted">İzleme zevkini sayılara dönüştüren kişisel alan.</p></div></div></div><section>'+profileStats()+'</section><section class="split"><div class="panel"><h3>En çok ayrıştıkların</h3><div class="rows">'+(diffs.length?diffs.map(function(x){var d=Number(saved.ratings[x.key])-Number(x.public||0);return '<div class="row" data-open="'+h(openCode(x))+'"><span>'+h(x.title)+'</span><b class="delta '+(d<0?'neg':'')+'">'+(d>0?'+':'')+d.toFixed(1)+'</b></div>'}).join(''):'<p class="muted">Gerçek puanlar verdikçe burada kişisel farkların görünecek.</p>')+'</div></div><div class="panel"><h3>Sıradaki profil analizleri</h3><p class="muted">Favori türlerin, en sevdiğin yönetmenler ve oyuncular, yıllara göre puan eğilimin ve arkadaşlarla zevk uyumu burada hesaplanacak.</p></div></section>'
+  var rated=ratedItems();
+  var ratingVals=Object.keys(saved.ratings).map(function(k){return Number(saved.ratings[k])}).filter(function(v){return isFinite(v)});
+  var avg=ratingVals.length?ratingVals.reduce(function(a,b){return a+b},0)/ratingVals.length:0;
+  var withPublic=rated.filter(function(x){return Number(x.public)>0});
+  var publicAvg=withPublic.length?withPublic.reduce(function(s,x){return s+Number(x.public)},0)/withPublic.length:0;
+  var bias=withPublic.length?avg-publicAvg:0;
+  var biasLabel=!withPublic.length?'Henüz hesaplanmadı':Math.abs(bias)<.2?'Genel izleyiciyle dengeli':bias>0?'Genel izleyiciden daha cömert':'Genel izleyiciden daha seçici';
+  var top=rated[0]||null;
+  var diffs=rated.slice().sort(function(a,b){return Math.abs(Number(saved.ratings[b.key])-Number(b.public||0))-Math.abs(Number(saved.ratings[a.key])-Number(a.public||0))}).slice(0,5);
+  var typeCounts=rated.reduce(function(acc,x){acc[x.type]=(acc[x.type]||0)+1;return acc},{});
+  var epCount=Object.keys(saved.episodeRatings).length;
+  var loggedMovies=Object.keys(saved.movieLogs).length;
+  var dist=[];
+  for(var i=1;i<=10;i++){dist.push(ratingVals.filter(function(v){return Math.round(v)===i}).length)}
+  var maxDist=Math.max.apply(null,dist.concat([1]));
+  var bars=dist.map(function(n,i){return '<div class="ratingBar"><span>'+(i+1)+'</span><div class="ratingTrack"><div class="ratingFill" style="width:'+((n/maxDist)*100)+'%"></div></div><span>'+n+'</span></div>'}).join('');
+  return '<div class="profileCover"><div class="profileTop"><div class="avatar">S</div><div class="profileMeta"><h1>Seyir profilin</h1><p>Puanların ve listelerinden oluşan gerçek kişisel özet.</p><div class="profileBadge">● Veriler şimdilik bu cihazda saklanıyor</div></div></div></div>'+
+  '<section>'+profileStats()+'</section>'+
+  '<section><div class="insightGrid"><div class="insightCard"><span>Puanlama tarzın</span><strong>'+h(biasLabel)+'</strong>'+(withPublic.length?'<small class="muted">'+(bias>=0?'+':'')+bias.toFixed(1)+' TMDB farkı</small>':'')+'</div><div class="insightCard"><span>En yüksek puanın</span><strong>'+(top?h(top.title)+' · '+Number(saved.ratings[top.key]).toFixed(1):'—')+'</strong></div><div class="insightCard"><span>Bölüm puanların</span><strong>'+epCount+'</strong><small class="muted">'+loggedMovies+' film günlüğü kaydı</small></div></div></section>'+
+  '<section class="split"><div class="panel"><h3>En çok ayrıştıkların</h3><div class="rows">'+(diffs.length?diffs.map(function(x){var d=Number(saved.ratings[x.key])-Number(x.public||0);return '<div class="row" data-open="'+h(openCode(x))+'"><span><b>'+h(x.title)+'</b><br><small class="muted">'+h(x.type)+' · Sen '+Number(saved.ratings[x.key]).toFixed(1)+' · TMDB '+publicScore(x.public)+'</small></span><b class="delta '+(d<0?'neg':'')+'">'+(d>0?'+':'')+d.toFixed(1)+'</b></div>'}).join(''):'<p class="muted">Puan verdikçe genel izleyiciyle en çok ayrıştığın yapımlar burada görünecek.</p>')+'</div></div><div class="panel"><h3>Puan dağılımın</h3>'+(ratingVals.length?'<div class="ratingBars">'+bars+'</div>':'<p class="muted">Dağılımı görmek için birkaç yapıma puan ver.</p>')+'</div></section>'+
+  '<section class="panel"><h3>Arşiv özeti</h3><div class="rows"><div class="row"><span>Puanladığın diziler</span><b>'+(typeCounts.Dizi||0)+'</b></div><div class="row"><span>Puanladığın filmler</span><b>'+(typeCounts.Film||0)+'</b></div><div class="row"><span>Favoriler</span><b>'+saved.favorites.length+'</b></div><div class="row"><span>İzleme listesi</span><b>'+saved.watchlist.length+'</b></div></div></section>'
 }
 function chart(data){
   if(!data.length)return '<div class="loading">Bu sezon için bölüm verisi yok.</div>';
@@ -247,6 +292,12 @@ function bind(){
       searchTimer=setTimeout(function(){categorySearch(kind,value)},250)
     }
   }
+  document.querySelectorAll('[data-list-tab]').forEach(function(btn){btn.onclick=function(){
+    activeListTab=btn.getAttribute('data-list-tab');
+    document.querySelectorAll('[data-list-tab]').forEach(function(b){b.classList.toggle('active',b===btn)});
+    var grid=document.getElementById('listGrid');
+    if(grid){grid.innerHTML=listGridHtml(activeListTab);bindOpeners()}
+  }});
   if(currentItem)bindPersonalControls(currentItem);
 }
 function bindOpeners(){
