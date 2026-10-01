@@ -120,6 +120,11 @@ textarea{min-height:110px;resize:vertical}
 .profileListsHub .compactListGrid{display:flex!important;grid-template-columns:none!important;gap:14px!important;width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:2px 2px 14px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}.profileListsHub .compactListGrid::-webkit-scrollbar{display:none}.profileListsHub .compactListCard{flex:0 0 158px;min-width:158px;scroll-snap-align:start}.profileListsHub .compactListInfo{padding-top:9px}.profileListsHub .compactListInfo b{font-size:13px!important;font-weight:750}.profileListsHub .compactListInfo small{font-size:10px!important;line-height:1.4}.profileListsHub .compactListScores{font-size:10px!important;margin-top:6px}.profileListsHub .compactOrderBtn{height:29px;font-size:14px}
 @media(max-width:680px){.profileAvatarGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:8px 14px 20px}.profileAvatarModal{padding:8px}.profileAvatarModalCard{border-radius:24px 24px 18px 18px}.profileAvatarModalHead{padding:18px 16px 12px}.profileAvatarModalHead h3{font-size:24px}.profilePersonOption b{font-size:10px}.profileListsHub .compactListCard{flex:0 0 148px;min-width:148px}.profileListsHub .listMediaHead h2{font-size:24px}.profileListsHub .listMediaHead p{font-size:12px}}
 
+
+/* Navigation is cache-first: no large loading placeholders on primary pages */
+#homeSpotlight:empty{min-height:0;border-color:transparent;background:transparent}
+#trendingGrid:empty,#catalogGrid:empty{min-height:0}
+
 </style>
 </head>
 <body>
@@ -179,6 +184,12 @@ var pendingEpisodeRatings={};
 var episodeRatingMode='stars';
 var activeRatingSeason=1;
 var seasonDataCache={};
+var viewCache={home:null,catalog:{}};
+try{
+  var cachedViews=JSON.parse(sessionStorage.getItem('seyir-view-cache')||'null');
+  if(cachedViews&&typeof cachedViews==='object')viewCache=Object.assign({home:null,catalog:{}},cachedViews)
+}catch(e){}
+if(!viewCache.catalog)viewCache.catalog={};
 
 function persist(){localStorage.setItem('seyir-state',JSON.stringify(saved))}
 function h(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
@@ -257,6 +268,30 @@ function moveFavoriteItem(type,key,direction){
   persist()
 }
 syncFavoriteOrder();
+function saveViewCache(){
+  try{sessionStorage.setItem('seyir-view-cache',JSON.stringify(viewCache))}catch(e){}
+}
+function cacheFresh(entry,maxAge){
+  return !!(entry&&entry.data&&Date.now()-Number(entry.ts||0)<(maxAge||600000))
+}
+function catalogViewKey(type){
+  return [type,catalogGenres[type]||'all',catalogSorts[type]||'rating'].join(':')
+}
+function getCachedCatalog(type){
+  var entry=viewCache.catalog[catalogViewKey(type)];
+  return cacheFresh(entry,900000)?entry.data:null
+}
+function setCachedCatalog(type,data){
+  viewCache.catalog[catalogViewKey(type)]={ts:Date.now(),data:data};
+  saveViewCache()
+}
+function getCachedHome(){
+  return cacheFresh(viewCache.home,600000)?viewCache.home.data:null
+}
+function setCachedHome(data){
+  viewCache.home={ts:Date.now(),data:data};
+  saveViewCache()
+}
 async function api(params){
   var qs=new URLSearchParams(params);
   var res=await fetch('/api/tmdb?'+qs.toString());
@@ -276,9 +311,21 @@ function card(x){
 function section(title,sub,items,id){
   return '<section><div class="head"><div><h2>'+h(title)+'</h2><div class="muted">'+h(sub)+'</div></div></div><div class="grid"'+(id?' id="'+id+'"':'')+'>'+items.map(card).join('')+'</div></section>'
 }
+function homeSpotlightHtml(data){
+  var raw=(data&&data.results||[])[0];
+  if(!raw)return '';
+  var s=tmdbToItem(raw);
+  var backdrop=raw.backdrop_path?"linear-gradient(180deg,rgba(5,7,11,.08),rgba(5,7,11,.18)),url('https://image.tmdb.org/t/p/w780"+raw.backdrop_path+"') center/cover":s.poster;
+  return '<div class="homeSpotlightBg" style="--spot:'+backdrop+'"></div><div class="homeSpotlightBody"><span class="spotTag">Haftanın öne çıkanı</span><h3>'+h(s.title)+'</h3><div class="spotMeta"><span>'+h(s.type)+'</span><span>·</span><span>'+h(s.year)+'</span><span>·</span><span class="spotScore">★ '+publicScore(s.public)+'</span></div></div>'
+}
+function homeTrendingHtml(data){
+  var items=(data&&data.results||[]).slice(0,10).map(tmdbToItem);
+  return items.map(card).join('')
+}
 function home(){
-  return '<div class="hero"><div class="homeHeroMain"><div class="eyebrow">✦ İzleme zevkinin haritası</div><h1>İzlediklerini değil,<br><span>zevkini keşfet.</span></h1><p>Dizi, film ve animeleri puanla; bölüm bölüm takip et. Zamanla sana ait gerçek bir seyir profili oluşsun.</p><div class="homeSearch"><input id="q" placeholder="Dizi, film veya anime ara…"><button id="searchBtn">Ara</button></div><div id="searchResults" class="searchResults"></div><div class="homeQuick"><button data-route="series">Dizileri keşfet</button><button data-route="movies">Filmleri keşfet</button><button data-route="anime">Animelere göz at</button></div></div><aside id="homeSpotlight" class="homeSpotlight"><div class="loading" style="margin:18px">Öne çıkan yapım yükleniyor…</div></aside></div>'+
-  '<section class="homeSection"><div class="head"><div><div class="eyebrow">Şu an konuşulanlar</div><h2>Bu hafta öne çıkanlar</h2><div class="muted">Güncel popüler yapımlar arasından seçtiklerimiz</div></div></div><div id="trendingGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section>'
+  var cached=getCachedHome();
+  return '<div class="hero"><div class="homeHeroMain"><div class="eyebrow">✦ İzleme zevkinin haritası</div><h1>İzlediklerini değil,<br><span>zevkini keşfet.</span></h1><p>Dizi, film ve animeleri puanla; bölüm bölüm takip et. Zamanla sana ait gerçek bir seyir profili oluşsun.</p><div class="homeSearch"><input id="q" placeholder="Dizi, film veya anime ara…"><button id="searchBtn">Ara</button></div><div id="searchResults" class="searchResults"></div><div class="homeQuick"><button data-route="series">Dizileri keşfet</button><button data-route="movies">Filmleri keşfet</button><button data-route="anime">Animelere göz at</button></div></div><aside id="homeSpotlight" class="homeSpotlight">'+(cached?homeSpotlightHtml(cached):'')+'</aside></div>'+
+  '<section class="homeSection"><div class="head"><div><div class="eyebrow">Şu an konuşulanlar</div><h2>Bu hafta öne çıkanlar</h2><div class="muted">Güncel popüler yapımlar arasından seçtiklerimiz</div></div></div><div id="trendingGrid" class="grid">'+(cached?homeTrendingHtml(cached):'')+'</div></section>'
 }
 function profileStats(){
   var vals=Object.keys(saved.ratings).map(function(k){return Number(saved.ratings[k])}).filter(function(n){return isFinite(n)});
@@ -318,7 +365,9 @@ function cataloguePage(kind){
   var sort=catalogSorts[kind]||'rating';
   var baseHeading=active==='all'?cfg.heading:catalogueGenreLabel(kind,active)+' '+cfg.heading;
   var heading=(sort==='rating'?'En yüksek puanlı ':'En popüler ')+baseHeading;
-  return '<div class="eyebrow">'+cfg.eyebrow+'</div><h1 style="font-size:44px;margin:8px 0">'+cfg.title+'</h1><p class="muted">'+cfg.desc+'</p>'+catalogueCategoryHtml(kind)+'<div class="catalogSearch"><input id="catalogQ" placeholder="'+cfg.placeholder+'"><button id="catalogSearchBtn">Ara</button></div><div id="catalogSearchResults" class="catalogSearchResults"></div><div class="catalogHint">Arama seçili kategori içinde yapılır.</div><div class="catalogSortRow"><span class="catalogSortLabel">Sıralama</span><div class="catalogSorts"><button class="catalogSort '+(sort==='rating'?'active':'')+'" data-catalog-sort="rating">★ En yüksek puan</button><button class="catalogSort '+(sort==='popular'?'active':'')+'" data-catalog-sort="popular">↗ En popüler</button></div></div><section><div class="head"><div><h2 id="catalogHeading">'+h(heading)+'</h2><div class="muted">Güncel katalog</div></div></div><div id="catalogGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section><div id="catalogMeta" class="tmdbNote"></div>'
+  var cached=getCachedCatalog(kind);
+  var cachedItems=cached?(cached.results||[]).slice(0,20).map(tmdbToItem):[];
+  return '<div class="eyebrow">'+cfg.eyebrow+'</div><h1 style="font-size:44px;margin:8px 0">'+cfg.title+'</h1><p class="muted">'+cfg.desc+'</p>'+catalogueCategoryHtml(kind)+'<div class="catalogSearch"><input id="catalogQ" placeholder="'+cfg.placeholder+'"><button id="catalogSearchBtn">Ara</button></div><div id="catalogSearchResults" class="catalogSearchResults"></div><div class="catalogHint">Arama seçili kategori içinde yapılır.</div><div class="catalogSortRow"><span class="catalogSortLabel">Sıralama</span><div class="catalogSorts"><button class="catalogSort '+(sort==='rating'?'active':'')+'" data-catalog-sort="rating">★ En yüksek puan</button><button class="catalogSort '+(sort==='popular'?'active':'')+'" data-catalog-sort="popular">↗ En popüler</button></div></div><section><div class="head"><div><h2 id="catalogHeading">'+h(heading)+'</h2><div class="muted">Güncel katalog</div></div></div><div id="catalogGrid" class="grid">'+cachedItems.map(card).join('')+'</div></section><div id="catalogMeta" class="tmdbNote"></div>'
 }
 function listItems(keys){return keys.map(getItem).filter(Boolean)}
 function ratedItems(){
@@ -913,10 +962,17 @@ async function loadCatalogue(type){
   var grid=document.getElementById('catalogGrid');
   var meta=document.getElementById('catalogMeta');
   if(!grid)return;
+  var cached=getCachedCatalog(type);
+  if(cached){
+    var cachedItems=(cached.results||[]).slice(0,20).map(tmdbToItem);
+    if(!grid.children.length)grid.innerHTML=cachedItems.map(card).join('');
+    bindOpeners()
+  }
   try{
     var data=await api({action:'catalog',type:type,genre:catalogGenres[type]||'all',sort:catalogSorts[type]||'rating'});
+    setCachedCatalog(type,data);
     var items=(data.results||[]).slice(0,20).map(tmdbToItem);
-    grid.innerHTML=items.length?items.map(card).join(''):'<div class="loading" style="grid-column:1/-1">İçerik bulunamadı.</div>';
+    grid.innerHTML=items.length?items.map(card).join(''):'';
     if(meta){
       var g=catalogGenres[type]||'all';
       var sort=catalogSorts[type]||'rating';
@@ -925,8 +981,7 @@ async function loadCatalogue(type){
     }
     bindOpeners()
   }catch(err){
-    grid.innerHTML='<div class="emptyState">Katalog şu an yüklenemedi.<br><small>Biraz sonra tekrar deneyebilirsin.</small></div>';
-    if(meta)meta.textContent=''
+    if(!cached&&meta)meta.textContent='Katalog şu an yenilenemedi.'
   }
 }
 
@@ -958,38 +1013,46 @@ async function categorySearch(type,forcedQuery){
   }
 }
 
-async function loadHomeRemote(){
-  var status=document.getElementById('tmdbStatus');
+function paintHomeData(data){
   var spotlight=document.getElementById('homeSpotlight');
   var grid=document.getElementById('trendingGrid');
+  if(spotlight){
+    spotlight.innerHTML=homeSpotlightHtml(data);
+    var raw=(data&&data.results||[])[0];
+    if(raw)spotlight.setAttribute('data-open',openCode(tmdbToItem(raw)))
+  }
+  if(grid)grid.innerHTML=homeTrendingHtml(data);
+  bindOpeners()
+}
+async function loadHomeRemote(){
+  var cached=getCachedHome();
+  if(cached)paintHomeData(cached);
   try{
-    var st=await api({action:'status'});
-    if(!st.configured){
-      if(status)status.textContent='Katalog bağlantısı hazır değil';
-      if(spotlight)spotlight.innerHTML='<div class="emptyState" style="margin:18px">Öne çıkan içerik şu an yüklenemiyor.</div>';
-      if(grid)grid.innerHTML='<div class="emptyState">Güncel içerikler şu an yüklenemiyor.</div>';
-      return
-    }
-    if(status)status.textContent='Canlı katalog aktif';
     var data=await api({action:'trending'});
-    var items=(data.results||[]).slice(0,10).map(tmdbToItem);
-    if(grid){
-      grid.innerHTML=items.length?items.map(card).join(''):'<div class="emptyState">Şu an gösterilecek içerik bulunamadı.</div>';
-    }
-    if(spotlight&&items.length){
-      var s=items[0];
-      var raw=(data.results||[])[0]||{};
-      var backdrop=raw.backdrop_path?"linear-gradient(180deg,rgba(5,7,11,.08),rgba(5,7,11,.18)),url('https://image.tmdb.org/t/p/w780"+raw.backdrop_path+"') center/cover":s.poster;
-      spotlight.setAttribute('data-open',openCode(s));
-      spotlight.innerHTML='<div class="homeSpotlightBg" style="--spot:'+backdrop+'"></div><div class="homeSpotlightBody"><span class="spotTag">Haftanın öne çıkanı</span><h3>'+h(s.title)+'</h3><div class="spotMeta"><span>'+h(s.type)+'</span><span>·</span><span>'+h(s.year)+'</span><span>·</span><span class="spotScore">★ '+publicScore(s.public)+'</span></div></div>';
-    }
-    bindOpeners()
+    setCachedHome(data);
+    paintHomeData(data)
   }catch(err){
-    if(status)status.textContent='Katalog şu an kullanılamıyor';
-    if(spotlight)spotlight.innerHTML='<div class="emptyState" style="margin:18px">Öne çıkan içerik şu an yüklenemiyor.</div>';
-    if(grid)grid.innerHTML='<div class="emptyState">Güncel içerikler şu an yüklenemedi.</div>'
+    /* Cached/current content stays in place; no loading/error flash during navigation. */
   }
 }
+async function ensureRouteCache(routeName){
+  try{
+    if(routeName==='home'){
+      if(getCachedHome())return;
+      var homeData=await api({action:'trending'});
+      setCachedHome(homeData);
+      return
+    }
+    var type=routeName==='series'?'tv':routeName==='movies'?'movie':routeName==='anime'?'anime':null;
+    if(!type||getCachedCatalog(type))return;
+    var data=await api({action:'catalog',type:type,genre:catalogGenres[type]||'all',sort:catalogSorts[type]||'rating'});
+    setCachedCatalog(type,data)
+  }catch(err){}
+}
+function prefetchCoreViews(){
+  ['home','series','movies','anime'].forEach(function(routeName){ensureRouteCache(routeName)})
+}
+
 function normalizeText(v){
   return String(v||'').toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()
 }
@@ -1347,8 +1410,18 @@ async function loadSeason(x,season){
     area.className='notice';area.textContent='Sezon verileri alınamadı.'
   }
 }
-window.onhashchange=function(){currentItem=null;render()};
-render();
+window.onhashchange=async function(){
+  currentItem=null;
+  var base=location.hash.replace('#','').split('/')[0]||'home';
+  if(['home','series','movies','anime'].indexOf(base)>-1)await ensureRouteCache(base);
+  render()
+};
+(async function boot(){
+  var base=location.hash.replace('#','').split('/')[0]||'home';
+  if(['home','series','movies','anime'].indexOf(base)>-1)await ensureRouteCache(base);
+  render();
+  setTimeout(prefetchCoreViews,80)
+})();
 </script>
 </body>
 </html>
