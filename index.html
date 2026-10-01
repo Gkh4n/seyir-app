@@ -220,6 +220,74 @@ textarea{min-height:110px;resize:vertical}
 .ratedProfileRail{scrollbar-width:none;-webkit-overflow-scrolling:touch}.ratedProfileRail::-webkit-scrollbar{display:none;width:0;height:0}
 @media(max-width:680px){.profileStatsPage .profileStatsHero{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.profileStatsPage .profileStatBig{min-height:108px;padding:17px}.profileStatsPage .profileStatBig strong{font-size:32px}.profileStatsPage .profileStatBig span{font-size:11px}.profileStatsTitle h2{font-size:28px}.profileDistributionPanel{padding:16px;border-radius:19px}}
 
+
+/* --- SEYİR profile final polish --- */
+.scores.single{justify-content:flex-start}
+.profileHero{padding:0!important;border-radius:26px!important;overflow:hidden!important;background:
+ radial-gradient(circle at 85% -10%,rgba(105,91,255,.18),transparent 35%),
+ radial-gradient(circle at -8% 95%,rgba(47,108,168,.14),transparent 34%),
+ linear-gradient(145deg,#101722 0%,#090e16 60%,#080c12 100%)!important}
+.profileHero:after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.018),transparent 28%,transparent 67%,rgba(132,118,255,.025))}
+.profileHeroShell{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(380px,.9fr);gap:28px;align-items:center;padding:30px 30px 28px}
+.profileHeroIdentity{display:grid;grid-template-columns:122px minmax(0,1fr);gap:22px;align-items:center;min-width:0}
+.profileAvatarWrap{width:122px!important;height:122px!important}
+.profileAvatarBig{width:122px!important;height:122px!important;padding:3px!important;background:linear-gradient(135deg,#9b90ff,#5d7fff)!important;box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.07)!important}
+.profileAvatarImage{object-fit:cover!important;object-position:center center!important;border:3px solid #0b1018!important}
+.profileAvatarEdit{right:4px!important;bottom:4px!important;width:32px!important;height:32px!important;background:#151c28!important;border:2px solid #0a0f16!important}
+.profileHeroKicker{font-size:9px!important;letter-spacing:.18em!important;color:#aaa2ff!important;margin-bottom:7px!important}
+.profileIdentityText h1{font-size:40px!important;line-height:1!important;letter-spacing:-.04em!important}
+.profileIdentityText p{font-size:14px!important;color:#8f9bad!important;margin-top:10px!important}
+.profileCharacterName{display:inline-flex;align-items:center;gap:8px;margin-top:15px;padding:7px 10px;border:1px solid rgba(255,255,255,.065);border-radius:999px;background:rgba(10,15,23,.52);max-width:100%}
+.profileCharacterName b{font-size:11px;color:#e5e9f2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profileCharacterName span{font-size:10px;color:#788397;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profileCharacterName span:before{content:'·';margin-right:8px;color:#505a6b}
+.profileHeroMetrics{display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;align-items:stretch;min-height:112px;padding:17px 16px;border:1px solid rgba(255,255,255,.07);border-radius:20px;background:linear-gradient(145deg,rgba(15,21,31,.74),rgba(8,13,20,.54));box-shadow:inset 0 1px rgba(255,255,255,.018)}
+.profileHeroMetric{display:flex;flex-direction:column;justify-content:center;padding:0 15px;min-width:0}
+.profileHeroMetric span{font-size:8px;text-transform:uppercase;letter-spacing:.09em;color:#748095;white-space:normal}
+.profileHeroMetric strong{margin-top:8px;font-size:30px;line-height:1;color:#f6f8fc;letter-spacing:-.035em}
+.profileHeroMetric small{margin-top:6px;font-size:9px;color:#566276}
+.profileMetricDivider{width:1px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.09),transparent)}
+.profileHeroStats{display:none!important}
+
+/* Character picker must look like character stills, never poster cards. */
+.profileAvatarGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
+.profilePersonOption{padding-bottom:0!important;background:#0d131c!important}
+.profileCharacterVisual{aspect-ratio:16/10!important}
+.profileCharacterVisual img{width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:cover!important;object-position:center center!important}
+.profilePersonOption>span{padding:10px 11px 12px!important}
+.profilePersonOption b{font-size:12px!important}
+.profilePersonOption small{font-size:9px!important;color:#758195!important}
+.profileCharacterCheck{right:8px!important;top:8px!important}
+
+/* Remove every visible horizontal scrollbar from content rails while keeping swipe. */
+.relatedRail,.ratedProfileRail,.favoriteRail,.compactListGrid,.profileListTabs,.profileTabs{scrollbar-width:none!important}
+.relatedRail::-webkit-scrollbar,.ratedProfileRail::-webkit-scrollbar,.favoriteRail::-webkit-scrollbar,.compactListGrid::-webkit-scrollbar,.profileListTabs::-webkit-scrollbar,.profileTabs::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+
+@media(max-width:820px){
+  .profileHeroShell{grid-template-columns:1fr;gap:20px;padding:22px}
+  .profileHeroMetrics{min-height:94px}
+}
+@media(max-width:680px){
+  .profileHero{border-radius:22px!important}
+  .profileHeroShell{padding:18px 16px 17px;gap:17px}
+  .profileHeroIdentity{grid-template-columns:86px minmax(0,1fr);gap:14px}
+  .profileAvatarWrap,.profileAvatarBig{width:86px!important;height:86px!important}
+  .profileAvatarEdit{width:27px!important;height:27px!important;right:0!important;bottom:0!important}
+  .profileAvatarEdit svg{width:12px!important;height:12px!important}
+  .profileIdentityText h1{font-size:27px!important}
+  .profileIdentityText p{font-size:11px!important;line-height:1.45!important;margin-top:6px!important}
+  .profileHeroKicker{font-size:7px!important;margin-bottom:5px!important}
+  .profileCharacterName{margin-top:9px;padding:5px 8px;gap:6px}
+  .profileCharacterName b{font-size:9px}.profileCharacterName span{font-size:8px}.profileCharacterName span:before{margin-right:6px}
+  .profileHeroMetrics{grid-template-columns:1fr 1px 1fr 1px 1fr;min-height:82px;padding:11px 6px;border-radius:15px}
+  .profileHeroMetric{padding:0 7px}
+  .profileHeroMetric span{font-size:6.5px;letter-spacing:.04em}
+  .profileHeroMetric strong{font-size:21px;margin-top:6px}
+  .profileHeroMetric small{font-size:7px;margin-top:5px}
+  .profileAvatarGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  .profileCharacterVisual{aspect-ratio:16/11!important}
+}
+
 </style>
 </head>
 <body>
@@ -246,7 +314,7 @@ if(!saved.items)saved.items={};
 if(!saved.episodeRatings)saved.episodeRatings={};
 if(!saved.movieLogs)saved.movieLogs={};
 if(!saved.profileAvatar)saved.profileAvatar=null;
-if(saved.profileAvatar&&!saved.profileAvatar.image_path)saved.profileAvatar=null;
+if(saved.profileAvatar&&(!saved.profileAvatar.image_path||Number(saved.profileAvatar.aspect_ratio||0)<1.25))saved.profileAvatar=null;
 if(!saved.dataVersion||saved.dataVersion<4){
   var demoKeys=['dark','dexter','lost','supernatural','prisonbreak','interstellar','prestige','inception','parasite','shutter'];
   demoKeys.forEach(function(key){
@@ -402,7 +470,7 @@ function openFromCode(code){
 }
 function card(x){
   var mine=personalScore(x);
-  return '<article class="card" data-open="'+h(openCode(x))+'"><div class="poster" style="--poster:'+x.poster+'"><span class="letter">'+h(x.title[0]||'S')+'</span><span class="tag">'+h(x.type)+'</span><div class="meta"><b>'+h(x.title)+'</b><span>'+h(x.year)+(x.genre?' · '+h(x.genre):'')+'</span></div></div><div class="scores"><span>Genel <b>'+publicScore(x.public)+'</b></span><span>Ben <b>'+(mine==null?'—':mine.toFixed(1))+'</b></span></div></article>'
+  return '<article class="card" data-open="'+h(openCode(x))+'"><div class="poster" style="--poster:'+x.poster+'"><span class="letter">'+h(x.title[0]||'S')+'</span><span class="tag">'+h(x.type)+'</span><div class="meta"><b>'+h(x.title)+'</b><span>'+h(x.year)+(x.genre?' · '+h(x.genre):'')+'</span></div></div><div class="scores '+(mine==null?'single':'')+'"><span>Genel <b>'+publicScore(x.public)+'</b></span>'+(mine==null?'':'<span>Ben <b>'+mine.toFixed(1)+'</b></span>')+'</div></article>'
 }
 function section(title,sub,items,id){
   return '<section><div class="head"><div><h2>'+h(title)+'</h2><div class="muted">'+h(sub)+'</div></div></div><div class="grid"'+(id?' id="'+id+'"':'')+'>'+items.map(card).join('')+'</div></section>'
@@ -482,7 +550,7 @@ function listTabItems(tab,mediaType){
 function compactListCard(x,index,tab){
   var mine=saved.ratings[x.key]!=null?Number(saved.ratings[x.key]):null;
   var showRank=tab==='favorites'||tab==='rated';
-  return '<article class="compactListCard" data-open="'+h(openCode(x))+'"><div class="compactListPoster" style="--compact-poster:'+x.poster+'"><span class="compactListType">'+h(x.type)+'</span>'+(showRank?'<span class="compactListRank">'+(index+1)+'</span>':'')+'</div><div class="compactListInfo"><b>'+h(x.title)+'</b><small>'+h(x.year)+(x.genre?' · '+h(x.genre):'')+'</small><div class="compactListScores"><span class="public">★ '+publicScore(x.public)+'</span>'+(mine!=null?'<span class="mine">Sen '+mine.toFixed(1)+'</span>':'<span>—</span>')+'</div>'+(tab==='favorites'?'<div class="compactOrderControls"><button class="compactOrderBtn" data-fav-move="-1" data-fav-type="'+x.mediaType+'" data-fav-key="'+h(x.key)+'">←</button><button class="compactOrderBtn" data-fav-move="1" data-fav-type="'+x.mediaType+'" data-fav-key="'+h(x.key)+'">→</button></div>':'')+'</div></article>'
+  return '<article class="compactListCard" data-open="'+h(openCode(x))+'"><div class="compactListPoster" style="--compact-poster:'+x.poster+'"><span class="compactListType">'+h(x.type)+'</span>'+(showRank?'<span class="compactListRank">'+(index+1)+'</span>':'')+'</div><div class="compactListInfo"><b>'+h(x.title)+'</b><small>'+h(x.year)+(x.genre?' · '+h(x.genre):'')+'</small><div class="compactListScores"><span class="public">★ '+publicScore(x.public)+'</span>'+(mine!=null?'<span class="mine">Sen '+mine.toFixed(1)+'</span>':'')+'</div>'+(tab==='favorites'?'<div class="compactOrderControls"><button class="compactOrderBtn" data-fav-move="-1" data-fav-type="'+x.mediaType+'" data-fav-key="'+h(x.key)+'">←</button><button class="compactOrderBtn" data-fav-move="1" data-fav-type="'+x.mediaType+'" data-fav-key="'+h(x.key)+'">→</button></div>':'')+'</div></article>'
 }
 function listMediaSectionHtml(tab,mediaType){
   var items=listTabItems(tab,mediaType);
@@ -621,7 +689,8 @@ function renderProfileAvatarOptions(people){
         character:person.character,
         show:person.show,
         show_id:person.show_id,
-        image_path:person.image_path
+        image_path:person.image_path,
+        aspect_ratio:Number(person.aspect_ratio||1.78)
       };
       persist();
       var wrap=document.getElementById('profileAvatarButton');
@@ -668,7 +737,8 @@ function profile(){
   var data=profileRatingData();
   var avg=data.all.length?data.all.reduce(function(a,b){return a+b},0)/data.all.length:0;
   var editIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.25V20h2.75L17.8 8.95l-2.75-2.75L4 17.25Zm15.7-10.4a1 1 0 0 0 0-1.4l-1.15-1.15a1 1 0 0 0-1.4 0l-.9.9L19 7.95l.7-1.1Z" fill="currentColor"/></svg>';
-  return '<div class="profilePage"><div class="profileHero"><div class="profileHeroTop"><div class="profileAvatarWrap"><button id="profileAvatarButton" class="profileAvatarBig" aria-label="Profil karakterini değiştir">'+profileAvatarMarkup()+'</button><span class="profileAvatarEdit">'+editIcon+'</span></div><div class="profileIdentityText"><span class="profileHeroKicker">SEYİR PROFİLİ</span><h1>Seyir Profilim</h1><p>İzlediklerin, puanların ve kişisel seyir arşivin.</p></div></div><div class="profileHeroStats"><div class="profileHeroStat"><span>Puanlanan yapım</span><strong>'+data.works.length+'</strong><small>Dizi + film</small></div><div class="profileHeroStat"><span>Puanlanan bölüm</span><strong>'+data.episodes.length+'</strong><small>Toplam değerlendirme</small></div><div class="profileHeroStat"><span>Ortalama puanın</span><strong>'+(data.all.length?avg.toFixed(1):'—')+'</strong><small>10 üzerinden</small></div></div></div><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div>'+profileAvatarModalHtml()+'</div>'
+  var character=saved.profileAvatar?'<div class="profileCharacterName"><b>'+h(saved.profileAvatar.character)+'</b><span>'+h(saved.profileAvatar.show)+'</span></div>':'<div class="profileCharacterName"><b>Karakterini seç</b><span>Profilini kişiselleştir</span></div>';
+  return '<div class="profilePage"><div class="profileHero"><div class="profileHeroShell"><div class="profileHeroIdentity"><div class="profileAvatarWrap"><button id="profileAvatarButton" class="profileAvatarBig" aria-label="Profil karakterini değiştir">'+profileAvatarMarkup()+'</button><span class="profileAvatarEdit">'+editIcon+'</span></div><div class="profileIdentityText"><span class="profileHeroKicker">KİŞİSEL SEYİR PROFİLİ</span><h1>Seyir Profilim</h1><p>İzlediklerin, puanların ve kişisel seyir arşivin.</p>'+character+'</div></div><div class="profileHeroMetrics"><div class="profileHeroMetric"><span>Puanlanan yapım</span><strong>'+data.works.length+'</strong><small>Dizi + film</small></div><div class="profileMetricDivider"></div><div class="profileHeroMetric"><span>Puanlanan bölüm</span><strong>'+data.episodes.length+'</strong><small>Toplam değerlendirme</small></div><div class="profileMetricDivider"></div><div class="profileHeroMetric"><span>Ortalama puanın</span><strong>'+(data.all.length?avg.toFixed(1):'—')+'</strong><small>10 üzerinden</small></div></div></div></div><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div>'+profileAvatarModalHtml()+'</div>'
 }
 
 function profileSeriesGroups(){
