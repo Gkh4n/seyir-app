@@ -525,6 +525,14 @@ textarea{min-height:110px;resize:vertical}
   .socialCommentsSection{padding:18px 14px;border-radius:20px}.socialComment{grid-template-columns:34px minmax(0,1fr);gap:8px}.commentAvatar{width:34px;height:34px}.commentBody{padding:10px 11px}.reactionBtn{min-width:32px;padding:0 6px}
 }
 
+
+.profilePhotoEditor{display:grid;grid-template-columns:86px 1fr;gap:14px;align-items:center;margin:4px 0 8px;padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:#0b1018}
+.profilePhotoPreview{width:86px;height:86px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:linear-gradient(135deg,#7468ff,#475fca);font-size:30px;font-weight:800}
+.profilePhotoPreview img{width:100%;height:100%;object-fit:cover}
+.profilePhotoActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.profilePhotoActions small{width:100%;color:#697487;font-size:9px}
+.uploadAvatarLabel{position:relative;cursor:pointer}.uploadAvatarLabel input{position:absolute;inset:0;opacity:0;cursor:pointer}
+@media(max-width:680px){.profilePhotoEditor{grid-template-columns:70px 1fr}.profilePhotoPreview{width:70px;height:70px}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -627,7 +635,11 @@ function bindSocialOverlay(){
   var form=document.getElementById('seyirAuthForm');
   if(form)form.onsubmit=submitSeyirAuth;
   var save=document.getElementById('saveSeyirProfileSettings');
-  if(save)save.onclick=saveSeyirProfileSettings
+  if(save)save.onclick=saveSeyirProfileSettings;
+  var avatarFile=document.getElementById('seyirAvatarFile');
+  if(avatarFile)avatarFile.onchange=uploadSeyirAvatar;
+  var chooseCharacter=document.getElementById('chooseCharacterAvatar');
+  if(chooseCharacter)chooseCharacter.onclick=function(){closeSocialModal();setTimeout(openProfileAvatarModal,30)}
 }
 async function submitSeyirAuth(e){
   e.preventDefault();
@@ -662,7 +674,8 @@ async function submitSeyirAuth(e){
 }
 function profileSettingsMarkup(){
   var p=currentSeyirProfile||{};
-  return '<div class="socialModal open"><div class="socialModalCard profileSettingsCard"><button class="socialModalClose" data-close-social>×</button><div class="socialModalKicker">PROFİL AYARLARI</div><h2>Profilini düzenle</h2><div class="fieldRow"><label>Görünen ad<input id="profileDisplayName" maxlength="40" value="'+h(p.display_name||'')+'"></label><label>Kullanıcı adı<input id="profileUsername" maxlength="20" value="'+h(p.username||'')+'"></label></div><label>Biyografi<textarea id="profileBio" maxlength="180" placeholder="Kendinden kısaca bahset…">'+h(p.bio||'')+'</textarea></label><div id="profileSettingsMessage" class="authMessage"></div><button id="saveSeyirProfileSettings" class="primary socialSubmit">Kaydet</button></div></div>'
+  var avatar=socialProfileAvatar(p,'w342')||profileAvatarUrl(saved.profileAvatar,'w342');
+  return '<div class="socialModal open"><div class="socialModalCard profileSettingsCard"><button class="socialModalClose" data-close-social>×</button><div class="socialModalKicker">PROFİL AYARLARI</div><h2>Profilini düzenle</h2><div class="profilePhotoEditor"><div class="profilePhotoPreview">'+(avatar?'<img src="'+h(avatar)+'" alt="">':'<span>'+h((p.display_name||p.username||'S').charAt(0).toUpperCase())+'</span>')+'</div><div class="profilePhotoActions"><label class="secondary uploadAvatarLabel">Fotoğraf yükle<input id="seyirAvatarFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button class="secondary" id="chooseCharacterAvatar">Dizi karakteri seç</button><small>En fazla 3 MB · JPG, PNG, WEBP veya GIF</small></div></div><div class="fieldRow"><label>Görünen ad<input id="profileDisplayName" maxlength="40" value="'+h(p.display_name||'')+'"></label><label>Kullanıcı adı<input id="profileUsername" maxlength="20" value="'+h(p.username||'')+'"></label></div><label>Biyografi<textarea id="profileBio" maxlength="180" placeholder="Kendinden kısaca bahset…">'+h(p.bio||'')+'</textarea></label><div id="profileSettingsMessage" class="authMessage"></div><button id="saveSeyirProfileSettings" class="primary socialSubmit">Kaydet</button></div></div>'
 }
 function openProfileSettingsModal(){
   if(!currentUser){openAuthModal('login');return}
@@ -685,11 +698,36 @@ async function saveSeyirProfileSettings(){
 async function saveSocialAvatar(person){
   if(!currentUser||!seyirDb)return;
   var r=await seyirDb.from('seyir_profiles').update({
+    avatar_url:null,
     avatar_image_path:person.image_path,
     avatar_character:person.character||'',
     avatar_show:person.show||''
   }).eq('user_id',currentUser.id).select().single();
   if(!r.error){currentSeyirProfile=r.data}
+}
+async function uploadSeyirAvatar(e){
+  if(!currentUser||!seyirDb)return;
+  var file=e.target.files&&e.target.files[0];
+  var msg=document.getElementById('profileSettingsMessage');
+  if(!file)return;
+  if(file.size>3145728){if(msg)msg.textContent='Fotoğraf 3 MB’dan küçük olmalı.';return}
+  var ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+  var path=currentUser.id+'/avatar-'+Date.now()+'.'+ext;
+  if(msg)msg.textContent='Fotoğraf yükleniyor…';
+  var up=await seyirDb.storage.from('seyir-avatars').upload(path,file,{upsert:true,contentType:file.type});
+  if(up.error){if(msg)msg.textContent=up.error.message;return}
+  var pub=seyirDb.storage.from('seyir-avatars').getPublicUrl(path);
+  var url=pub.data&&pub.data.publicUrl?pub.data.publicUrl:'';
+  var r=await seyirDb.from('seyir_profiles').update({
+    avatar_url:url,
+    avatar_image_path:null,
+    avatar_character:null,
+    avatar_show:null
+  }).eq('user_id',currentUser.id).select().single();
+  if(r.error){if(msg)msg.textContent=r.error.message;return}
+  currentSeyirProfile=r.data;saved.profileAvatar=null;persist();
+  if(msg)msg.textContent='Profil fotoğrafı güncellendi.';
+  setTimeout(function(){closeSocialModal();render()},350)
 }
 async function logoutSeyir(){
   if(!seyirDb)return;
@@ -1057,8 +1095,9 @@ function profileAvatarUrl(avatar,size){
   return 'https://image.tmdb.org/t/p/'+(size||'w500')+avatar.image_path
 }
 function profileAvatarMarkup(){
-  var url=profileAvatarUrl(saved.profileAvatar,'w500');
-  if(url)return '<img id="profileAvatarImage" class="profileAvatarImage" src="'+h(url)+'" alt="'+h(saved.profileAvatar.character||'Profil karakteri')+'">';
+  var custom=currentUser&&currentSeyirProfile&&currentSeyirProfile.avatar_url?currentSeyirProfile.avatar_url:'';
+  var url=custom||profileAvatarUrl(saved.profileAvatar,'w500');
+  if(url)return '<img id="profileAvatarImage" class="profileAvatarImage" src="'+h(url)+'" alt="'+h((currentSeyirProfile&&currentSeyirProfile.display_name)||(saved.profileAvatar&&saved.profileAvatar.character)||'Profil')+'">';
   return '<div id="profileAvatarImage" class="profileAvatarFallback"><span></span></div>'
 }
 function profileAvatarModalHtml(){
@@ -1135,6 +1174,7 @@ function profileAuthLanding(){
   return '<div class="accountLanding"><div class="accountLandingGlow"></div><div class="socialModalKicker">SEYİR TOPLULUĞU</div><h1>Kendi profilini oluştur.</h1><p>Dizi ve filmler hakkında yorum yap, diğer kullanıcıların profillerini gör, yorumlara yanıt ver ve ifadelerle tepki göster.</p><div class="accountLandingActions"><button class="primary" data-open-auth="register">Kayıt ol</button><button class="secondary" data-open-auth="login">Giriş yap</button></div></div>'
 }
 function socialProfileAvatar(profile,size){
+  if(profile&&profile.avatar_url)return profile.avatar_url;
   if(profile&&profile.avatar_image_path)return 'https://image.tmdb.org/t/p/'+(size||'w342')+profile.avatar_image_path;
   return ''
 }
@@ -1253,7 +1293,8 @@ function profile(){
   if(!currentUser)return profileAuthLanding();
   var p=currentSeyirProfile||{};
   var editIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.25V20h2.75L17.8 8.95l-2.75-2.75L4 17.25Zm15.7-10.4a1 1 0 0 0 0-1.4l-1.15-1.15a1 1 0 0 0-1.4 0l-.9.9L19 7.95l.7-1.1Z" fill="currentColor"/></svg>';
-  var cover=saved.profileAvatar&&saved.profileAvatar.image_path?"url('https://image.tmdb.org/t/p/w1280"+saved.profileAvatar.image_path+"')":"linear-gradient(135deg,#171a20,#0d1016 58%,#171326)";
+  var profileVisual=currentSeyirProfile&&currentSeyirProfile.avatar_url?currentSeyirProfile.avatar_url:(saved.profileAvatar&&saved.profileAvatar.image_path?'https://image.tmdb.org/t/p/w1280'+saved.profileAvatar.image_path:'');
+  var cover=profileVisual?"url('"+profileVisual+"')":"linear-gradient(135deg,#171a20,#0d1016 58%,#171326)";
   return '<div class="profilePage"><section class="profileHeaderCard"><div class="profileCover" style="--profile-cover:'+cover+'"><div class="profileCoverShade"></div></div><div class="profileHeaderBody"><div class="profileAvatarWrap"><button id="profileAvatarButton" class="profileAvatarBig" aria-label="Profil karakterini değiştir">'+profileAvatarMarkup()+'</button><span class="profileAvatarEdit">'+editIcon+'</span></div><div class="profileHeaderText"><div class="profileNameRow"><div><h1>'+h(p.display_name||p.username||'Seyir Kullanıcısı')+'</h1><span class="profileUsername">@'+h(p.username||'')+'</span></div><div class="profileAccountActions"><button class="secondary" id="editSeyirProfile">Profili düzenle</button><button class="profileGhostButton" id="logoutSeyir">Çıkış</button></div></div><p>'+h(p.bio||'Dizi, film ve anime arşivim.')+'</p>'+(saved.profileAvatar?'<span class="profileCharacterMeta">'+h(saved.profileAvatar.character)+' · '+h(saved.profileAvatar.show)+'</span>':'<span class="profileCharacterMeta">Profil karakterini seç</span>')+'</div></div></section><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div>'+profileAvatarModalHtml()+'</div>'
 }
 
