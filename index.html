@@ -9,7 +9,7 @@
 :root{--bg:#090b10;--panel:#121620;--panel2:#171c27;--line:#252c3a;--text:#f4f6fb;--muted:#8e98aa;--accent:#8a7dff;--accent2:#5f8cff;--warn:#ffc85a;--good:#4bd6a1;--bad:#ff7184}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0,#15142d 0,transparent 30%),var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,Arial,sans-serif}button,input{font:inherit}.top{height:68px;display:flex;align-items:center;gap:26px;padding:0 5vw;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(9,11,16,.88);backdrop-filter:blur(18px);z-index:20}.brand{font-weight:900;letter-spacing:.14em;cursor:pointer}.brand b{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));margin-right:8px}.nav{display:flex;gap:6px}.nav button,.profile{border:0;background:transparent;color:var(--muted);padding:10px 12px;border-radius:10px;cursor:pointer}.nav button.active,.nav button:hover{background:#1b202c;color:#fff}.profile{margin-left:auto;color:#fff;border:1px solid var(--line);background:var(--panel)}main{max-width:1220px;margin:auto;padding:36px 24px 90px}.hero{display:grid;grid-template-columns:1.7fr .7fr;gap:18px}.box{border:1px solid var(--line);background:linear-gradient(145deg,rgba(22,26,38,.9),rgba(12,15,22,.9));border-radius:26px}.hero .copy{padding:42px}.eyebrow{color:#b8b0ff;text-transform:uppercase;font-size:12px;letter-spacing:.1em;font-weight:800}.hero h1{font-size:clamp(38px,5vw,68px);line-height:1.02;margin:14px 0 16px}.hero h1 span{background:linear-gradient(90deg,#fff,#9f97ff,#67a7ff);-webkit-background-clip:text;color:transparent}.hero p{max-width:700px;color:#aab3c3;font-size:17px}.search{display:flex;gap:8px;margin-top:24px;padding:7px;border:1px solid var(--line);background:#0b0e14;border-radius:15px}.search input{flex:1;border:0;outline:0;background:transparent;color:#fff;padding:10px}.search button,.primary{border:0;border-radius:11px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800;cursor:pointer}.taste{padding:28px;display:flex;flex-direction:column;justify-content:space-between}.taste strong{font-size:70px;line-height:1}.taste small{color:var(--muted)}.bar{height:10px;background:#252a35;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;width:82%;background:linear-gradient(90deg,var(--accent),#57b6ff)}section{margin-top:36px}.head{display:flex;justify-content:space-between;align-items:end;margin-bottom:14px}.head h2{margin:0;font-size:24px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.card{border:1px solid var(--line);background:var(--panel);border-radius:19px;overflow:hidden;cursor:pointer;transition:.2s}.card:hover{transform:translateY(-4px);border-color:#414a5f}.poster{aspect-ratio:2/3;padding:14px;display:flex;align-items:end;position:relative;background:var(--poster);overflow:hidden}.poster:after{content:'';position:absolute;inset:0;background:linear-gradient(transparent 42%,rgba(5,7,11,.95))}.poster .letter{position:absolute;right:-8px;top:-28px;font-size:126px;font-weight:900;color:rgba(255,255,255,.08)}.poster .tag{position:absolute;top:12px;left:12px;background:rgba(6,8,12,.7);border:1px solid rgba(255,255,255,.13);padding:5px 8px;border-radius:99px;font-size:10px}.poster .meta{position:relative;z-index:1}.poster .meta b{display:block;font-size:17px}.poster .meta span{font-size:12px;color:#cad1dc}.scores{display:flex;justify-content:space-between;padding:12px;font-size:12px}.scores b:first-child{color:var(--warn)}.scores b:last-child{color:#a89fff}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.stat,.panel{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:18px}.stat strong{display:block;font-size:29px}.split{display:grid;grid-template-columns:1fr 1fr;gap:16px}.rows{display:grid;gap:10px}.row{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.delta{font-weight:900;color:var(--good)}.delta.neg{color:var(--bad)}.detail{display:grid;grid-template-columns:220px 1fr;gap:26px;align-items:start}.detailposter{aspect-ratio:2/3;border-radius:22px;background:var(--poster);border:1px solid var(--line);position:relative;overflow:hidden}.detailposter:after{content:attr(data-letter);position:absolute;right:-20px;bottom:-32px;font-size:190px;font-weight:900;color:rgba(255,255,255,.08)}.detail h1{font-size:52px;line-height:1;margin:0 0 10px}.bigscore{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.scorebox{min-width:145px;padding:13px;border:1px solid var(--line);border-radius:15px;background:var(--panel)}.scorebox strong{display:block;font-size:25px}.slider{margin-top:18px}.slider input{width:100%;accent-color:var(--accent2)}.ratingHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:12px;color:var(--muted)}.ratingHead b{color:#b8b0ff;font-size:14px}.sliderScale{display:flex;justify-content:space-between;font-size:10px;color:#667084;margin-top:3px}.actions{display:flex;gap:9px;margin-top:15px;flex-wrap:wrap}.secondary{background:var(--panel);color:#fff;border:1px solid var(--line);border-radius:11px;padding:10px 13px;cursor:pointer}.chart{height:260px;border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:16px}.chart svg{width:100%;height:100%}.episodes{display:grid;gap:8px}.ep{display:grid;grid-template-columns:55px 1fr auto auto;gap:12px;background:var(--panel2);padding:11px;border-radius:12px}.profileHero{display:flex;gap:18px;align-items:center}.avatar{display:grid;place-items:center;width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));font-size:24px;font-weight:900}.searchResults{display:grid;gap:8px;margin-top:12px;max-height:520px;overflow:auto;padding-right:2px}.searchItem{display:grid;grid-template-columns:46px 1fr auto;align-items:center;gap:11px;padding:8px;border:1px solid var(--line);background:var(--panel);border-radius:14px;cursor:pointer;transition:.18s}.searchItem:hover{border-color:#46516a;background:#171c27}.searchThumb{width:46px;height:64px;border-radius:9px;background:var(--thumb);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.08)}.searchInfo{min-width:0}.searchInfo b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.searchInfo span{display:block;font-size:12px;margin-top:2px}.searchScore{font-weight:800;color:var(--warn);padding-right:6px}.mobile{display:none}
 @media(max-width:950px){.grid{grid-template-columns:repeat(3,1fr)}.hero{grid-template-columns:1fr}.split{grid-template-columns:1fr}.detail{grid-template-columns:150px 1fr}}
-@media(max-width:680px){.nav,.profile{display:none}.top{height:60px;padding:0 16px}.brand{margin:auto 0}.mobile{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:40;background:rgba(17,20,28,.94);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:18px;padding:6px}.mobile button{border:0;background:transparent;color:var(--muted);padding:8px 2px;border-radius:12px;font-size:10px}.mobile button.active{background:#252b38;color:#fff}main{padding:24px 14px 150px}.hero .copy{padding:25px 20px}.hero h1{font-size:39px}.searchResults{max-height:420px}.searchItem{grid-template-columns:42px 1fr auto}.searchThumb{width:42px;height:58px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.stats{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:110px 1fr;align-items:start}.detailposter{margin-top:4px}.detail h1{font-size:31px}.scorebox{min-width:0;flex:1}.ep{grid-template-columns:45px 1fr auto}.ep .mineep{display:none}.seasonStats{grid-template-columns:1fr}.seasonStat{padding:10px 12px}}
+@media(max-width:680px){.nav,.profile{display:none}.top{height:60px;padding:0 16px}.brand{margin:auto 0}.mobile{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:40;background:rgba(17,20,28,.94);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:18px;padding:6px}.mobile button{border:0;background:transparent;color:var(--muted);padding:8px 2px;border-radius:12px;font-size:10px}.mobile button.active{background:#252b38;color:#fff}main{padding:24px 14px 150px}.hero .copy{padding:25px 20px}.hero h1{font-size:39px}.searchResults{max-height:420px}.searchItem{grid-template-columns:42px 1fr auto}.searchThumb{width:42px;height:58px}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.stats{grid-template-columns:repeat(2,1fr)}.detail{grid-template-columns:110px 1fr;align-items:start}.detailposter{margin-top:4px}.detail h1{font-size:31px}.scorebox{min-width:0;flex:1}.ep{grid-template-columns:45px 1fr auto}.ep .mineep{display:none}.seasonStats{grid-template-columns:1fr}.seasonStat{padding:10px 12px}}
 
 textarea,.fieldInput,.seasonSelect,.episodeRating{width:100%;background:#0b0e14;color:#fff;border:1px solid var(--line);border-radius:11px;padding:10px;outline:none}
 textarea{min-height:110px;resize:vertical}
@@ -21,7 +21,7 @@ textarea{min-height:110px;resize:vertical}
 .seasonSelect{width:auto;min-width:150px}
 .episodeRating{width:72px;padding:6px 7px}.seasonStats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.seasonStat{border:1px solid var(--line);background:#10141d;border-radius:14px;padding:12px}.seasonStat span{display:block;color:var(--muted);font-size:11px}.seasonStat b{display:block;margin-top:4px;font-size:17px}.seasonStat.good b{color:var(--good)}.seasonStat.bad b{color:var(--bad)}
 .notice{border:1px solid #4a4230;background:#1b1810;color:#f5d98f;border-radius:14px;padding:12px 14px;margin-top:14px}
-.tmdbNote{font-size:11px;color:var(--muted);margin-top:8px}
+.tmdbNote{font-size:11px;color:var(--muted);margin-top:8px}.catalogSearch{display:flex;gap:8px;margin-top:20px;max-width:680px;padding:7px;border:1px solid var(--line);background:#0b0e14;border-radius:15px}.catalogSearch input{flex:1;border:0;outline:0;background:transparent;color:#fff;padding:10px}.catalogSearch button{border:0;border-radius:11px;padding:10px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:800}.catalogSearchResults{margin-top:12px;display:grid;gap:8px;max-width:680px}.catalogHint{margin-top:7px;font-size:11px;color:var(--muted)}
 
 </style>
 </head>
@@ -29,13 +29,13 @@ textarea{min-height:110px;resize:vertical}
 <header class="top">
 <div class="brand" data-route="home"><b>S</b>SEYİR</div>
 <nav class="nav">
-<button data-route="home">Keşfet</button><button data-route="series">Diziler</button><button data-route="movies">Filmler</button><button data-route="lists">Listelerim</button>
+<button data-route="home">Keşfet</button><button data-route="series">Diziler</button><button data-route="movies">Filmler</button><button data-route="anime">Animeler</button><button data-route="lists">Listelerim</button>
 </nav>
 <button class="profile" data-route="profile">Profilim</button>
 </header>
 <main id="app"></main>
 <nav class="mobile">
-<button data-route="home">⌂<br>Keşfet</button><button data-route="series">▤<br>Diziler</button><button data-route="movies">▶<br>Filmler</button><button data-route="lists">♡<br>Listeler</button><button data-route="profile">◉<br>Profil</button>
+<button data-route="home">⌂<br>Keşfet</button><button data-route="series">▤<br>Diziler</button><button data-route="movies">▶<br>Filmler</button><button data-route="anime">✦<br>Anime</button><button data-route="lists">♡<br>Listeler</button><button data-route="profile">◉<br>Profil</button>
 </nav>
 <script>
 var fallbackCatalogue=[
@@ -143,9 +143,13 @@ function profileStats(){
   var avg=vals.length?(vals.reduce(function(a,b){return a+b},0)/vals.length).toFixed(1):'—';
   return '<div class="stats"><div class="stat"><strong>'+vals.length+'</strong><span class="muted">Puanlanan yapım</span></div><div class="stat"><strong>'+saved.favorites.length+'</strong><span class="muted">Favori</span></div><div class="stat"><strong>'+saved.watchlist.length+'</strong><span class="muted">İzleme listesi</span></div><div class="stat"><strong>'+avg+'</strong><span class="muted">Puan ortalaması</span></div></div>'
 }
-function cataloguePage(type){
-  var mediaType=type==='Dizi'?'tv':'movie';
-  return '<div class="eyebrow">'+(type==='Dizi'?'Bölüm bölüm analiz':'Film günlüğün')+'</div><h1 style="font-size:44px;margin:8px 0">'+type+'ler</h1><p class="muted">TMDB kataloğundaki popüler '+type.toLocaleLowerCase('tr-TR')+'leri keşfet.</p><section><div class="head"><div><h2>Popüler '+type+'ler</h2><div class="muted">TMDB gerçek verileri</div></div></div><div id="catalogGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section><div id="catalogMeta" class="tmdbNote"></div>'
+function cataloguePage(kind){
+  var cfg={
+    tv:{eyebrow:'Bölüm bölüm analiz',title:'Diziler',desc:'TMDB kataloğundaki gerçek dizileri keşfet.',placeholder:'Dizi ara…',heading:'Popüler Diziler'},
+    movie:{eyebrow:'Film günlüğün',title:'Filmler',desc:'TMDB kataloğundaki gerçek filmleri keşfet.',placeholder:'Film ara…',heading:'Popüler Filmler'},
+    anime:{eyebrow:'Anime dünyası',title:'Animeler',desc:'Japon anime dizi ve filmlerini tek yerde keşfet.',placeholder:'Anime ara…',heading:'Popüler Animeler'}
+  }[kind];
+  return '<div class="eyebrow">'+cfg.eyebrow+'</div><h1 style="font-size:44px;margin:8px 0">'+cfg.title+'</h1><p class="muted">'+cfg.desc+'</p><div class="catalogSearch"><input id="catalogQ" placeholder="'+cfg.placeholder+'"><button id="catalogSearchBtn">Ara</button></div><div id="catalogSearchResults" class="catalogSearchResults"></div><div class="catalogHint">Yazdıkça yalnızca bu kategoride arama yapılır.</div><section><div class="head"><div><h2>'+cfg.heading+'</h2><div class="muted">TMDB gerçek verileri</div></div></div><div id="catalogGrid" class="grid"><div class="loading" style="grid-column:1/-1">Yükleniyor…</div></div></section><div id="catalogMeta" class="tmdbNote"></div>'
 }
 function listItems(keys){return keys.map(getItem).filter(Boolean)}
 function lists(){
@@ -192,8 +196,9 @@ function route(){
   var hash=location.hash.replace('#','');
   if(hash.indexOf('detail/')===0)return localDetail(hash.split('/')[1]);
   if(hash.indexOf('tmdb/')===0)return remoteLoading();
-  if(hash==='series')return cataloguePage('Dizi');
-  if(hash==='movies')return cataloguePage('Film');
+  if(hash==='series')return cataloguePage('tv');
+  if(hash==='movies')return cataloguePage('movie');
+  if(hash==='anime')return cataloguePage('anime');
   if(hash==='lists')return lists();
   if(hash==='profile')return profile();
   return home()
@@ -206,6 +211,7 @@ function render(){
   if(base==='home')loadHomeRemote();
   if(base==='series')loadCatalogue('tv');
   if(base==='movies')loadCatalogue('movie');
+  if(base==='anime')loadCatalogue('anime');
   if(base==='tmdb'){
     var p=location.hash.replace('#','').split('/');
     loadTmdbDetail(p[1],p[2]);
@@ -225,6 +231,20 @@ function bind(){
       var box=document.getElementById('searchResults');
       if(!value){if(box)box.innerHTML='';return}
       searchTimer=setTimeout(function(){search(value)},250)
+    }
+  }
+  var cq=document.getElementById('catalogQ');
+  var csb=document.getElementById('catalogSearchBtn');
+  if(cq){
+    var kind=location.hash.replace('#','')==='series'?'tv':(location.hash.replace('#','')==='movies'?'movie':'anime');
+    if(csb)csb.onclick=function(){clearTimeout(searchTimer);categorySearch(kind)};
+    cq.onkeydown=function(e){if(e.key==='Enter'){clearTimeout(searchTimer);categorySearch(kind)}};
+    cq.oninput=function(){
+      clearTimeout(searchTimer);
+      var value=(cq.value||'').trim();
+      var box=document.getElementById('catalogSearchResults');
+      if(!value){if(box)box.innerHTML='';return}
+      searchTimer=setTimeout(function(){categorySearch(kind,value)},250)
     }
   }
   if(currentItem)bindPersonalControls(currentItem);
@@ -261,14 +281,42 @@ async function loadCatalogue(type){
     var data=await api({action:'catalog',type:type});
     var items=(data.results||[]).slice(0,20).map(tmdbToItem);
     grid.innerHTML=items.length?items.map(card).join(''):'<div class="loading" style="grid-column:1/-1">İçerik bulunamadı.</div>';
-    if(meta)meta.textContent=items.length+' gerçek '+(type==='tv'?'dizi':'film')+' gösteriliyor.';
+    if(meta)meta.textContent=items.length+' gerçek '+(type==='tv'?'dizi':type==='movie'?'film':'anime')+' gösteriliyor.';
     bindOpeners()
   }catch(err){
     var fallbackType=type==='tv'?'Dizi':'Film';
-    var items=fallbackCatalogue.filter(function(x){return x.type===fallbackType});
+    var items=type==='anime'?[]:fallbackCatalogue.filter(function(x){return x.type===fallbackType});
     grid.innerHTML=items.map(card).join('');
     if(meta)meta.textContent='TMDB kataloğu şu an alınamadı; örnek veriler gösteriliyor.';
     bindOpeners()
+  }
+}
+
+async function categorySearch(type,forcedQuery){
+  var input=document.getElementById('catalogQ');
+  var box=document.getElementById('catalogSearchResults');
+  if(!box)return;
+  var q=(forcedQuery!=null?forcedQuery:(input&&input.value||'')).trim();
+  if(!q){box.innerHTML='';return}
+  var mySeq=++searchSeq;
+  box.innerHTML='<div class="muted">Aranıyor…</div>';
+  try{
+    var data=await api({action:'search',q:q,type:type});
+    if(mySeq!==searchSeq)return;
+    var nq=normalizeText(q);
+    var items=(data.results||[]).map(tmdbToItem).sort(function(a,b){
+      var at=normalizeText(a.title),bt=normalizeText(b.title);
+      var ae=at===nq?1:0,be=bt===nq?1:0;
+      if(ae!==be)return be-ae;
+      var as=at.indexOf(nq)===0?1:0,bs=bt.indexOf(nq)===0?1:0;
+      if(as!==bs)return bs-as;
+      return Number(b.public||0)-Number(a.public||0)
+    }).slice(0,8);
+    box.innerHTML=items.length?items.map(searchResultRow).join(''):'<div class="muted">Bu kategoride sonuç bulunamadı.</div>';
+    bindOpeners()
+  }catch(err){
+    if(mySeq!==searchSeq)return;
+    box.innerHTML='<div class="notice">Arama şu an kullanılamıyor.</div>'
   }
 }
 
