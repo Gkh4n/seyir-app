@@ -88,7 +88,7 @@ function matchesGenre(item, type, genre) {
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=3600");
 
-  const { action, q, type, id, season, genre } = req.query;
+  const { action, q, type, id, season, genre, sort } = req.query;
 
   try {
     if (action === "status") {
@@ -153,6 +153,9 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "catalog") {
+      const order = sort === "popular" ? "popular" : "rating";
+      const sortBy = order === "popular" ? "popularity.desc" : "vote_average.desc";
+
       if (type === "anime") {
         const animeGenre = genre && genre !== "all" ? genre : null;
         const tvIds = animeGenre ? wantedGenreIds("anime", animeGenre, "tv") : [];
@@ -161,25 +164,32 @@ module.exports = async function handler(req, res) {
         const movieExtra = movieIds.length > 1 ? movieIds.join("|") : (movieIds[0] ? String(movieIds[0]) : "");
         const movieGenres = ["16", movieExtra].filter(Boolean).join(",");
 
+        const common = {
+          page: 1,
+          sort_by: sortBy,
+          with_original_language: "ja"
+        };
+        if (order === "rating") common["vote_count.gte"] = 100;
+
         const [tv, movies] = await Promise.all([
           tmdb("/discover/tv", {
-            page: 1,
-            sort_by: "popularity.desc",
-            with_genres: tvGenres,
-            with_original_language: "ja"
+            ...common,
+            with_genres: tvGenres
           }),
           tmdb("/discover/movie", {
-            page: 1,
-            sort_by: "popularity.desc",
-            with_genres: movieGenres,
-            with_original_language: "ja"
+            ...common,
+            with_genres: movieGenres
           })
         ]);
 
         const results = [
           ...(tv.results || []).map(item => ({ ...item, media_type: "tv" })),
           ...(movies.results || []).map(item => ({ ...item, media_type: "movie" }))
-        ].sort((a, b) => Number(b.popularity || 0) - Number(a.popularity || 0));
+        ].sort((a, b) => {
+          if (order === "popular") return Number(b.popularity || 0) - Number(a.popularity || 0);
+          return Number(b.vote_average || 0) - Number(a.vote_average || 0) ||
+            Number(b.vote_count || 0) - Number(a.vote_count || 0);
+        });
 
         return send(res, 200, { results: results.slice(0, 30) });
       }
@@ -189,14 +199,14 @@ module.exports = async function handler(req, res) {
       }
 
       const ids = wantedGenreIds(type, genre, type);
-      const data = ids.length
-        ? await tmdb(`/discover/${type}`, {
-            page: 1,
-            sort_by: "popularity.desc",
-            with_genres: ids.join("|")
-          })
-        : await tmdb(`/${type}/popular`, { page: 1 });
+      const params = {
+        page: 1,
+        sort_by: sortBy
+      };
+      if (ids.length) params.with_genres = ids.join("|");
+      if (order === "rating") params["vote_count.gte"] = type === "movie" ? 300 : 200;
 
+      const data = await tmdb(`/discover/${type}`, params);
       data.results = (data.results || []).map(item => ({
         ...item,
         media_type: type
