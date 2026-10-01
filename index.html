@@ -111,6 +111,7 @@ var currentMatrixMode='public';
 var pendingEpisodeRatings={};
 var episodeRatingMode='stars';
 var activeRatingSeason=1;
+var seasonDataCache={};
 
 function persist(){localStorage.setItem('seyir-state',JSON.stringify(saved))}
 function h(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
@@ -512,6 +513,7 @@ async function loadTmdbDetail(type,id){
       pendingEpisodeRatings={};
       episodeRatingMode='stars';
       activeRatingSeason=1;
+      seasonDataCache={};
       var count=Math.max(1,Number(d.number_of_seasons||1));
       var options='';
       for(var i=1;i<=count;i++)options+='<option value="'+i+'">'+i+'. sezon</option>';
@@ -745,29 +747,47 @@ function renderEpisodeRateControl(x,season,ep){
   for(var i=1;i<=10;i++)stars+='<button class="'+(val!=null&&i<=Math.round(Number(val))?'on':'')+'" data-star-ep="'+key+'" data-season="'+season+'" data-episode="'+ep.episode_number+'" data-star="'+i+'" aria-label="'+i+' puan">★</button>';
   return '<div class="starRate">'+stars+'</div>'+(val!=null?'<button class="clearEpRating" data-clear-ep="'+key+'" data-season="'+season+'" data-episode="'+ep.episode_number+'">Puanı kaldır</button>':'')
 }
+function renderSeasonEditor(x,season,d){
+  var area=document.getElementById('seasonArea');
+  if(!area||!d)return;
+  activeRatingSeason=Number(season||1);
+  renderSeasonTabs(x);
+  var episodes=d.episodes||[];
+  area.className='';
+  area.innerHTML='<div class="episodeRatingList">'+episodes.map(function(ep){
+    var still=ep.still_path?"url('https://image.tmdb.org/t/p/w500"+ep.still_path+"') center/cover":"linear-gradient(135deg,#18202d,#0d1118)";
+    return '<div class="episodeRatingRow"><div class="episodeNo">'+ep.episode_number+'</div><div class="episodeRaterMain"><div class="episodeRaterTop"><div class="episodeRaterTitle"><b>'+h(ep.name||('Bölüm '+ep.episode_number))+'</b><span>'+(ep.air_date?h(ep.air_date):'Tarih bilgisi yok')+'</span><div class="episodeGeneralMeta"><span>Genel <b>'+publicScore(ep.vote_average)+'</b></span><span>'+formatVotes(ep.vote_count)+'</span></div></div><div class="episodeRaterStill" style="--epstill:'+still+'"></div></div>'+(ep.overview?'<p class="episodeRaterOverview">'+h(ep.overview)+'</p>':'')+'</div><div class="episodeRateControl">'+renderEpisodeRateControl(x,activeRatingSeason,ep)+'</div></div>'
+  }).join('')+'</div><div class="episodeSaveBar"><span id="episodeSaveState" class="episodeSaveState"></span><button id="saveEpisodeRatings" class="episodeSaveBtn">Değişiklikleri kaydet</button></div>';
+  bindEpisodeRatingEditor(x,activeRatingSeason)
+}
 function bindEpisodeRatingEditor(x,season){
   document.querySelectorAll('[data-star-ep]').forEach(function(btn){btn.onclick=function(){
     setEpisodeRatingPending(x,season,Number(btn.getAttribute('data-episode')),Number(btn.getAttribute('data-star')));
-    loadSeason(x,season)
+    renderSeasonEditor(x,season,seasonDataCache[season]);
+    renderSeasonTabs(x)
   }});
   document.querySelectorAll('[data-decimal-ep]').forEach(function(inp){inp.oninput=function(){
     var raw=inp.value;
-    if(raw===''){setEpisodeRatingPending(x,season,Number(inp.getAttribute('data-episode')),null);return}
-    var v=Number(raw);if(v>=1&&v<=10)setEpisodeRatingPending(x,season,Number(inp.getAttribute('data-episode')),v)
+    if(raw===''){setEpisodeRatingPending(x,season,Number(inp.getAttribute('data-episode')),null);renderSeasonTabs(x);return}
+    var v=Number(raw);if(v>=1&&v<=10){setEpisodeRatingPending(x,season,Number(inp.getAttribute('data-episode')),v);renderSeasonTabs(x)}
   }});
   document.querySelectorAll('[data-clear-ep]').forEach(function(btn){btn.onclick=function(){
-    setEpisodeRatingPending(x,season,Number(btn.getAttribute('data-episode')),null);loadSeason(x,season)
+    setEpisodeRatingPending(x,season,Number(btn.getAttribute('data-episode')),null);
+    renderSeasonEditor(x,season,seasonDataCache[season]);
+    renderSeasonTabs(x)
   }});
   var stars=document.getElementById('modeStars'),dec=document.getElementById('modeDecimal');
-  if(stars){stars.classList.toggle('active',episodeRatingMode==='stars');stars.onclick=function(){episodeRatingMode='stars';loadSeason(x,season)}}
-  if(dec){dec.classList.toggle('active',episodeRatingMode==='decimal');dec.onclick=function(){episodeRatingMode='decimal';loadSeason(x,season)}}
+  if(stars){stars.classList.toggle('active',episodeRatingMode==='stars');stars.onclick=function(){episodeRatingMode='stars';renderSeasonEditor(x,season,seasonDataCache[season])}}
+  if(dec){dec.classList.toggle('active',episodeRatingMode==='decimal');dec.onclick=function(){episodeRatingMode='decimal';renderSeasonEditor(x,season,seasonDataCache[season])}}
   var save=document.getElementById('saveEpisodeRatings');
   if(save)save.onclick=function(){
     Object.keys(pendingEpisodeRatings).forEach(function(key){
       var v=pendingEpisodeRatings[key];
       if(v==null)delete saved.episodeRatings[key];else saved.episodeRatings[key]=Number(v)
     });
-    pendingEpisodeRatings={};rememberItem(x);persist();renderEpisodeMatrix();renderTopEpisodes();renderSeasonTabs(x);loadSeason(x,season)
+    pendingEpisodeRatings={};rememberItem(x);persist();
+    renderEpisodeMatrix();renderTopEpisodes();renderSeasonTabs(x);
+    renderSeasonEditor(x,season,seasonDataCache[season])
   };
   updateEpisodeSaveBar()
 }
@@ -776,16 +796,15 @@ async function loadSeason(x,season){
   if(!area)return;
   activeRatingSeason=Number(season||1);
   renderSeasonTabs(x);
+  if(seasonDataCache[activeRatingSeason]){
+    renderSeasonEditor(x,activeRatingSeason,seasonDataCache[activeRatingSeason]);
+    return
+  }
   area.className='loading';area.innerHTML='Sezon yükleniyor…';
   try{
     var d=await api({action:'season',type:'tv',id:x.tmdbId,season:activeRatingSeason});
-    var episodes=d.episodes||[];
-    area.className='';
-    area.innerHTML='<div class="episodeRatingList">'+episodes.map(function(ep){
-      var still=ep.still_path?"url('https://image.tmdb.org/t/p/w500"+ep.still_path+"') center/cover":"linear-gradient(135deg,#18202d,#0d1118)";
-      return '<div class="episodeRatingRow"><div class="episodeNo">'+ep.episode_number+'</div><div class="episodeRaterMain"><div class="episodeRaterTop"><div class="episodeRaterTitle"><b>'+h(ep.name||('Bölüm '+ep.episode_number))+'</b><span>'+(ep.air_date?h(ep.air_date):'Tarih bilgisi yok')+'</span><div class="episodeGeneralMeta"><span>Genel <b>'+publicScore(ep.vote_average)+'</b></span><span>'+formatVotes(ep.vote_count)+'</span></div></div><div class="episodeRaterStill" style="--epstill:'+still+'"></div></div>'+(ep.overview?'<p class="episodeRaterOverview">'+h(ep.overview)+'</p>':'')+'</div><div class="episodeRateControl">'+renderEpisodeRateControl(x,activeRatingSeason,ep)+'</div></div>'
-    }).join('')+'</div><div class="episodeSaveBar"><span id="episodeSaveState" class="episodeSaveState"></span><button id="saveEpisodeRatings" class="episodeSaveBtn">Değişiklikleri kaydet</button></div>';
-    bindEpisodeRatingEditor(x,activeRatingSeason)
+    seasonDataCache[activeRatingSeason]=d;
+    renderSeasonEditor(x,activeRatingSeason,d)
   }catch(err){
     area.className='notice';area.textContent='Sezon verileri alınamadı.'
   }
