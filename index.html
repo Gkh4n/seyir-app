@@ -66,6 +66,8 @@ if(!saved.episodeRatings)saved.episodeRatings={};
 if(!saved.movieLogs)saved.movieLogs={};
 
 var currentItem=null;
+var searchTimer=null;
+var searchSeq=0;
 
 function persist(){localStorage.setItem('seyir-state',JSON.stringify(saved))}
 function h(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]})}
@@ -213,7 +215,16 @@ function bind(){
   var sb=document.getElementById('searchBtn');
   if(sb)sb.onclick=search;
   var q=document.getElementById('q');
-  if(q)q.onkeydown=function(e){if(e.key==='Enter')search()}
+  if(q){
+    q.onkeydown=function(e){if(e.key==='Enter'){clearTimeout(searchTimer);search()}};
+    q.oninput=function(){
+      clearTimeout(searchTimer);
+      var value=(q.value||'').trim();
+      var box=document.getElementById('searchResults');
+      if(!value){if(box)box.innerHTML='';return}
+      searchTimer=setTimeout(function(){search(value)},250)
+    }
+  }
   if(currentItem)bindPersonalControls(currentItem);
 }
 function bindOpeners(){
@@ -261,14 +272,16 @@ function searchResultRow(x){
   var thumb=x.posterPath?"url('https://image.tmdb.org/t/p/w185"+x.posterPath+"') center/cover":x.poster;
   return '<div class="searchItem" data-open="'+h(openCode(x))+'"><div class="searchThumb" style="--thumb:'+thumb+'"></div><div class="searchInfo"><b>'+h(x.title)+'</b><span class="muted">'+h(x.type)+' · '+h(x.year)+'</span></div><div class="searchScore">★ '+publicScore(x.public)+'</div></div>'
 }
-async function search(){
+async function search(forcedQuery){
   var input=document.getElementById('q');
   var box=document.getElementById('searchResults');
-  var q=(input.value||'').trim();
-  if(q.length<2){box.innerHTML='<div class="muted">En az 2 karakter yaz.</div>';return}
+  var q=(forcedQuery!=null?forcedQuery:(input&&input.value||'')).trim();
+  if(!q){if(box)box.innerHTML='';return}
+  var mySeq=++searchSeq;
   box.innerHTML='<div class="muted">Aranıyor…</div>';
   try{
     var data=await api({action:'search',q:q});
+    if(mySeq!==searchSeq)return;
     var nq=normalizeText(q);
     var items=(data.results||[]).map(tmdbToItem).sort(function(a,b){
       var at=normalizeText(a.title),bt=normalizeText(b.title);
@@ -281,6 +294,7 @@ async function search(){
     box.innerHTML=items.length?items.map(searchResultRow).join(''):'<div class="muted">Sonuç bulunamadı.</div>';
     bindOpeners()
   }catch(err){
+    if(mySeq!==searchSeq)return;
     var low=normalizeText(q);
     var hits=fallbackCatalogue.filter(function(x){return normalizeText(x.title).indexOf(low)>-1||normalizeText(x.genre).indexOf(low)>-1});
     box.innerHTML='<div class="notice">TMDB şu an kullanılamıyor. Örnek katalogda arandı.</div>'+hits.map(searchResultRow).join('');
