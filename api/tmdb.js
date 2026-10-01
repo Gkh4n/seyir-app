@@ -14,9 +14,10 @@ async function tmdb(path, params = {}) {
 
   const url = new URL(BASE + path);
   url.searchParams.set("api_key", apiKey);
-  url.searchParams.set("language", "tr-TR");
+  if (!params.__skipLanguage) url.searchParams.set("language", "tr-TR");
 
   for (const [key, value] of Object.entries(params)) {
+    if (key.startsWith("__")) continue;
     if (value !== undefined && value !== null && value !== "") {
       url.searchParams.set(key, String(value));
     }
@@ -146,18 +147,51 @@ module.exports = async function handler(req, res) {
 
     if (action === "profile_avatars") {
       const curated = [
-        { id: 1399, show: "Game of Thrones", people: ["Kit Harington", "Peter Dinklage", "Emilia Clarke"] },
-        { id: 1396, show: "Breaking Bad", people: ["Bryan Cranston", "Aaron Paul"] },
-        { id: 70523, show: "Dark", people: ["Louis Hofmann", "Lisa Vicari"] },
-        { id: 1405, show: "Dexter", people: ["Michael C. Hall", "Jennifer Carpenter"] },
-        { id: 2288, show: "Prison Break", people: ["Wentworth Miller", "Dominic Purcell"] },
-        { id: 63174, show: "Lucifer", people: ["Tom Ellis", "Lauren German"] },
-        { id: 66732, show: "Stranger Things", people: ["Millie Bobby Brown", "Finn Wolfhard"] },
-        { id: 1402, show: "The Walking Dead", people: ["Andrew Lincoln", "Norman Reedus"] },
-        { id: 62560, show: "Mr. Robot", people: ["Rami Malek", "Christian Slater"] },
-        { id: 1622, show: "Supernatural", people: ["Jensen Ackles", "Jared Padalecki"] },
-        { id: 76479, show: "The Boys", people: ["Antony Starr", "Karl Urban"] },
-        { id: 60059, show: "Better Call Saul", people: ["Bob Odenkirk", "Rhea Seehorn"] }
+        { id: 1396, show: "Breaking Bad", people: [
+          { actor: "Bryan Cranston", character: "Walter White" },
+          { actor: "Aaron Paul", character: "Jesse Pinkman" }
+        ]},
+        { id: 70523, show: "Dark", people: [
+          { actor: "Louis Hofmann", character: "Jonas Kahnwald" },
+          { actor: "Lisa Vicari", character: "Martha Nielsen" }
+        ]},
+        { id: 1405, show: "Dexter", people: [
+          { actor: "Michael C. Hall", character: "Dexter Morgan" }
+        ]},
+        { id: 2288, show: "Prison Break", people: [
+          { actor: "Wentworth Miller", character: "Michael Scofield" },
+          { actor: "Dominic Purcell", character: "Lincoln Burrows" }
+        ]},
+        { id: 63174, show: "Lucifer", people: [
+          { actor: "Tom Ellis", character: "Lucifer Morningstar" }
+        ]},
+        { id: 66732, show: "Stranger Things", people: [
+          { actor: "Millie Bobby Brown", character: "Eleven" },
+          { actor: "David Harbour", character: "Jim Hopper" }
+        ]},
+        { id: 1402, show: "The Walking Dead", people: [
+          { actor: "Andrew Lincoln", character: "Rick Grimes" },
+          { actor: "Norman Reedus", character: "Daryl Dixon" }
+        ]},
+        { id: 62560, show: "Mr. Robot", people: [
+          { actor: "Rami Malek", character: "Elliot Alderson" }
+        ]},
+        { id: 1399, show: "Game of Thrones", people: [
+          { actor: "Kit Harington", character: "Jon Snow" },
+          { actor: "Peter Dinklage", character: "Tyrion Lannister" },
+          { actor: "Emilia Clarke", character: "Daenerys Targaryen" }
+        ]},
+        { id: 1622, show: "Supernatural", people: [
+          { actor: "Jensen Ackles", character: "Dean Winchester" },
+          { actor: "Jared Padalecki", character: "Sam Winchester" }
+        ]},
+        { id: 60059, show: "Better Call Saul", people: [
+          { actor: "Bob Odenkirk", character: "Saul Goodman" }
+        ]},
+        { id: 76479, show: "The Boys", people: [
+          { actor: "Antony Starr", character: "Homelander" },
+          { actor: "Karl Urban", character: "Billy Butcher" }
+        ]}
       ];
 
       const castLists = await Promise.all(
@@ -168,21 +202,53 @@ module.exports = async function handler(req, res) {
         )
       );
 
-      const results = [];
+      const selected = [];
       for (const group of castLists) {
         for (const wanted of group.entry.people) {
-          const person = group.cast.find(c => c.name === wanted);
-          if (!person || !person.profile_path) continue;
-          results.push({
+          const person = group.cast.find(c => c.name === wanted.actor);
+          if (!person) continue;
+          selected.push({
             id: person.id,
             actor: person.name,
-            character: person.character || person.name,
+            character: wanted.character,
             show: group.entry.show,
-            show_id: group.entry.id,
-            profile_path: person.profile_path
+            show_id: group.entry.id
           });
         }
       }
+
+      const results = (await Promise.all(selected.map(async person => {
+        try {
+          const tagged = await tmdb(`/person/${person.id}/tagged_images`, {
+            page: 1,
+            __skipLanguage: true
+          });
+          const candidates = (tagged.results || []).filter(image => {
+            const media = image.media || {};
+            return media.media_type === "tv" && Number(media.id) === Number(person.show_id) && image.file_path;
+          });
+
+          candidates.sort((a, b) => {
+            const ratioA = Number(a.aspect_ratio || 1.78);
+            const ratioB = Number(b.aspect_ratio || 1.78);
+            const portraitFitA = Math.abs(ratioA - 0.9);
+            const portraitFitB = Math.abs(ratioB - 0.9);
+            if (portraitFitA !== portraitFitB) return portraitFitA - portraitFitB;
+            return Number(b.vote_count || 0) - Number(a.vote_count || 0) ||
+              Number(b.vote_average || 0) - Number(a.vote_average || 0);
+          });
+
+          const image = candidates[0];
+          if (!image) return null;
+          return {
+            ...person,
+            image_path: image.file_path,
+            aspect_ratio: Number(image.aspect_ratio || 1.78)
+          };
+        } catch {
+          return null;
+        }
+      }))).filter(Boolean);
 
       return send(res, 200, { results });
     }
