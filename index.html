@@ -41,7 +41,7 @@ textarea{min-height:110px;resize:vertical}
 .seriesMapControls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.seriesMapControls .matrixToolbar{margin:0}.seriesMapControls .matrixLegend{margin-left:auto}
 .seriesMapCard .episodeMatrixWrap{display:block;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;padding:8px 2px 8px;scrollbar-width:thin;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;contain:inline-size}.seriesMapCard .episodeMatrix{margin:0}.seriesMapCard .scoreCell{width:64px;height:48px;border-radius:8px;font-size:15px}
 .seriesMapCard .episodeMatrix th:first-child,.seriesMapCard .episodeMatrix td:first-child{background:#10151e}
-.episodeDetailPanel{margin-top:15px;border:1px solid rgba(255,255,255,.07);background:#0b0f16;border-radius:16px;overflow:hidden}.episodeDetailEmpty{padding:18px;color:var(--muted)}
+.episodeDetailPanel{margin-top:15px;border:1px solid rgba(255,255,255,.07);background:#0b0f16;border-radius:16px;overflow:hidden;scroll-margin-top:110px}.episodeDetailEmpty{padding:18px;color:var(--muted)}
 .episodeDetailInner{display:grid;grid-template-columns:170px 1fr;gap:16px;padding:14px}.episodeStill{min-height:96px;border-radius:12px;background:var(--still);background-size:cover;background-position:center;border:1px solid rgba(255,255,255,.06)}.episodeDetailText h3{margin:1px 0 4px;font-size:18px}.episodeCode{color:#a69eff;font-size:11px;font-weight:800;letter-spacing:.06em}.episodeDetailMeta{display:flex;gap:9px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin:6px 0}.episodeDetailMeta b{color:#ffc85a}.episodeDetailText p{color:#aeb7c6;font-size:12px;line-height:1.6;margin:8px 0 0}.episodeMineInline{display:flex;align-items:center;gap:8px;margin-top:10px}.episodeMineInline input{width:78px}
 .seriesSeasonDetails{margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)}.seriesSeasonDetails .seasonToolbar{margin:0 0 12px}.seriesSeasonDetailsTitle{font-size:13px;font-weight:800;margin-right:8px}
 .topEpisodesGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.topEpisode{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:12px;padding:9px;border:1px solid rgba(255,255,255,.065);background:#111620;border-radius:14px;cursor:pointer;transition:.16s}.topEpisode:hover{border-color:rgba(75,214,161,.25);transform:translateY(-1px)}.topEpisodeImg{aspect-ratio:16/9;border-radius:9px;background:var(--ep-img);background-size:cover;background-position:center}.topEpisodeInfo b{display:block;font-size:12px}.topEpisodeInfo span{font-size:10px;color:var(--muted)}.topEpisodeScore{font-weight:900;color:#fff;background:#12834b;padding:5px 8px;border-radius:7px}
@@ -761,7 +761,7 @@ function getMatrixEpisode(season,episode){
   var s=currentMatrixData.find(function(x){return Number(x.season)===Number(season)});
   return s?(s.episodes||[]).find(function(e){return Number(e.episode_number)===Number(episode)}):null
 }
-function showEpisodeDetail(season,episode){
+function showEpisodeDetail(season,episode,shouldScroll){
   var ep=getMatrixEpisode(season,episode);
   var panel=document.getElementById('episodeDetail');
   if(!ep||!panel||!currentMatrixItem)return;
@@ -775,7 +775,13 @@ function showEpisodeDetail(season,episode){
     var v=Number(inp.value);
     if(v>=1&&v<=10)saved.episodeRatings[key]=v;else delete saved.episodeRatings[key];
     rememberItem(currentMatrixItem);persist();
-    renderEpisodeMatrix();renderTopEpisodes();showEpisodeDetail(season,episode)
+    renderEpisodeMatrix();renderTopEpisodes();showEpisodeDetail(season,episode,false)
+  };
+  if(shouldScroll){
+    requestAnimationFrame(function(){
+      var target=document.getElementById('episodeDetail');
+      if(target)target.scrollIntoView({behavior:'smooth',block:'center'})
+    })
   }
 }
 function renderTopEpisodes(){
@@ -797,12 +803,11 @@ function renderTopEpisodes(){
   }).join(''):'<div class="emptyState">Puanlı bölüm bulunamadı.</div>';
   document.querySelectorAll('[data-top-season]').forEach(function(el){el.onclick=function(){
     var s=Number(el.getAttribute('data-top-season')),e=Number(el.getAttribute('data-top-episode'));
-    showEpisodeDetail(s,e);
+    showEpisodeDetail(s,e,true);
     activeRatingSeason=s;
     var select=document.getElementById('seasonSelect');if(select)select.value=String(s);
     renderSeasonTabs(currentMatrixItem);
-    loadSeason(currentMatrixItem,s);
-    var panel=document.getElementById('episodeDetail');if(panel)panel.scrollIntoView({behavior:'smooth',block:'center'})
+    loadSeason(currentMatrixItem,s)
   }})
 }
 async function loadRelatedShows(x){
@@ -855,7 +860,7 @@ function renderEpisodeMatrix(){
   document.querySelectorAll('[data-matrix-season]').forEach(function(cell){cell.onclick=function(){
     var season=Number(cell.getAttribute('data-matrix-season'));
     var episode=Number(cell.getAttribute('data-matrix-episode'));
-    showEpisodeDetail(season,episode);
+    showEpisodeDetail(season,episode,true);
     activeRatingSeason=season;
     var select=document.getElementById('seasonSelect');
     if(select)select.value=String(season);
