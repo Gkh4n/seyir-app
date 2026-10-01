@@ -52,8 +52,36 @@ module.exports = async function handler(req, res) {
         return send(res, 400, { error: "En az 2 karakter gir." });
       }
 
+      const query = String(q).trim();
+
+      if (type === "anime") {
+        const [tv, movies] = await Promise.all([
+          tmdb("/search/tv", {
+            query,
+            include_adult: "false",
+            page: 1
+          }),
+          tmdb("/search/movie", {
+            query,
+            include_adult: "false",
+            page: 1
+          })
+        ]);
+
+        const results = [
+          ...(tv.results || []).map(item => ({ ...item, media_type: "tv" })),
+          ...(movies.results || []).map(item => ({ ...item, media_type: "movie" }))
+        ].filter(item =>
+          item.original_language === "ja" &&
+          Array.isArray(item.genre_ids) &&
+          item.genre_ids.includes(16)
+        ).sort((a, b) => Number(b.popularity || 0) - Number(a.popularity || 0));
+
+        return send(res, 200, { results });
+      }
+
       const data = await tmdb("/search/multi", {
-        query: String(q).trim(),
+        query,
         include_adult: "false",
         page: 1
       });
@@ -62,11 +90,6 @@ module.exports = async function handler(req, res) {
         if (item.media_type !== "movie" && item.media_type !== "tv") return false;
         if (type === "tv") return item.media_type === "tv";
         if (type === "movie") return item.media_type === "movie";
-        if (type === "anime") {
-          return item.original_language === "ja" &&
-            Array.isArray(item.genre_ids) &&
-            item.genre_ids.includes(16);
-        }
         return true;
       });
 
