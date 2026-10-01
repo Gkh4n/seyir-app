@@ -58,9 +58,17 @@ module.exports = async function handler(req, res) {
         page: 1
       });
 
-      data.results = (data.results || []).filter(
-        item => item.media_type === "movie" || item.media_type === "tv"
-      );
+      data.results = (data.results || []).filter(item => {
+        if (item.media_type !== "movie" && item.media_type !== "tv") return false;
+        if (type === "tv") return item.media_type === "tv";
+        if (type === "movie") return item.media_type === "movie";
+        if (type === "anime") {
+          return item.original_language === "ja" &&
+            Array.isArray(item.genre_ids) &&
+            item.genre_ids.includes(16);
+        }
+        return true;
+      });
 
       return send(res, 200, data);
     }
@@ -74,6 +82,30 @@ module.exports = async function handler(req, res) {
     }
 
     if (action === "catalog") {
+      if (type === "anime") {
+        const [tv, movies] = await Promise.all([
+          tmdb("/discover/tv", {
+            page: 1,
+            sort_by: "popularity.desc",
+            with_genres: "16",
+            with_original_language: "ja"
+          }),
+          tmdb("/discover/movie", {
+            page: 1,
+            sort_by: "popularity.desc",
+            with_genres: "16",
+            with_original_language: "ja"
+          })
+        ]);
+
+        const results = [
+          ...(tv.results || []).map(item => ({ ...item, media_type: "tv" })),
+          ...(movies.results || []).map(item => ({ ...item, media_type: "movie" }))
+        ].sort((a, b) => Number(b.popularity || 0) - Number(a.popularity || 0));
+
+        return send(res, 200, { results: results.slice(0, 30) });
+      }
+
       if (!["movie", "tv"].includes(type)) {
         return send(res, 400, { error: "Geçersiz katalog türü." });
       }
