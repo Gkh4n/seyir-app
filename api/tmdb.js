@@ -225,7 +225,9 @@ module.exports = async function handler(req, res) {
           });
           const candidates = (tagged.results || []).filter(image => {
             const media = image.media || {};
-            return media.media_type === "tv" && Number(media.id) === Number(person.show_id) && image.file_path;
+            return (image.media_type === "tv" || media.media_type === "tv") &&
+              Number(media.id) === Number(person.show_id) &&
+              image.file_path;
           });
 
           candidates.sort((a, b) => {
