@@ -787,6 +787,19 @@ textarea{min-height:110px;resize:vertical}
   .adminCommentText{font-size:11px}.adminUserRow time{font-size:8px}
 }
 
+
+.adminUserRight{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.adminDeleteUserButton{border:1px solid rgba(255,102,124,.13);background:rgba(255,102,124,.045);color:#e98596;border-radius:9px;padding:7px 9px;font-size:9px;font-weight:800;cursor:pointer}
+.adminDeleteUserButton:hover{background:rgba(255,102,124,.09);border-color:rgba(255,102,124,.22)}
+.adminSelfBadge{display:inline-flex;align-items:center;height:25px;padding:0 8px;border-radius:999px;background:rgba(126,112,255,.075);border:1px solid rgba(126,112,255,.14);color:#9b92ff;font-size:8px;font-weight:900;letter-spacing:.04em}
+.adminDeleteUserOverlay{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,8,.76);backdrop-filter:blur(11px)}
+.adminDeleteUserCard{width:min(470px,100%);display:grid;gap:16px;padding:23px;border:1px solid rgba(255,255,255,.085);border-radius:22px;background:linear-gradient(160deg,#141a24,#0a0f16);box-shadow:0 28px 90px rgba(0,0,0,.56)}
+.adminDeleteUserIcon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:rgba(255,104,124,.075);color:#ff8fa0;font-weight:950;font-size:20px}
+.adminDeleteUserCard h3{font-size:23px;margin:5px 0 7px}.adminDeleteUserCard p{margin:0;color:#7f8a9c;font-size:11px;line-height:1.65}
+.adminDeleteConfirmLabel{display:grid;gap:7px;color:#8b96a8;font-size:10px}.adminDeleteConfirmLabel b{color:#d8dde7}.adminDeleteConfirmLabel input{height:44px;border:1px solid rgba(255,255,255,.075);border-radius:12px;background:#090e15;color:#fff;padding:0 13px;outline:0}.adminDeleteConfirmLabel input:focus{border-color:rgba(143,130,255,.35)}
+.adminDeleteUserActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:680px){.adminUserRight{display:grid;gap:6px;justify-items:end}.adminDeleteUserButton{padding:6px 8px}.adminDeleteUserOverlay{align-items:flex-end;padding:8px}.adminDeleteUserCard{border-radius:22px 22px 16px 16px;padding:20px 16px}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -899,7 +912,8 @@ function adminUsersHtml(data){
   var users=data&&data.users||[];
   if(!users.length)return '<div class="adminEmpty">Henüz kayıtlı kullanıcı yok.</div>';
   return '<div class="adminList">'+users.map(function(p){
-    return '<div class="adminUserRow"><div class="adminAvatar">'+adminAvatarMarkup(p)+'</div><div class="adminUserIdentity"><b>'+h(p.display_name||p.username||'Kullanıcı')+'</b><span>@'+h(p.username||'')+'</span></div><time>'+h(adminDate(p.created_at))+'</time></div>'
+    var self=currentSeyirProfile&&String(currentSeyirProfile.user_id||'')===String(p.user_id||'');
+    return '<div class="adminUserRow"><div class="adminAvatar">'+adminAvatarMarkup(p)+'</div><div class="adminUserIdentity"><b>'+h(p.display_name||p.username||'Kullanıcı')+'</b><span>@'+h(p.username||'')+'</span></div><div class="adminUserRight"><time>'+h(adminDate(p.created_at))+'</time>'+(self?'<span class="adminSelfBadge">Yönetici</span>':'<button class="adminDeleteUserButton" data-admin-delete-user="'+h(p.user_id||'')+'" data-admin-delete-username="'+h(p.username||'')+'">Hesabı sil</button>')+'</div></div>'
   }).join('')+'</div>'
 }
 function renderAdminTab(){
@@ -908,6 +922,48 @@ function renderAdminTab(){
   if(activeAdminTab==='users')area.innerHTML=adminUsersHtml(adminDashboardData);
   else area.innerHTML=adminCommentsHtml(adminDashboardData,adminDashboardData.mediaMap||{});
   bindAdminPanel()
+}
+function closeAdminDeleteUserModal(){
+  var modal=document.getElementById('adminDeleteUserOverlay');
+  if(modal)modal.remove()
+}
+function openAdminDeleteUserModal(userId,username){
+  closeAdminDeleteUserModal();
+  var overlay=document.createElement('div');
+  overlay.id='adminDeleteUserOverlay';
+  overlay.className='adminDeleteUserOverlay';
+  overlay.innerHTML='<div class="adminDeleteUserCard"><div class="adminDeleteUserIcon">!</div><div><div class="socialModalKicker dangerKicker">HESAP SİLME</div><h3>@'+h(username)+' hesabı silinsin mi?</h3><p>Profil, yorumlar, reaksiyonlar ve profil fotoğrafı kalıcı olarak silinecek. Bu işlem geri alınamaz.</p></div><label class="adminDeleteConfirmLabel">Onaylamak için <b>'+h(username)+'</b> yaz<input id="adminDeleteUsernameConfirm" autocomplete="off" placeholder="'+h(username)+'"></label><div id="adminDeleteUserStatus" class="authMessage"></div><div class="adminDeleteUserActions"><button class="secondary" id="cancelAdminDeleteUser">Vazgeç</button><button class="dangerPrimary compactDanger" id="confirmAdminDeleteUser" disabled>Hesabı kalıcı sil</button></div></div>';
+  document.body.appendChild(overlay);
+  var input=document.getElementById('adminDeleteUsernameConfirm');
+  var confirm=document.getElementById('confirmAdminDeleteUser');
+  var cancel=document.getElementById('cancelAdminDeleteUser');
+  if(cancel)cancel.onclick=closeAdminDeleteUserModal;
+  overlay.onclick=function(e){if(e.target===overlay)closeAdminDeleteUserModal()};
+  if(input&&confirm){
+    input.oninput=function(){confirm.disabled=input.value.trim().toLowerCase()!==String(username||'').toLowerCase()};
+    setTimeout(function(){input.focus()},80)
+  }
+  if(confirm)confirm.onclick=async function(){
+    var status=document.getElementById('adminDeleteUserStatus');
+    confirm.disabled=true;
+    if(cancel)cancel.disabled=true;
+    setAuthMessage(status,'Hesap siliniyor…','info');
+    try{
+      await seyirAdminRequest({action:'delete_user',user_id:userId,confirm_username:username});
+      setAuthMessage(status,'Hesap silindi.','success');
+      setTimeout(async function(){
+        closeAdminDeleteUserModal();
+        adminDashboardData=null;
+        var area=document.getElementById('adminContent');
+        if(area)area.innerHTML='<div class="loading">Yönetici verileri yenileniyor…</div>';
+        await loadAdminDashboard()
+      },450)
+    }catch(err){
+      setAuthMessage(status,friendlyAuthError(err),'error');
+      confirm.disabled=false;
+      if(cancel)cancel.disabled=false
+    }
+  }
 }
 function bindAdminPanel(){
   document.querySelectorAll('[data-admin-tab]').forEach(function(b){b.onclick=function(){
@@ -920,6 +976,9 @@ function bindAdminPanel(){
     var id=b.getAttribute('data-admin-media-id');
     var comment=b.getAttribute('data-admin-open-comment');
     location.hash='tmdb/'+type+'/'+id+'/comment/'+comment
+  }});
+  document.querySelectorAll('[data-admin-delete-user]').forEach(function(b){b.onclick=function(){
+    openAdminDeleteUserModal(b.getAttribute('data-admin-delete-user'),b.getAttribute('data-admin-delete-username')||'')
   }})
 }
 async function loadAdminDashboard(){
