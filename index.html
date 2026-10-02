@@ -680,6 +680,49 @@ textarea{min-height:110px;resize:vertical}
   .commentDeleteOverlay{align-items:flex-end;padding:8px}.commentDeleteCard{border-radius:22px 22px 17px 17px}
 }
 
+
+/* --- premium comment threads v2 --- */
+.commentThread{display:grid;gap:0}
+.commentThread+.commentThread{margin-top:4px}
+.threadReplies{position:relative;display:grid;gap:9px;margin:9px 0 2px 47px;padding-left:14px}
+.threadReplies:before{content:"";position:absolute;left:0;top:2px;bottom:14px;width:1px;background:linear-gradient(to bottom,rgba(139,128,255,.22),rgba(255,255,255,.035))}
+.socialComment.reply{margin:0!important;padding:0!important;border-left:0!important}
+.socialComment.reply .commentBody{background:#0b1119;border-color:rgba(255,255,255,.055)}
+.replyMention{display:inline;border:0;background:transparent;color:#9186ff;font:inherit;font-weight:800;padding:0;cursor:pointer}
+.commentActions{gap:10px}
+.reactionStrip{display:inline-flex;gap:4px;padding:3px;border:1px solid rgba(255,255,255,.055);border-radius:999px;background:#090e15}
+.reactionBtn{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;width:auto!important;min-width:31px!important;height:29px!important;padding:0 7px!important;border:0!important;border-radius:999px!important;background:transparent!important;color:#7f8a9b!important;transition:.16s ease!important}
+.reactionBtn:hover{background:rgba(255,255,255,.045)!important;color:#cfd5df!important}
+.reactionBtn.active{background:#171e2b!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.065)!important}
+.reactionIcon{display:grid;place-items:center;width:15px;height:15px}
+.reactionIcon svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.reaction-like.active{color:#79a8ff!important}.reaction-love.active{color:#ff8297!important}.reaction-haha.active{color:#f1c969!important}.reaction-sad.active{color:#83b6e8!important}
+.reactionCount{font-size:9px!important;margin:0!important;color:inherit!important;font-weight:800}
+.replyToggle,.deleteComment{font-size:10px!important;padding:6px 4px!important;border-radius:8px!important}
+.replyToggle:hover{color:#b8c0cf!important;background:rgba(255,255,255,.035)!important}
+.deleteComment:hover{color:#ff9bab!important;background:rgba(255,105,125,.05)!important}
+.inlineReply{display:grid!important;gap:7px!important;margin-top:10px!important;padding:10px!important;border:1px solid rgba(139,128,255,.11)!important;border-radius:13px!important;background:#090e15!important}
+.inlineReplyTo{font-size:9px;color:#8d82ff;font-weight:800}
+.inlineReplyRow{display:flex;gap:8px;align-items:flex-end}
+.inlineReplyRow textarea{flex:1;min-height:55px;max-height:130px;border:0!important;background:transparent!important;color:#eef1f7!important;padding:5px!important;outline:0;resize:vertical}
+.inlineReplyRow button{min-width:76px}
+.commentDeleteOverlay{position:fixed;inset:0;z-index:2800;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,8,.72);backdrop-filter:blur(10px)}
+.commentDeleteCard{width:min(430px,100%);display:grid;gap:16px;padding:22px;border:1px solid rgba(255,255,255,.085);border-radius:22px;background:linear-gradient(160deg,#141a24,#0a0f16);box-shadow:0 28px 90px rgba(0,0,0,.52)}
+.commentDeleteIcon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(255,104,124,.075);color:#ff8fa0}
+.commentDeleteIcon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.commentDeleteCard h3{margin:5px 0 6px;font-size:24px}.commentDeleteCard p{margin:0;color:#7f8a9c;font-size:12px;line-height:1.6}
+.commentDeleteActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.compactDanger{height:42px;margin:0!important}
+.commentDeleteStatus{min-height:0;display:flex;align-items:center;justify-content:center;gap:7px;color:#9ca6b6;font-size:10px}.commentDeleteStatus:not(:empty){min-height:24px}
+@media(max-width:680px){
+  .threadReplies{margin-left:25px;padding-left:10px;gap:8px}
+  .socialComment.reply{grid-template-columns:30px minmax(0,1fr)!important}
+  .socialComment.reply .commentAvatar{width:30px!important;height:30px!important}
+  .commentMeta>button{min-width:0;display:flex;align-items:center;gap:5px;overflow:hidden}.commentMeta b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px}.commentMeta span{white-space:nowrap;margin-left:0!important}
+  .reactionStrip{gap:2px}.reactionBtn{min-width:29px!important;padding:0 6px!important}.reactionIcon,.reactionIcon svg{width:14px;height:14px}
+  .inlineReplyRow{align-items:stretch;flex-direction:column}.inlineReplyRow button{align-self:flex-end}
+  .commentDeleteOverlay{align-items:flex-end;padding:8px}.commentDeleteCard{border-radius:22px 22px 16px 16px;padding:20px 16px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1571,37 +1614,44 @@ function commentAvatar(profile){
   var url=socialProfileAvatar(profile,'w185');
   return url?'<img src="'+h(url)+'" alt="">':'<span>'+h(((profile&&profile.display_name)||(profile&&profile.username)||'S').charAt(0).toUpperCase())+'</span>'
 }
-function reactionLabel(type){
+function reactionTitle(type){
   return {like:'Beğen',love:'Kalp',haha:'Haha',sad:'Üzgün'}[type]||'Beğen'
 }
 function reactionIcon(type){
-  if(type==='love')return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.3 13A5.1 5.1 0 0 1 11.5 5.8L12 6.3l.5-.5A5.1 5.1 0 0 1 19.7 13L12 20.3Z"/></svg>';
-  if(type==='haha')return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 10c.8-.8 1.6-.8 2.4 0M13.4 10c.8-.8 1.6-.8 2.4 0M8.7 14.1c1.9 2.2 4.7 2.2 6.6 0"/></svg>';
-  if(type==='sad')return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 9.5h.01M15.5 9.5h.01M8.7 16c1.9-2.2 4.7-2.2 6.6 0"/><path d="M16.8 11.7c.8 1 .8 2 0 3"/></svg>';
-  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 20H5.8V10.7h3.6V20Zm0-9.3 3.3-6.2c.4-.7 1.5-.4 1.5.4v3.7h3.1a2 2 0 0 1 2 2.4l-1.2 6.4a2 2 0 0 1-2 1.6H9.4v-8.3Z"/></svg>'
+  var icons={
+    like:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.6 10.2 10.7 4c.5-1 1.6-1.5 2.5-1.1.8.4 1.2 1.3.9 2.2l-1 3.1h5.2c1.6 0 2.8 1.5 2.4 3l-1.7 7.1a2.4 2.4 0 0 1-2.3 1.8H7.6V10.2Z"/><path d="M3.3 10.2h4.3v9.9H3.3z"/></svg>',
+    love:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.8a5.5 5.5 0 0 0-7.8 0L12 5.9l-1.1-1.1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.4a5.5 5.5 0 0 0 0-7.8Z"/></svg>',
+    haha:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M7.6 9.3c.8-.8 1.7-.8 2.5 0M13.9 9.3c.8-.8 1.7-.8 2.5 0M7.5 14.2c1.1 2 2.6 3 4.5 3s3.4-1 4.5-3H7.5Z"/></svg>',
+    sad:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.2 9.4h.1M15.7 9.4h.1M8.2 17c1-1.4 2.3-2.1 3.8-2.1s2.8.7 3.8 2.1M18.2 12.4c1.2 1.3 1.3 2.4.2 3.4-1-1-1.1-2.1-.2-3.4Z"/></svg>'
+  };
+  return icons[type]||icons.like
 }
-function flattenCommentReplies(parentId,children,out){
-  (children[parentId]||[]).forEach(function(child){
-    out.push(child);
-    flattenCommentReplies(child.id,children,out)
-  });
-  return out
+function formatCommentTime(value){
+  try{
+    var d=new Date(value),diff=(Date.now()-d.getTime())/1000;
+    if(diff<60)return 'şimdi';
+    if(diff<3600)return Math.floor(diff/60)+' dk';
+    if(diff<86400)return Math.floor(diff/3600)+' sa';
+    if(diff<604800)return Math.floor(diff/86400)+' gün';
+    return d.toLocaleDateString('tr-TR')
+  }catch(e){return ''}
 }
-function renderSocialCommentRow(comment,profiles,reactions,commentMap,isReply){
+function renderSocialCommentRow(comment,profiles,reactions,parentComment,isReply){
   var profile=profiles[comment.user_id]||{};
-  var parent=comment.parent_id?commentMap[comment.parent_id]:null;
-  var parentProfile=parent?(profiles[parent.user_id]||{}):null;
+  var parentProfile=parentComment?profiles[parentComment.user_id]||{}:null;
   var own=currentUser&&currentUser.id===comment.user_id;
   var reacts=reactions.filter(function(r){return r.comment_id===comment.id});
   var counts={like:0,love:0,haha:0,sad:0};
   reacts.forEach(function(r){if(counts[r.reaction]!=null)counts[r.reaction]++});
   var mine=currentUser?reacts.find(function(r){return r.user_id===currentUser.id}):null;
-  var mention=isReply&&parentProfile&&parentProfile.username?'<button class="replyMention" data-user-profile="'+h(parentProfile.username)+'">@'+h(parentProfile.username)+'</button> ':'';
-  var reactionHtml=['like','love','haha','sad'].map(function(type){
-    var n=counts[type];
-    return '<button class="reactionBtn reaction-'+type+' '+(mine&&mine.reaction===type?'active':'')+'" data-comment-react="'+comment.id+'" data-reaction="'+type+'" aria-label="'+reactionLabel(type)+'" title="'+reactionLabel(type)+'"><span class="reactionGlyph">'+reactionIcon(type)+'</span>'+(n?'<span class="reactionCount">'+n+'</span>':'')+'</button>'
-  }).join('');
-  return '<article class="socialComment '+(isReply?'reply flatReply':'rootComment')+'" data-comment-id="'+comment.id+'"><button class="commentAvatar" data-user-profile="'+h(profile.username||'')+'">'+commentAvatar(profile)+'</button><div class="commentBody"><div class="commentMeta"><button data-user-profile="'+h(profile.username||'')+'"><b>'+h(profile.display_name||profile.username||'Kullanıcı')+'</b><span>@'+h(profile.username||'')+'</span></button><time>'+formatCommentTime(comment.created_at)+'</time></div><p>'+mention+h(comment.body)+'</p><div class="commentActions"><div class="reactionStrip">'+reactionHtml+'</div>'+(currentUser?'<button class="replyToggle" data-reply-to="'+comment.id+'" data-reply-username="'+h(profile.username||'')+'">Yanıtla</button>':'')+(own?'<button class="deleteComment" data-delete-comment="'+comment.id+'">Sil</button>':'')+'</div><div class="replyComposer" id="reply-'+comment.id+'"></div></div></article>'
+  var mention=parentProfile&&parentProfile.username?'<button class="replyMention" data-user-profile="'+h(parentProfile.username)+'">@'+h(parentProfile.username)+'</button> ':'';
+  return '<article class="socialComment '+(isReply?'reply':'')+'" data-comment-id="'+comment.id+'"><button class="commentAvatar" data-user-profile="'+h(profile.username||'')+'">'+commentAvatar(profile)+'</button><div class="commentBody"><div class="commentMeta"><button data-user-profile="'+h(profile.username||'')+'"><b>'+h(profile.display_name||profile.username||'Kullanıcı')+'</b><span>@'+h(profile.username||'')+'</span></button><time>'+formatCommentTime(comment.created_at)+'</time></div><p>'+mention+h(comment.body)+'</p><div class="commentActions"><div class="reactionStrip">'+['like','love','haha','sad'].map(function(type){var n=counts[type];return '<button class="reactionBtn reaction-'+type+' '+(mine&&mine.reaction===type?'active':'')+'" data-comment-react="'+comment.id+'" data-reaction="'+type+'" aria-label="'+reactionTitle(type)+'" title="'+reactionTitle(type)+'"><span class="reactionIcon">'+reactionIcon(type)+'</span>'+(n?'<span class="reactionCount">'+n+'</span>':'')+'</button>'}).join('')+'</div>'+(currentUser?'<button class="replyToggle" data-reply-to="'+comment.id+'" data-reply-username="'+h(profile.username||'')+'">Yanıtla</button>':'')+(own?'<button class="deleteComment" data-delete-comment="'+comment.id+'">Sil</button>':'')+'</div><div class="replyComposer" id="reply-'+comment.id+'"></div></div></article>'
+}
+function flattenCommentReplies(parent,children,out){
+  (children[parent.id]||[]).forEach(function(child){
+    out.push({comment:child,parent:parent});
+    flattenCommentReplies(child,children,out)
+  })
 }
 async function loadSocialComments(x){
   var area=document.getElementById('socialCommentsList');
@@ -1618,50 +1668,40 @@ async function loadSocialComments(x){
   var profiles={};
   (profilesRes.data||[]).forEach(function(p){profiles[p.user_id]=p});
   var reactions=reactionsRes.data||[];
-  var children={},commentMap={},roots=[];
-  comments.forEach(function(c){commentMap[c.id]=c});
+  var children={};
+  var roots=[];
   comments.forEach(function(c){
-    if(c.parent_id&&commentMap[c.parent_id]){
-      if(!children[c.parent_id])children[c.parent_id]=[];
-      children[c.parent_id].push(c)
-    }else roots.push(c)
+    if(c.parent_id){if(!children[c.parent_id])children[c.parent_id]=[];children[c.parent_id].push(c)}
+    else roots.push(c)
   });
   area.innerHTML=roots.map(function(root){
-    var replies=flattenCommentReplies(root.id,children,[]);
-    return '<section class="commentThread">'+renderSocialCommentRow(root,profiles,reactions,commentMap,false)+(replies.length?'<div class="flatReplies">'+replies.map(function(reply){return renderSocialCommentRow(reply,profiles,reactions,commentMap,true)}).join('')+'</div>':'')+'</section>'
+    var flat=[];
+    flattenCommentReplies(root,children,flat);
+    return '<section class="commentThread">'+renderSocialCommentRow(root,profiles,reactions,null,false)+(flat.length?'<div class="threadReplies">'+flat.map(function(item){return renderSocialCommentRow(item.comment,profiles,reactions,item.parent,true)}).join('')+'</div>':'')+'</section>'
   }).join('');
   bindCommentUI(x)
 }
-function commentDeleteMarkup(){
-  return '<div class="commentDeleteOverlay" id="commentDeleteOverlay"><div class="commentDeleteCard"><div class="commentDeleteIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 10v7M12 10v7M16 10v7M7 7l1 13h8l1-13"/></svg></div><div><h3>Yorumu sil?</h3><p>Bu yorum ve ona verilen yanıtlar kalıcı olarak kaldırılacak.</p></div><div id="commentDeleteStatus" class="commentDeleteStatus"></div><div class="commentDeleteActions"><button class="secondary" id="cancelDeleteComment">Vazgeç</button><button class="dangerButton" id="confirmDeleteComment">Yorumu sil</button></div></div></div>'
-}
-function closeDeleteCommentModal(){
+function closeCommentDeleteModal(){
   var modal=document.getElementById('commentDeleteOverlay');
   if(modal)modal.remove()
 }
-function openDeleteCommentModal(commentId,x){
-  closeDeleteCommentModal();
-  document.body.insertAdjacentHTML('beforeend',commentDeleteMarkup());
-  var overlay=document.getElementById('commentDeleteOverlay');
-  var cancel=document.getElementById('cancelDeleteComment');
-  var confirmDelete=document.getElementById('confirmDeleteComment');
-  if(cancel)cancel.onclick=closeDeleteCommentModal;
-  if(overlay)overlay.onclick=function(e){if(e.target===overlay)closeDeleteCommentModal()};
-  if(confirmDelete)confirmDelete.onclick=async function(){
-    confirmDelete.disabled=true;
-    if(cancel)cancel.disabled=true;
-    confirmDelete.innerHTML='<span class="miniSpinner"></span> Siliniyor';
-    var status=document.getElementById('commentDeleteStatus');
-    var result=await seyirDb.from('seyir_comments').delete().eq('id',commentId);
-    if(result.error){
-      if(status)status.textContent='Yorum silinemedi. Tekrar dene.';
-      confirmDelete.disabled=false;
-      if(cancel)cancel.disabled=false;
-      confirmDelete.textContent='Yorumu sil';
-      return
-    }
-    if(status)status.innerHTML='<span class="statusCheck">✓</span> Yorum silindi';
-    setTimeout(function(){closeDeleteCommentModal();loadSocialComments(x)},280)
+function openCommentDeleteModal(commentId,x){
+  closeCommentDeleteModal();
+  var overlay=document.createElement('div');
+  overlay.id='commentDeleteOverlay';
+  overlay.className='commentDeleteOverlay';
+  overlay.innerHTML='<div class="commentDeleteCard"><div class="commentDeleteIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg></div><div><div class="socialModalKicker dangerKicker">YORUMU SİL</div><h3>Yorum silinsin mi?</h3><p>Bu yoruma bağlı yanıtlar varsa onlar da kaldırılır. Bu işlem geri alınamaz.</p></div><div class="commentDeleteActions"><button class="secondary" id="cancelCommentDelete">Vazgeç</button><button class="dangerPrimary compactDanger" id="confirmCommentDelete">Yorumu sil</button></div><div id="commentDeleteStatus" class="commentDeleteStatus"></div></div>';
+  document.body.appendChild(overlay);
+  overlay.onclick=function(e){if(e.target===overlay)closeCommentDeleteModal()};
+  document.getElementById('cancelCommentDelete').onclick=closeCommentDeleteModal;
+  document.getElementById('confirmCommentDelete').onclick=async function(){
+    var btn=this,status=document.getElementById('commentDeleteStatus');
+    btn.disabled=true;
+    status.innerHTML='<span class="miniSpinner"></span> Yorum siliniyor…';
+    var r=await seyirDb.from('seyir_comments').delete().eq('id',commentId);
+    if(r.error){status.textContent='Yorum silinemedi. Tekrar dene.';btn.disabled=false;return}
+    status.innerHTML='<span class="statusCheck">✓</span> Yorum silindi';
+    setTimeout(function(){closeCommentDeleteModal();loadSocialComments(x)},320)
   }
 }
 function bindCommentUI(x){
@@ -1682,15 +1722,16 @@ function bindCommentUI(x){
   };
   document.querySelectorAll('[data-reply-to]').forEach(function(b){b.onclick=function(){
     if(!currentUser){openAuthModal('login');return}
-    var id=b.getAttribute('data-reply-to'),username=b.getAttribute('data-reply-username')||'',host=document.getElementById('reply-'+id);
-    document.querySelectorAll('.replyComposer').forEach(function(el){if(el!==host)el.innerHTML=''});
-    host.innerHTML='<div class="inlineReply inlineReplyV2"><div class="replyingTo">Yanıtlanıyor <b>@'+h(username)+'</b></div><div class="replyComposeRow"><textarea maxlength="1000" placeholder="@'+h(username)+' kullanıcısına yanıt yaz…"></textarea><button class="primary">Gönder</button></div></div>';
+    var id=b.getAttribute('data-reply-to');
+    var username=b.getAttribute('data-reply-username')||'kullanici';
+    var host=document.getElementById('reply-'+id);
+    document.querySelectorAll('.replyComposer').forEach(function(c){if(c!==host)c.innerHTML=''});
+    host.innerHTML='<div class="inlineReply"><div class="inlineReplyTo">@'+h(username)+' kullanıcısına yanıt</div><div class="inlineReplyRow"><textarea maxlength="1000" placeholder="Yanıtını yaz…"></textarea><button class="primary">Gönder</button></div></div>';
     var input=host.querySelector('textarea'),send=host.querySelector('button');
     input.focus();
     send.onclick=async function(){
       var body=input.value.trim();if(!body)return;
-      send.disabled=true;
-      send.textContent='Gönderiliyor…';
+      send.disabled=true;send.textContent='Gönderiliyor…';
       var r=await seyirDb.from('seyir_comments').insert({user_id:currentUser.id,media_type:x.mediaType==='movie'?'movie':'tv',media_id:x.tmdbId,parent_id:id,body:body});
       if(!r.error)loadSocialComments(x);else{send.disabled=false;send.textContent='Gönder'}
     }
@@ -1699,13 +1740,13 @@ function bindCommentUI(x){
     if(!currentUser){openAuthModal('login');return}
     var id=b.getAttribute('data-comment-react'),reaction=b.getAttribute('data-reaction');
     var active=b.classList.contains('active');
-    b.classList.add('reactionPending');
+    b.classList.toggle('active',!active);
     if(active)await seyirDb.from('seyir_comment_reactions').delete().eq('comment_id',id).eq('user_id',currentUser.id);
     else await seyirDb.from('seyir_comment_reactions').upsert({comment_id:id,user_id:currentUser.id,reaction:reaction},{onConflict:'comment_id,user_id'});
     loadSocialComments(x)
   }});
   document.querySelectorAll('[data-delete-comment]').forEach(function(b){b.onclick=function(){
-    openDeleteCommentModal(b.getAttribute('data-delete-comment'),x)
+    openCommentDeleteModal(b.getAttribute('data-delete-comment'),x)
   }})
 }
 function profile(){
