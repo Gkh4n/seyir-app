@@ -765,7 +765,7 @@ textarea{min-height:110px;resize:vertical}
 <script>
 var SEYIR_SUPABASE_URL='https://vysddydaqjxdfoaziyrv.supabase.co';
 var SEYIR_SUPABASE_KEY='sb_publishable_3QXB59ogdtiPnVHEMpvKIw_4dFLra_e';
-var seyirRecoveryLanding=/(?:^|[&#?])type=recovery(?:&|$)/i.test(String(location.hash||'')+String(location.search||''));
+var seyirRecoveryLanding=/(?:^|[&#?])type=recovery(?:&|$)/i.test(String(location.hash||'')+String(location.search||''))||/[?&]password-recovery=1(?:&|$)/i.test(String(location.search||''));
 var seyirDb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SEYIR_SUPABASE_URL,SEYIR_SUPABASE_KEY):null;
 var currentUser=null;
 var currentSeyirProfile=null;
@@ -807,7 +807,7 @@ async function showRecoveryPasswordModal(session){
   document.body.classList.add('socialModalOpen');
   try{
     if(location.hash&&/access_token|refresh_token|type=recovery/i.test(location.hash)){
-      history.replaceState(null,'',location.pathname+location.search)
+      history.replaceState(null,'',location.pathname)
     }
   }catch(e){}
 }
@@ -1035,7 +1035,7 @@ async function submitForgotPasswordRequest(e){
   passwordResetEmail=email;
   setAuthMessage(msg,'Bağlantı gönderiliyor…','info');
   try{
-    var options={redirectTo:'https://seyir-app-4tez.vercel.app/'};
+    var options={redirectTo:'https://seyir-app-4tez.vercel.app/?password-recovery=1'};
     var r=await seyirDb.auth.resetPasswordForEmail(email,options);
     if(r.error)throw r.error;
     setAuthMessage(msg,'Şifre yenileme bağlantısı gönderildi. E-postanı kontrol et.','success');
