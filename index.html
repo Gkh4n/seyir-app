@@ -616,7 +616,7 @@ function ensureSocialOverlay(){
 }
 function authModalMarkup(mode){
   var register=mode==='register';
-  return '<div class="socialModal open" id="socialAuthModal"><div class="socialModalCard authCard"><button class="socialModalClose" data-close-social>×</button><div class="socialModalKicker">SEYİR HESABI</div><h2>'+(register?'Profilini oluştur':'Tekrar hoş geldin')+'</h2><p>'+(register?'Yorum yap, diğer kullanıcılarla etkileşime geç ve kendi profilini oluştur.':'Profiline ve topluluğa giriş yap.')+'</p><div class="authSwitch"><button data-auth-mode="login" class="'+(!register?'active':'')+'">Giriş yap</button><button data-auth-mode="register" class="'+(register?'active':'')+'">Kayıt ol</button></div><form id="seyirAuthForm">'+(register?'<div class="fieldRow"><label>Kullanıcı adı<input id="authUsername" maxlength="20" autocomplete="username" placeholder="gokhan98" required></label><label>Görünen ad<input id="authDisplayName" maxlength="40" placeholder="Gökhan" required></label></div>':'')+'<label>E-posta<input id="authEmail" type="email" autocomplete="email" required></label><label>Şifre<input id="authPassword" type="password" minlength="6" autocomplete="'+(register?'new-password':'current-password')+'" required></label><div id="authMessage" class="authMessage"></div><button class="primary socialSubmit" type="submit">'+(register?'Profil oluştur':'Giriş yap')+'</button></form></div></div>'
+  return '<div class="socialModal open" id="socialAuthModal"><div class="socialModalCard authCard"><button class="socialModalClose" data-close-social>×</button><div class="socialModalKicker">SEYİR HESABI</div><h2>'+(register?'Profilini oluştur':'Tekrar hoş geldin')+'</h2><p>'+(register?'Yorum yap, diğer kullanıcılarla etkileşime geç ve kendi profilini oluştur.':'Profiline ve topluluğa giriş yap.')+'</p><div class="authSwitch"><button data-auth-mode="login" class="'+(!register?'active':'')+'">Giriş yap</button><button data-auth-mode="register" class="'+(register?'active':'')+'">Kayıt ol</button></div><form id="seyirAuthForm">'+(register?'<div class="fieldRow"><label>Kullanıcı adı<input id="authUsername" maxlength="20" autocomplete="username" placeholder="kullanici_adi" required></label><label>Görünen ad<input id="authDisplayName" maxlength="40" placeholder="Adın veya rumuzun" required></label></div>':'')+'<label>E-posta<input id="authEmail" type="email" autocomplete="email" required></label><label>Şifre<input id="authPassword" type="password" minlength="6" autocomplete="'+(register?'new-password':'current-password')+'" required></label><div id="authMessage" class="authMessage"></div><button class="primary socialSubmit" type="submit">'+(register?'Profil oluştur':'Giriş yap')+'</button></form></div></div>'
 }
 function openAuthModal(mode){
   ensureSocialOverlay();
@@ -746,7 +746,7 @@ if(!saved.items)saved.items={};
 if(!saved.episodeRatings)saved.episodeRatings={};
 if(!saved.movieLogs)saved.movieLogs={};
 if(!saved.profileAvatar)saved.profileAvatar=null;
-if(!saved.profileName)saved.profileName='Gökhan';
+if(!saved.profileName)saved.profileName='Seyir Kullanıcısı';
 if(!saved.profileBio)saved.profileBio='Dizi, film ve anime arşivim.';
 if(saved.profileAvatar&&(!saved.profileAvatar.image_path||Number(saved.profileAvatar.aspect_ratio||0)<1.25))saved.profileAvatar=null;
 if(!saved.dataVersion||saved.dataVersion<4){
