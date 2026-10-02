@@ -603,6 +603,39 @@ textarea{min-height:110px;resize:vertical}
   .photoActionSheet{border-radius:22px 22px 16px 16px}
 }
 
+
+/* --- profile photo actions / visible feedback --- */
+.hiddenAvatarInput{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+.profilePhotoEditorV3{grid-template-columns:86px minmax(0,1fr);align-items:center}
+.profilePhotoButton,.profileIdentityAvatarButton{position:relative;border:0;padding:0;cursor:pointer;color:#fff}
+.profilePhotoButton:focus-visible,.profileIdentityAvatarButton:focus-visible{outline:2px solid #8c80ff;outline-offset:4px}
+.profilePhotoInfo{display:grid;gap:5px}.profilePhotoInfo b{font-size:13px}.profilePhotoInfo span{font-size:10px;color:#707c8f;line-height:1.5}
+.photoEditBadge{position:absolute;right:-2px;bottom:-2px;width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#1b2230;color:#fff;border:3px solid #0b1018;font-size:12px;box-shadow:0 7px 20px rgba(0,0,0,.3)}
+.profileBadge{right:2px;bottom:2px;border-color:#111722}
+.photoActionBackdrop{position:fixed;inset:0;z-index:2300;display:flex;align-items:flex-end;justify-content:center;padding:14px;background:rgba(2,4,8,.62);backdrop-filter:blur(8px)}
+.photoActionSheet{width:min(470px,100%);padding:10px 14px 14px;border:1px solid rgba(255,255,255,.09);border-radius:24px;background:linear-gradient(165deg,#151b26,#0b1017);box-shadow:0 30px 90px rgba(0,0,0,.55)}
+.photoActionHandle{width:38px;height:4px;border-radius:999px;background:rgba(255,255,255,.16);margin:2px auto 14px}
+.photoActionTitle{display:grid;gap:3px;padding:0 5px 12px}.photoActionTitle b{font-size:15px}.photoActionTitle span{font-size:10px;color:#758194}
+.photoActionPrimary,.photoActionDanger{width:100%;display:grid;grid-template-columns:38px 1fr;gap:11px;align-items:center;text-align:left;border:1px solid rgba(255,255,255,.065);border-radius:15px;background:#0b1119;color:#fff;padding:12px;margin-top:8px;cursor:pointer}
+.photoActionPrimary:hover{background:#111824}.photoActionDanger{color:#ff9aaa}.photoActionDanger:hover{background:rgba(255,100,120,.06)}
+.photoActionIcon{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:#161e2a;font-size:18px}.photoActionDanger .photoActionIcon{background:rgba(255,100,120,.08)}
+.photoActionPrimary>span:last-child,.photoActionDanger>span:last-child{display:grid;gap:3px}.photoActionPrimary b,.photoActionDanger b{font-size:12px}.photoActionPrimary small,.photoActionDanger small{font-size:9px;color:#6f7b8e}
+.photoActionCancel{width:100%;border:0;background:transparent;color:#8a95a6;padding:13px 0 5px;cursor:pointer}
+.photoActionStatus{min-height:0;display:flex;align-items:center;justify-content:center;gap:8px;color:#aeb7c7;font-size:10px;transition:.2s}.photoActionStatus:not(:empty){min-height:38px;margin-top:5px;border-top:1px solid rgba(255,255,255,.055);padding-top:9px}
+.photoActionSheet.busy .photoActionPrimary,.photoActionSheet.busy .photoActionDanger,.photoActionSheet.busy .photoActionCancel{opacity:.42}
+.miniSpinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.18);border-top-color:#9186ff;border-radius:50%;animation:seyirSpin .7s linear infinite}.statusCheck{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:rgba(84,211,154,.12);color:#67daa8;font-weight:900}
+@keyframes seyirSpin{to{transform:rotate(360deg)}}
+.photoPending{position:relative}.photoLoadingOverlay{position:absolute;inset:0;border-radius:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:rgba(4,7,12,.62);backdrop-filter:blur(2px);font-size:9px;color:#fff}.photoLoadingOverlay .miniSpinner{width:17px;height:17px}
+.profileToast{position:fixed;z-index:2600;left:50%;bottom:92px;transform:translate(-50%,18px);opacity:0;display:flex;align-items:center;gap:8px;padding:11px 14px;border-radius:999px;background:#171e29;border:1px solid rgba(255,255,255,.09);box-shadow:0 18px 45px rgba(0,0,0,.4);color:#e9edf5;font-size:11px;transition:.2s ease}.profileToast.show{opacity:1;transform:translate(-50%,0)}.profileToast>span{color:#67daa8;font-weight:900}
+.accountSessionRow{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:18px;padding:17px 0;border-top:1px solid rgba(255,255,255,.065)}.accountSessionRow>div{display:grid;gap:3px}.accountSessionRow b{font-size:12px}.accountSessionRow span{color:#707b8e;font-size:10px}.logoutProfileButton{white-space:nowrap}
+@media(min-width:681px){.photoActionBackdrop{align-items:center}.photoActionSheet{border-radius:22px}}
+@media(max-width:680px){
+  .profilePhotoEditorV3{grid-template-columns:72px minmax(0,1fr)}
+  .accountSessionRow{align-items:flex-start;flex-direction:column}.accountSessionRow .secondary{width:100%}
+  .photoActionBackdrop{padding:8px}.photoActionSheet{border-radius:24px 24px 18px 18px}
+  .profileToast{bottom:90px;max-width:calc(100vw - 30px);white-space:nowrap}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -828,64 +861,64 @@ async function submitSeyirAuth(e){
 }
 function profileSettingsMarkup(){
   var p=currentSeyirProfile||{};
-  return '<div class="socialModal open"><div class="socialModalCard profileSettingsCard profileSettingsV2"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="settingsHead"><div class="socialModalKicker">PROFİL AYARLARI</div><h2>Profilini düzenle</h2><p>Profilinde diğer kullanıcılara nasıl görüneceğini belirle.</p></div><div class="profilePhotoEditor profilePhotoEditorV3"><button id="profilePhotoMenuTrigger" class="profilePhotoPreview profilePhotoButton" aria-label="Profil fotoğrafı seçenekleri">'+accountAvatarMarkup(p)+'<span class="photoEditBadge">✎</span><span id="profilePhotoBusy" class="profilePhotoBusy" aria-hidden="true"><i></i><b>İşleniyor…</b></span></button><div class="profilePhotoCopy"><b>Profil fotoğrafı</b><span>Değiştirmek veya kaldırmak için fotoğrafa dokun.</span></div><input id="seyirAvatarFile" class="hiddenAvatarInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></div><div class="settingsFields"><div class="fieldRow"><label>Görünen ad<input id="profileDisplayName" maxlength="40" value="'+h(p.display_name||'')+'"></label><label>Kullanıcı adı<input id="profileUsername" maxlength="20" value="'+h(p.username||'')+'"></label></div><label>Biyografi<textarea id="profileBio" maxlength="180" placeholder="Kendinden kısaca bahset…">'+h(p.bio||'')+'</textarea></label></div><div id="profileSettingsMessage" class="authMessage settingsStatus"></div><button id="saveSeyirProfileSettings" class="primary socialSubmit">Değişiklikleri kaydet</button><div class="accountSessionZone"><div><b>Oturum</b><span>Bu cihazdaki Seyir hesabından çıkış yap.</span></div><button id="settingsLogoutSeyir" class="secondary sessionLogoutButton">Hesaptan çıkış yap</button></div><div class="accountDangerZone"><div><b>Hesabı sil</b><span>Profilin, yorumların ve tepkilerin kalıcı olarak silinir.</span></div><button id="openDeleteSeyirAccount" class="dangerButton">Hesabı sil</button></div></div></div>'
+  return '<div class="socialModal open"><div class="socialModalCard profileSettingsCard profileSettingsV2"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="settingsHead"><div class="socialModalKicker">PROFİL AYARLARI</div><h2>Profilini düzenle</h2><p>Profilinde diğer kullanıcılara nasıl görüneceğini belirle.</p></div><div class="profilePhotoEditor profilePhotoEditorV3"><button type="button" class="profilePhotoPreview profilePhotoButton" data-photo-menu aria-label="Profil fotoğrafını düzenle">'+accountAvatarMarkup(p)+'<span class="photoEditBadge">✎</span></button><div class="profilePhotoInfo"><b>Profil fotoğrafı</b><span>Değiştirmek veya kaldırmak için fotoğrafa dokun.</span></div><input id="seyirAvatarFile" class="hiddenAvatarInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></div><div class="settingsFields"><div class="fieldRow"><label>Görünen ad<input id="profileDisplayName" maxlength="40" value="'+h(p.display_name||'')+'"></label><label>Kullanıcı adı<input id="profileUsername" maxlength="20" value="'+h(p.username||'')+'"></label></div><label>Biyografi<textarea id="profileBio" maxlength="180" placeholder="Kendinden kısaca bahset…">'+h(p.bio||'')+'</textarea></label></div><div id="profileSettingsMessage" class="authMessage"></div><button id="saveSeyirProfileSettings" class="primary socialSubmit">Değişiklikleri kaydet</button><div class="accountSessionRow"><div><b>Oturum</b><span>Bu cihazdaki hesabından güvenle çıkış yap.</span></div><button id="logoutSeyirSettings" class="secondary">Hesaptan çıkış yap</button></div><div class="accountDangerZone"><div><b>Hesabı sil</b><span>Profilin, yorumların ve tepkilerin kalıcı olarak silinir.</span></div><button id="openDeleteSeyirAccount" class="dangerButton">Hesabı sil</button></div></div></div>'
 }
-function profilePhotoMenuMarkup(){
+function photoMenuMarkup(){
   var hasPhoto=!!(currentSeyirProfile&&currentSeyirProfile.avatar_url);
-  return '<div class="photoActionBackdrop" id="profilePhotoActions"><div class="photoActionSheet"><div class="photoActionHandle"></div><div class="photoActionHead"><b>Profil fotoğrafı</b><span>Fotoğrafın için bir işlem seç.</span></div><button id="changeSeyirAvatar" class="photoActionPrimary"><span class="photoActionIcon">↻</span><span><b>Fotoğrafı değiştir</b><small>Galeriden yeni bir fotoğraf seç</small></span></button><button id="removeSeyirAvatar" class="photoActionDanger" '+(hasPhoto?'':'disabled')+'><span class="photoActionIcon">×</span><span><b>Fotoğrafı kaldır</b><small>'+(hasPhoto?'Varsayılan profil görünümüne dön':'Kaldırılacak fotoğraf yok')+'</small></span></button><button id="cancelPhotoAction" class="photoActionCancel">Vazgeç</button></div></div>'
+  return '<div class="photoActionBackdrop" id="photoActionBackdrop"><div class="photoActionSheet"><div class="photoActionHandle"></div><div class="photoActionTitle"><b>Profil fotoğrafı</b><span>Ne yapmak istiyorsun?</span></div><button class="photoActionPrimary" id="changeSeyirAvatar"><span class="photoActionIcon">↻</span><span><b>Fotoğrafı değiştir</b><small>Galerinden yeni bir fotoğraf seç</small></span></button>'+(hasPhoto?'<button class="photoActionDanger" id="removeSeyirAvatar"><span class="photoActionIcon">×</span><span><b>Fotoğrafı kaldır</b><small>Varsayılan profil görünümüne dön</small></span></button>':'')+'<button class="photoActionCancel" id="cancelPhotoAction">Vazgeç</button><div id="photoActionStatus" class="photoActionStatus" aria-live="polite"></div></div></div>'
 }
-function openProfilePhotoMenu(){
-  var settings=document.querySelector('.profileSettingsV2');
-  if(!settings)return;
-  settings.insertAdjacentHTML('beforeend',profilePhotoMenuMarkup());
-  var layer=document.getElementById('profilePhotoActions');
+function openPhotoActionMenu(){
+  ensureSocialOverlay();
+  var host=document.getElementById('seyirSocialOverlay');
+  var existing=document.getElementById('photoActionBackdrop');
+  if(existing)existing.remove();
+  host.insertAdjacentHTML('beforeend',photoMenuMarkup());
+  bindPhotoActionMenu()
+}
+function closePhotoActionMenu(){
+  var menu=document.getElementById('photoActionBackdrop');
+  if(menu)menu.remove()
+}
+function bindPhotoActionMenu(){
   var change=document.getElementById('changeSeyirAvatar');
   var remove=document.getElementById('removeSeyirAvatar');
   var cancel=document.getElementById('cancelPhotoAction');
+  var backdrop=document.getElementById('photoActionBackdrop');
   if(change)change.onclick=function(){
-    closeProfilePhotoMenu();
-    var input=document.getElementById('seyirAvatarFile');
-    if(input)input.click()
+    var file=document.getElementById('seyirAvatarFile');
+    if(!file){
+      closePhotoActionMenu();
+      openProfileSettingsModal();
+      setTimeout(function(){var f=document.getElementById('seyirAvatarFile');if(f)f.click()},80);
+      return
+    }
+    file.click()
   };
-  if(remove&&!remove.disabled)remove.onclick=removeSeyirAvatar;
-  if(cancel)cancel.onclick=closeProfilePhotoMenu;
-  if(layer)layer.onclick=function(ev){if(ev.target===layer)closeProfilePhotoMenu()}
+  if(remove)remove.onclick=removeSeyirAvatar;
+  if(cancel)cancel.onclick=closePhotoActionMenu;
+  if(backdrop)backdrop.onclick=function(e){if(e.target===backdrop)closePhotoActionMenu()}
 }
-function closeProfilePhotoMenu(){
-  var layer=document.getElementById('profilePhotoActions');
-  if(layer)layer.remove()
+function setPhotoActionBusy(text){
+  var sheet=document.querySelector('.photoActionSheet');
+  var status=document.getElementById('photoActionStatus');
+  if(sheet)sheet.classList.add('busy');
+  if(status)status.innerHTML='<span class="miniSpinner"></span>'+h(text||'Güncelleniyor…');
+  document.querySelectorAll('.photoActionSheet button').forEach(function(b){b.disabled=true})
 }
-function setProfilePhotoBusy(active,text){
-  var busy=document.getElementById('profilePhotoBusy');
-  var trigger=document.getElementById('profilePhotoMenuTrigger');
-  if(trigger)trigger.classList.toggle('busy',!!active);
-  if(busy){
-    busy.setAttribute('aria-hidden',active?'false':'true');
-    var label=busy.querySelector('b');
-    if(label&&text)label.textContent=text
-  }
+function setPhotoActionSuccess(text){
+  var status=document.getElementById('photoActionStatus');
+  if(status)status.innerHTML='<span class="statusCheck">✓</span>'+h(text||'Güncellendi');
 }
-function updateProfilePhotoPreview(url){
-  var trigger=document.getElementById('profilePhotoMenuTrigger');
-  if(!trigger)return;
-  var img=trigger.querySelector('img');
-  var fallback=trigger.querySelector(':scope > span:not(.photoEditBadge):not(.profilePhotoBusy)');
-  if(url){
-    if(!img){
-      img=document.createElement('img');
-      img.alt='Profil fotoğrafı';
-      trigger.insertBefore(img,trigger.firstChild)
-    }
-    img.src=url;
-    if(fallback)fallback.remove()
-  }else{
-    if(img)img.remove();
-    if(!fallback){
-      var letter=document.createElement('span');
-      letter.textContent=((currentSeyirProfile&&currentSeyirProfile.display_name)||(currentSeyirProfile&&currentSeyirProfile.username)||'S').charAt(0).toUpperCase();
-      trigger.insertBefore(letter,trigger.firstChild)
-    }
-  }
+function showProfileToast(text){
+  var old=document.getElementById('profileToast');
+  if(old)old.remove();
+  var toast=document.createElement('div');
+  toast.id='profileToast';
+  toast.className='profileToast';
+  toast.innerHTML='<span>✓</span>'+h(text);
+  document.body.appendChild(toast);
+  requestAnimationFrame(function(){toast.classList.add('show')});
+  setTimeout(function(){toast.classList.remove('show');setTimeout(function(){toast.remove()},220)},1800)
 }
 
 function openProfileSettingsModal(){
@@ -915,65 +948,85 @@ async function uploadSeyirAvatar(e){
   var file=e.target.files&&e.target.files[0];
   var msg=document.getElementById('profileSettingsMessage');
   if(!file)return;
-  if(file.size>3145728){if(msg)msg.textContent='Seçtiğin fotoğraf çok büyük.';e.target.value='';return}
-  if(!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)){if(msg)msg.textContent='Desteklenen bir görsel dosyası seç.';e.target.value='';return}
-  var previewUrl=URL.createObjectURL(file);
-  updateProfilePhotoPreview(previewUrl);
-  setProfilePhotoBusy(true,'Fotoğraf değiştiriliyor…');
-  if(msg){msg.classList.remove('success');msg.textContent='Yeni fotoğrafın yükleniyor…'}
+  if(file.size>3145728){if(msg)msg.textContent='Seçtiğin fotoğraf çok büyük.';return}
+  if(!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)){if(msg)msg.textContent='Desteklenen bir görsel dosyası seç.';return}
+
+  var previewUrl='';
+  try{previewUrl=URL.createObjectURL(file)}catch(err){}
+  var preview=document.querySelector('.profilePhotoPreview');
+  if(preview&&previewUrl){
+    preview.classList.add('photoPending');
+    preview.innerHTML='<img src="'+h(previewUrl)+'" alt="Yeni profil fotoğrafı"><span class="photoLoadingOverlay"><span class="miniSpinner"></span><b>Yükleniyor</b></span><span class="photoEditBadge">✎</span>'
+  }
+  setPhotoActionBusy('Yeni fotoğraf yükleniyor…');
+
   var ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
   var path=currentUser.id+'/avatar-'+Date.now()+'.'+ext;
-  try{
-    var up=await seyirDb.storage.from('seyir-avatars').upload(path,file,{upsert:true,contentType:file.type});
-    if(up.error)throw new Error('Fotoğraf yüklenemedi.');
-    var pub=seyirDb.storage.from('seyir-avatars').getPublicUrl(path);
-    var url=pub.data&&pub.data.publicUrl?pub.data.publicUrl:'';
-    var r=await seyirDb.from('seyir_profiles').update({
-      avatar_url:url,
-      avatar_image_path:null,
-      avatar_character:null,
-      avatar_show:null
-    }).eq('user_id',currentUser.id).select().single();
-    if(r.error)throw new Error('Profil fotoğrafı güncellenemedi.');
-    currentSeyirProfile=r.data;
-    saved.profileAvatar=null;
-    persist();
-    updateProfilePhotoPreview(url);
-    if(msg){msg.classList.add('success');msg.textContent='Profil fotoğrafın değiştirildi.'}
-    setProfilePhotoBusy(false);
-    updateAuthNav()
-  }catch(err){
-    updateProfilePhotoPreview(currentSeyirProfile&&currentSeyirProfile.avatar_url||'');
-    setProfilePhotoBusy(false);
-    if(msg){msg.classList.remove('success');msg.textContent=err.message||'Fotoğraf güncellenemedi.'}
-  }finally{
-    URL.revokeObjectURL(previewUrl);
-    e.target.value=''
+  var up=await seyirDb.storage.from('seyir-avatars').upload(path,file,{upsert:true,contentType:file.type});
+  if(up.error){
+    if(msg)msg.textContent='Fotoğraf yüklenemedi.';
+    closePhotoActionMenu();
+    openProfileSettingsModal();
+    return
   }
+  var pub=seyirDb.storage.from('seyir-avatars').getPublicUrl(path);
+  var url=pub.data&&pub.data.publicUrl?pub.data.publicUrl:'';
+  var r=await seyirDb.from('seyir_profiles').update({
+    avatar_url:url,
+    avatar_image_path:null,
+    avatar_character:null,
+    avatar_show:null
+  }).eq('user_id',currentUser.id).select().single();
+  if(r.error){
+    if(msg)msg.textContent='Profil fotoğrafı güncellenemedi.';
+    closePhotoActionMenu();
+    openProfileSettingsModal();
+    return
+  }
+  currentSeyirProfile=r.data;
+  saved.profileAvatar=null;
+  persist();
+  if(previewUrl)try{URL.revokeObjectURL(previewUrl)}catch(err){}
+  setPhotoActionSuccess('Profil fotoğrafı değiştirildi');
+  setTimeout(function(){
+    closePhotoActionMenu();
+    closeSocialModal();
+    render();
+    showProfileToast('Profil fotoğrafın güncellendi')
+  },450)
 }
 async function removeSeyirAvatar(){
   if(!currentUser||!seyirDb)return;
-  closeProfilePhotoMenu();
-  var msg=document.getElementById('profileSettingsMessage');
-  var previous=currentSeyirProfile&&currentSeyirProfile.avatar_url||'';
-  updateProfilePhotoPreview('');
-  setProfilePhotoBusy(true,'Fotoğraf kaldırılıyor…');
-  if(msg){msg.classList.remove('success');msg.textContent='Profil fotoğrafın kaldırılıyor…'}
+  setPhotoActionBusy('Profil fotoğrafı kaldırılıyor…');
+
+  var preview=document.querySelector('.profilePhotoPreview');
+  if(preview){
+    var p=currentSeyirProfile||{};
+    preview.classList.add('photoPending');
+    preview.innerHTML='<span>'+h((p.display_name||p.username||'S').charAt(0).toUpperCase())+'</span><span class="photoLoadingOverlay"><span class="miniSpinner"></span><b>Kaldırılıyor</b></span><span class="photoEditBadge">✎</span>'
+  }
+
   try{
     await seyirAccountRequest({action:'remove_avatar'},true);
     if(currentSeyirProfile)currentSeyirProfile.avatar_url=null;
     saved.profileAvatar=null;
     persist();
-    setProfilePhotoBusy(false);
-    if(msg){msg.classList.add('success');msg.textContent='Profil fotoğrafın kaldırıldı.'}
-    updateAuthNav()
+    setPhotoActionSuccess('Profil fotoğrafı kaldırıldı');
+    setTimeout(function(){
+      closePhotoActionMenu();
+      closeSocialModal();
+      render();
+      showProfileToast('Profil fotoğrafı kaldırıldı')
+    },420)
   }catch(err){
-    updateProfilePhotoPreview(previous);
-    setProfilePhotoBusy(false);
-    if(msg){msg.classList.remove('success');msg.textContent=err.message||'Fotoğraf kaldırılamadı.'}
+    var status=document.getElementById('photoActionStatus');
+    if(status)status.textContent=err.message;
+    var sheet=document.querySelector('.photoActionSheet');
+    if(sheet)sheet.classList.remove('busy');
+    document.querySelectorAll('.photoActionSheet button').forEach(function(b){b.disabled=false});
+    openProfileSettingsModal()
   }
 }
-
 function deleteAccountMarkup(){
   var username=currentSeyirProfile&&currentSeyirProfile.username||'';
   return '<div class="socialModal open"><div class="socialModalCard deleteAccountCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="dangerIcon">!</div><div class="socialModalKicker dangerKicker">HESABI KALICI OLARAK SİL</div><h2>Bu işlem geri alınamaz</h2><p>Profilin, yorumların, yanıtların ve tepkilerin kalıcı olarak silinecek. Devam etmek için aşağıya <b>@'+h(username)+'</b> kullanıcı adını yaz.</p><label class="authField"><span>Kullanıcı adı</span><div class="authInputWrap"><input id="deleteUsernameConfirm" autocomplete="off" placeholder="'+h(username)+'"></div></label><div id="deleteAccountMessage" class="authMessage"></div><button id="confirmDeleteSeyirAccount" class="dangerPrimary" disabled>Hesabımı kalıcı olarak sil</button></div></div>'
@@ -1567,7 +1620,7 @@ function bindCommentUI(x){
 function profile(){
   if(!currentUser)return profileAuthLanding();
   var p=currentSeyirProfile||{};
-  return '<div class="profilePage"><section class="profileIdentityCard"><div class="profileIdentityAvatar">'+accountAvatarMarkup(p)+'</div><div class="profileIdentityText"><span class="profileUsername">@'+h(p.username||'')+'</span><h1>'+h(p.display_name||p.username||'Seyir Kullanıcısı')+'</h1><p>'+h(p.bio||'Henüz biyografi eklenmemiş.')+'</p></div><div class="profileIdentityActions"><button class="secondary" id="editSeyirProfile">Profili düzenle</button><button class="profileGhostButton profileLogoutButton" id="logoutSeyir">Hesaptan çıkış</button></div></section><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div></div>'
+  return '<div class="profilePage"><section class="profileIdentityCard"><button class="profileIdentityAvatar profileIdentityAvatarButton" data-photo-menu aria-label="Profil fotoğrafını değiştir">'+accountAvatarMarkup(p)+'<span class="photoEditBadge profileBadge">✎</span></button><input id="seyirAvatarFile" class="hiddenAvatarInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif"><div class="profileIdentityText"><span class="profileUsername">@'+h(p.username||'')+'</span><h1>'+h(p.display_name||p.username||'Seyir Kullanıcısı')+'</h1><p>'+h(p.bio||'Henüz biyografi eklenmemiş.')+'</p></div><div class="profileIdentityActions"><button class="secondary" id="editSeyirProfile">Profili düzenle</button><button class="profileGhostButton logoutProfileButton" id="logoutSeyir">Hesaptan çıkış yap</button></div></section><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div></div>'
 }
 function profileSeriesGroups(){
   var groups={};
@@ -1773,6 +1826,8 @@ function bind(){
   bindProfileAvatarPicker();
   bindProfileLinks();
   bindListTabs();
+  document.querySelectorAll('[data-photo-menu]').forEach(function(b){b.onclick=openPhotoActionMenu});
+  var profileAvatarFile=document.getElementById('seyirAvatarFile');if(profileAvatarFile)profileAvatarFile.onchange=uploadSeyirAvatar;
   document.querySelectorAll('[data-open-auth]').forEach(function(b){b.onclick=function(){openAuthModal(b.getAttribute('data-open-auth')||'login')}});
   var editProfile=document.getElementById('editSeyirProfile');if(editProfile)editProfile.onclick=openProfileSettingsModal;
   var logoutBtn=document.getElementById('logoutSeyir');if(logoutBtn)logoutBtn.onclick=logoutSeyir;
