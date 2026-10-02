@@ -805,6 +805,13 @@ textarea{min-height:110px;resize:vertical}
 .homeSpotlight:empty{min-height:390px;background:radial-gradient(circle at 65% 20%,rgba(126,110,255,.09),transparent 34%),linear-gradient(145deg,#111620,#0b0f16)}
 @media(min-width:681px){.homeSpotlight:empty{min-height:420px}}
 
+
+/* --- movie synopsis --- */
+.movieSynopsis{margin-top:22px;padding:22px 24px;border:1px solid rgba(255,255,255,.065);border-radius:20px;background:linear-gradient(145deg,rgba(17,22,32,.94),rgba(10,14,21,.96))}
+.movieSynopsisHead{display:grid;gap:3px;margin-bottom:10px}.movieSynopsisHead h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.movieSynopsisText p{margin:0;color:#a9b3c3;font-size:14px;line-height:1.75;max-width:920px}
+@media(max-width:680px){.movieSynopsis{margin-top:16px;padding:18px 16px}.movieSynopsisHead h2{font-size:20px}.movieSynopsisText p{font-size:13px;line-height:1.7}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -2814,7 +2821,11 @@ async function loadTmdbDetail(type,id){
       for(var i=1;i<=count;i++)options+='<option value="'+i+'">'+i+'. sezon</option>';
       app.innerHTML=seriesDetailShell(x,d,overview+credits,options);
     }else{
-      app.innerHTML=detailShell(x,overview+credits,null);
+      app.innerHTML=detailShell(x,credits,null);
+      var movieOverview=d.overview
+        ?'<p>'+h(d.overview)+'</p>'
+        :'<p class="muted">Bu film için henüz Türkçe konu açıklaması bulunmuyor.</p>';
+      app.innerHTML+='<section class="movieSynopsis"><div class="movieSynopsisHead"><span class="eyebrow">HİKÂYE</span><h2>Konu</h2></div><div class="movieSynopsisText">'+movieOverview+'</div></section>';
       var log=saved.movieLogs[x.key]||{rewatches:0,note:''};
       app.innerHTML+='<section class="panel"><h3>Film günlüğüm</h3><div class="split"><div><label class="muted">Kaç kez izledin?</label><input id="rewatches" class="fieldInput" type="number" min="0" max="99" value="'+Number(log.rewatches||0)+'"></div><div><label class="muted">Kısa notun</label><textarea id="movieNote" placeholder="Bu film sende ne bıraktı?">'+h(log.note||'')+'</textarea></div></div><div class="actions"><button id="saveMovieLog" class="primary">Günlüğü kaydet</button></div></section>'
     }
