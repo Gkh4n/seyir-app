@@ -765,8 +765,14 @@ textarea{min-height:110px;resize:vertical}
 <script>
 var SEYIR_SUPABASE_URL='https://vysddydaqjxdfoaziyrv.supabase.co';
 var SEYIR_SUPABASE_KEY='sb_publishable_3QXB59ogdtiPnVHEMpvKIw_4dFLra_e';
-var seyirRecoveryLanding=/(?:^|[&#?])type=recovery(?:&|$)/i.test(String(location.hash||'')+String(location.search||''))||/[?&]password-recovery=1(?:&|$)/i.test(String(location.search||''));
-var seyirDb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SEYIR_SUPABASE_URL,SEYIR_SUPABASE_KEY):null;
+var seyirRecoveryRaw=String(location.hash||'').replace(/^#/,'');
+var seyirRecoveryParams=new URLSearchParams(seyirRecoveryRaw);
+var seyirRecoveryTokens={
+  access_token:seyirRecoveryParams.get('access_token')||'',
+  refresh_token:seyirRecoveryParams.get('refresh_token')||''
+};
+var seyirRecoveryLanding=seyirRecoveryParams.get('type')==='recovery'||/(?:^|[&#?])type=recovery(?:&|$)/i.test(String(location.hash||'')+String(location.search||''))||/[?&]password-recovery=1(?:&|$)/i.test(String(location.search||''));
+var seyirDb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SEYIR_SUPABASE_URL,SEYIR_SUPABASE_KEY,{auth:{detectSessionInUrl:false}}):null;
 var currentUser=null;
 var currentSeyirProfile=null;
 var socialAuthBound=false;
@@ -807,7 +813,7 @@ async function showRecoveryPasswordModal(session){
   document.body.classList.add('socialModalOpen');
   try{
     if(location.hash&&/access_token|refresh_token|type=recovery/i.test(location.hash)){
-      history.replaceState(null,'',location.pathname)
+      history.replaceState(null,'',location.pathname+location.search)
     }
   }catch(e){}
 }
@@ -836,6 +842,21 @@ async function initSocial(){
 
   var session=null;
   try{
+    if(seyirRecoveryLanding&&seyirRecoveryTokens.access_token&&seyirRecoveryTokens.refresh_token){
+      var restored=await seyirDb.auth.setSession({
+        access_token:seyirRecoveryTokens.access_token,
+        refresh_token:seyirRecoveryTokens.refresh_token
+      });
+      if(restored.error)throw restored.error;
+      session=restored.data&&restored.data.session?restored.data.session:null;
+      currentUser=session?session.user:null;
+      if(session){
+        try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+        setTimeout(function(){showRecoveryPasswordModal(session)},0);
+        return
+      }
+    }
+
     var s=await seyirDb.auth.getSession();
     session=s.data&&s.data.session?s.data.session:null;
     currentUser=session?session.user:null;
