@@ -800,6 +800,11 @@ textarea{min-height:110px;resize:vertical}
 .adminDeleteUserActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 @media(max-width:680px){.adminUserRight{display:grid;gap:6px;justify-items:end}.adminDeleteUserButton{padding:6px 8px}.adminDeleteUserOverlay{align-items:flex-end;padding:8px}.adminDeleteUserCard{border-radius:22px 22px 16px 16px;padding:20px 16px}}
 
+
+/* --- refresh-safe home paint --- */
+.homeSpotlight:empty{min-height:390px;background:radial-gradient(circle at 65% 20%,rgba(126,110,255,.09),transparent 34%),linear-gradient(145deg,#111620,#0b0f16)}
+@media(min-width:681px){.homeSpotlight:empty{min-height:420px}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1756,15 +1761,24 @@ function catalogViewKey(type){
   return [type,catalogGenres[type]||'all',catalogSorts[type]||'rating'].join(':')
 }
 function getCachedCatalog(type){
-  var entry=viewCache.catalog[catalogViewKey(type)];
-  return cacheFresh(entry,900000)?entry.data:null
+  try{
+    var entry=viewCache&&viewCache.catalog&&viewCache.catalog[catalogViewKey(type)];
+    var data=cacheFresh(entry,900000)?entry.data:null;
+    if(!data||!Array.isArray(data.results))return null;
+    return data
+  }catch(e){return null}
 }
 function setCachedCatalog(type,data){
   viewCache.catalog[catalogViewKey(type)]={ts:Date.now(),data:data};
   saveViewCache()
 }
 function getCachedHome(){
-  return cacheFresh(viewCache.home,600000)?viewCache.home.data:null
+  try{
+    var entry=viewCache&&viewCache.home;
+    var data=cacheFresh(entry,600000)?entry.data:null;
+    if(!data||!Array.isArray(data.results))return null;
+    return data
+  }catch(e){return null}
 }
 function setCachedHome(data){
   viewCache.home={ts:Date.now(),data:data};
@@ -1790,20 +1804,23 @@ function section(title,sub,items,id){
   return '<section><div class="head"><div><h2>'+h(title)+'</h2><div class="muted">'+h(sub)+'</div></div></div><div class="grid"'+(id?' id="'+id+'"':'')+'>'+items.map(card).join('')+'</div></section>'
 }
 function homeSpotlightHtml(data){
-  var raw=(data&&data.results||[])[0];
+  var rows=Array.isArray(data&&data.results)?data.results:[];
+  var raw=rows.find(function(x){return x&&x.id&&(x.title||x.name)});
   if(!raw)return '';
   var s=tmdbToItem(raw);
   var backdrop=raw.backdrop_path?"linear-gradient(180deg,rgba(5,7,11,.08),rgba(5,7,11,.18)),url('https://image.tmdb.org/t/p/w780"+raw.backdrop_path+"') center/cover":s.poster;
   return '<div class="homeSpotlightBg" style="--spot:'+backdrop+'"></div><div class="homeSpotlightBody"><span class="spotTag">Haftanın öne çıkanı</span><h3>'+h(s.title)+'</h3><div class="spotMeta"><span>'+h(s.type)+'</span><span>·</span><span>'+h(s.year)+'</span><span>·</span><span class="spotScore">★ '+publicScore(s.public)+'</span></div></div>'
 }
 function homeTrendingHtml(data){
-  var items=(data&&data.results||[]).map(tmdbToItem);
-  return items.map(card).join('')
+  try{
+    var rows=Array.isArray(data&&data.results)?data.results:[];
+    var items=rows.filter(function(x){return x&&x.id&&(x.title||x.name)}).map(tmdbToItem);
+    return items.map(card).join('')
+  }catch(e){return ''}
 }
 function home(){
-  var cached=getCachedHome();
-  return '<div class="hero"><div class="homeHeroMain"><div class="eyebrow">✦ İzleme zevkinin haritası</div><h1>İzlediklerini değil,<br><span>zevkini keşfet.</span></h1><p>Dizi, film ve animeleri puanla; bölüm bölüm takip et. Zamanla sana ait gerçek bir seyir profili oluşsun.</p><div class="homeSearch"><input id="q" placeholder="Dizi, film veya anime ara…"><button id="searchBtn">Ara</button></div><div id="searchResults" class="searchResults"></div><div class="homeQuick"><button data-route="series">Dizileri keşfet</button><button data-route="movies">Filmleri keşfet</button><button data-route="anime">Animelere göz at</button></div></div><aside id="homeSpotlight" class="homeSpotlight">'+(cached?homeSpotlightHtml(cached):'')+'</aside></div>'+
-  '<section class="homeSection"><div class="head"><div><div class="eyebrow">Şu an konuşulanlar</div><h2>Bu hafta öne çıkanlar</h2><div class="muted">Güncel popüler yapımlar arasından seçtiklerimiz</div></div></div><div id="trendingGrid" class="grid">'+(cached?homeTrendingHtml(cached):'')+'</div></section>'+
+  return '<div class="hero"><div class="homeHeroMain"><div class="eyebrow">✦ İzleme zevkinin haritası</div><h1>İzlediklerini değil,<br><span>zevkini keşfet.</span></h1><p>Dizi, film ve animeleri puanla; bölüm bölüm takip et. Zamanla sana ait gerçek bir seyir profili oluşsun.</p><div class="homeSearch"><input id="q" placeholder="Dizi, film veya anime ara…"><button id="searchBtn">Ara</button></div><div id="searchResults" class="searchResults"></div><div class="homeQuick"><button data-route="series">Dizileri keşfet</button><button data-route="movies">Filmleri keşfet</button><button data-route="anime">Animelere göz at</button></div></div><aside id="homeSpotlight" class="homeSpotlight"></aside></div>'+
+  '<section class="homeSection"><div class="head"><div><div class="eyebrow">Şu an konuşulanlar</div><h2>Bu hafta öne çıkanlar</h2><div class="muted">Güncel popüler yapımlar arasından seçtiklerimiz</div></div></div><div id="trendingGrid" class="grid"></div></section>'+
   '<footer class="homeDataFooter"><div class="homeDataBrand"><span class="tmdbMark">TMDB</span><div><b>İçerik verileri TMDB tarafından sağlanmaktadır.</b><p>SEYİR, The Movie Database (TMDB) API\'sini kullanır ancak TMDB tarafından onaylanmış veya sertifikalandırılmış değildir.</p></div></div><a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB\'yi ziyaret et ↗</a></footer>'
 }
 function profileStats(){
@@ -2686,25 +2703,35 @@ async function categorySearch(type,forcedQuery){
 }
 
 function paintHomeData(data){
-  var spotlight=document.getElementById('homeSpotlight');
-  var grid=document.getElementById('trendingGrid');
-  if(spotlight){
-    spotlight.innerHTML=homeSpotlightHtml(data);
-    var raw=(data&&data.results||[])[0];
-    if(raw)spotlight.setAttribute('data-open',openCode(tmdbToItem(raw)))
-  }
-  if(grid)grid.innerHTML=homeTrendingHtml(data);
-  bindOpeners()
+  try{
+    var rows=Array.isArray(data&&data.results)?data.results:[];
+    if(!rows.length)return false;
+    var spotlight=document.getElementById('homeSpotlight');
+    var grid=document.getElementById('trendingGrid');
+    if(spotlight){
+      spotlight.innerHTML=homeSpotlightHtml(data);
+      var raw=rows.find(function(x){return x&&x.id&&(x.title||x.name)});
+      if(raw)spotlight.setAttribute('data-open',openCode(tmdbToItem(raw)))
+    }
+    if(grid)grid.innerHTML=homeTrendingHtml(data);
+    bindOpeners();
+    return true
+  }catch(e){return false}
 }
 async function loadHomeRemote(){
   var cached=getCachedHome();
-  if(cached)paintHomeData(cached);
+  if(cached&&!paintHomeData(cached)){
+    viewCache.home=null;
+    saveViewCache()
+  }
   try{
     var data=await api({action:'trending'});
-    setCachedHome(data);
-    paintHomeData(data)
+    if(data&&Array.isArray(data.results)){
+      setCachedHome(data);
+      paintHomeData(data)
+    }
   }catch(err){
-    /* Cached/current content stays in place; no loading/error flash during navigation. */
+    /* Ana sayfanın statik içeriği görünür kalır. */
   }
 }
 async function ensureRouteCache(routeName){
@@ -3092,11 +3119,18 @@ window.onhashchange=async function(){
 };
 (function boot(){
   ensureSocialOverlay();
-  render();
+  try{
+    render()
+  }catch(err){
+    try{sessionStorage.removeItem('seyir-view-cache')}catch(e){}
+    viewCache={home:null,catalog:{}};
+    var app=document.getElementById('app');
+    if(app){
+      try{app.innerHTML=home();bind();loadHomeRemote()}catch(e){}
+    }
+  }
   setTimeout(prefetchCoreViews,80);
-  initSocial().catch(function(){
-    updateAuthNav()
-  })
+  initSocial().catch(function(){updateAuthNav()})
 })();
 </script>
 <!-- deploy-retry-2026-10-02-1929 -->
