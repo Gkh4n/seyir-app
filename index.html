@@ -772,7 +772,7 @@ var seyirRecoveryTokens={
   refresh_token:seyirRecoveryParams.get('refresh_token')||''
 };
 var seyirRecoveryLanding=seyirRecoveryParams.get('type')==='recovery'||/(?:^|[&#?])type=recovery(?:&|$)/i.test(String(location.hash||'')+String(location.search||''))||/[?&]password-recovery=1(?:&|$)/i.test(String(location.search||''));
-var seyirDb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SEYIR_SUPABASE_URL,SEYIR_SUPABASE_KEY,{auth:{detectSessionInUrl:false}}):null;
+var seyirDb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SEYIR_SUPABASE_URL,SEYIR_SUPABASE_KEY):null;
 var currentUser=null;
 var currentSeyirProfile=null;
 var socialAuthBound=false;
@@ -823,7 +823,7 @@ async function initSocial(){
   if(!socialAuthBound){
     socialAuthBound=true;
     seyirDb.auth.onAuthStateChange(function(event,session){
-      if(event==='PASSWORD_RECOVERY'){
+      if(event==='PASSWORD_RECOVERY'||(seyirRecoveryLanding&&session)){
         seyirRecoveryLanding=true;
         setTimeout(function(){showRecoveryPasswordModal(session)},0);
         return
@@ -1087,6 +1087,7 @@ async function submitDirectPasswordReset(e){
     setTimeout(async function(){
       try{await seyirDb.auth.signOut()}catch(e){}
       currentUser=null;currentSeyirProfile=null;passwordResetEmail='';
+      try{history.replaceState(null,'',location.pathname)}catch(e){}
       openAuthModal('login')
     },650)
   }catch(err){
