@@ -533,6 +533,46 @@ textarea{min-height:110px;resize:vertical}
 .uploadAvatarLabel{position:relative;cursor:pointer}.uploadAvatarLabel input{position:absolute;inset:0;opacity:0;cursor:pointer}
 @media(max-width:680px){.profilePhotoEditor{grid-template-columns:70px 1fr}.profilePhotoPreview{width:70px;height:70px}}
 
+
+/* --- SEYIR premium account/profile v2 --- */
+.authCardV2{width:min(510px,100%);padding:30px;background:radial-gradient(circle at 100% 0,rgba(119,101,255,.12),transparent 34%),linear-gradient(160deg,#111722,#090d14 72%);border-color:rgba(255,255,255,.09)}
+.authBrandMark{display:flex;align-items:center;gap:10px;margin-bottom:28px;font-weight:900;letter-spacing:.14em}
+.authBrandMark b{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.authIntro h2{margin:7px 0 8px;font-size:32px;letter-spacing:-.035em}
+.authIntro p{margin:0;color:#8793a6;line-height:1.6}
+.authSwitchV2{margin:24px 0 20px;background:#080d14;padding:4px}
+.authFormV2{display:grid;gap:14px}
+.authField{display:grid;gap:7px;color:#aab4c4;font-size:11px;font-weight:700}
+.authInputWrap{position:relative}
+.authInputWrap input{width:100%;height:50px;border:1px solid rgba(255,255,255,.085);background:#090e16;color:#f8faff;border-radius:14px;padding:0 14px;outline:none;transition:.18s}
+.authInputWrap input:focus{border-color:rgba(137,124,255,.58);box-shadow:0 0 0 3px rgba(137,124,255,.08)}
+.authInputWrap input[type=password],.authInputWrap input[type=text]{padding-right:70px}
+.passwordToggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#8175ff;font-size:10px;font-weight:800;cursor:pointer;padding:8px}
+.authPrivacyNote{margin-top:-5px;color:#667286;font-size:10px;line-height:1.5}
+.authMessage{min-height:18px}.authMessage.success{color:#65d7a9}
+.authSubmitV2{height:48px;margin-top:2px;border-radius:14px;font-size:13px}
+.profileIdentityCard{display:grid;grid-template-columns:118px minmax(0,1fr) auto;gap:24px;align-items:center;padding:28px;border:1px solid rgba(255,255,255,.075);border-radius:26px;background:radial-gradient(circle at 94% 0,rgba(115,98,255,.1),transparent 32%),linear-gradient(145deg,rgba(18,23,34,.96),rgba(9,13,20,.98));box-shadow:0 24px 70px rgba(0,0,0,.22)}
+.profileIdentityAvatar{width:118px;height:118px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:linear-gradient(145deg,#262c3b,#121722);border:3px solid rgba(138,125,255,.62);box-shadow:0 0 0 6px rgba(138,125,255,.06);color:#fff;font-size:38px;font-weight:850}
+.profileIdentityAvatar img{width:100%;height:100%;object-fit:cover}
+.profileIdentityText{min-width:0}.profileIdentityText h1{font-size:38px;line-height:1;margin:5px 0 10px;letter-spacing:-.035em}.profileIdentityText p{margin:0;color:#909bac;max-width:620px;line-height:1.6}.profileIdentityText .profileUsername{color:#8b80ff;font-weight:800}
+.profileIdentityActions{display:flex;gap:8px;align-items:center}
+.profileIdentityActions .secondary{white-space:nowrap}
+.profileSettingsV2{width:min(650px,100%);padding:30px}.settingsHead{padding-right:52px}.settingsHead h2{margin-bottom:5px}.settingsHead p{margin:0;color:#7f8a9d}
+.profilePhotoEditorV2{grid-template-columns:86px minmax(0,1fr);background:#0a0f16;border-color:rgba(255,255,255,.065);margin-top:22px}
+.profilePhotoActionsV2{align-items:center}.profilePhotoActionsV2 .secondary{min-height:42px;display:inline-flex;align-items:center}
+.removePhotoButton{color:#aeb7c7}
+.settingsFields{display:grid;gap:13px;margin-top:4px}.settingsFields label{display:grid;gap:7px;color:#aab4c4;font-size:11px;font-weight:700}.settingsFields input,.settingsFields textarea{width:100%;border:1px solid rgba(255,255,255,.08);background:#090e16;color:#fff;border-radius:13px;padding:12px 13px;outline:none}.settingsFields input:focus,.settingsFields textarea:focus{border-color:rgba(137,124,255,.55);box-shadow:0 0 0 3px rgba(137,124,255,.07)}
+.accountDangerZone{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:16px;padding-top:18px;border-top:1px solid rgba(255,255,255,.065)}.accountDangerZone>div{display:grid;gap:3px}.accountDangerZone b{font-size:12px}.accountDangerZone span{color:#707b8e;font-size:10px}
+.dangerButton,.dangerPrimary{border:1px solid rgba(255,106,126,.22);background:rgba(255,106,126,.06);color:#ff92a3;border-radius:12px;padding:10px 13px;cursor:pointer;font-weight:800}.dangerButton:hover,.dangerPrimary:hover{background:rgba(255,106,126,.11)}
+.deleteAccountCard{width:min(500px,100%);text-align:left}.dangerIcon{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:rgba(255,100,120,.09);border:1px solid rgba(255,100,120,.18);color:#ff8799;font-size:24px;font-weight:900;margin-bottom:18px}.dangerKicker{color:#ff8799}.deleteAccountCard h2{font-size:30px}.deleteAccountCard>p{color:#8b96a8;line-height:1.65}.dangerPrimary{width:100%;height:46px;margin-top:8px}.dangerPrimary:disabled{opacity:.35;cursor:not-allowed}
+.publicProfileHeroV2{padding:0;background:linear-gradient(145deg,#111722,#090d14)}.publicProfileBodyV2{display:grid;grid-template-columns:112px minmax(0,1fr);gap:22px;align-items:center;padding:28px}.publicAvatarV2{width:112px;height:112px;border:3px solid rgba(138,125,255,.55)}.publicIdentity h1{margin:5px 0 8px;font-size:34px}.publicIdentity p{margin:0 0 8px;color:#929caf}.publicIdentity .profileUsername{color:#8b80ff;font-weight:800}
+@media(max-width:680px){
+  .authCardV2{padding:22px 16px}.authBrandMark{margin-bottom:22px}.authIntro h2{font-size:27px}.authInputWrap input{height:48px}
+  .profileIdentityCard{grid-template-columns:82px minmax(0,1fr);gap:15px;padding:20px 16px;border-radius:20px}.profileIdentityAvatar{width:82px;height:82px;font-size:28px}.profileIdentityText h1{font-size:27px;margin-top:3px}.profileIdentityText p{font-size:12px}.profileIdentityActions{grid-column:1/-1;justify-content:flex-start;padding-left:97px;margin-top:-7px}
+  .profileSettingsV2{padding:22px 16px}.profilePhotoEditorV2{grid-template-columns:72px minmax(0,1fr)}.profilePhotoPreview{width:72px;height:72px}.fieldRow{grid-template-columns:1fr}.accountDangerZone{align-items:flex-start;flex-direction:column}.dangerButton{width:100%}
+  .publicProfileBodyV2{grid-template-columns:82px minmax(0,1fr);gap:15px;padding:20px 16px}.publicAvatarV2{width:82px;height:82px}.publicIdentity h1{font-size:27px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -614,9 +654,58 @@ function ensureSocialOverlay(){
     document.body.appendChild(host)
   }
 }
+function accountAvatarMarkup(profile){
+  var p=profile||{};
+  var avatar=socialProfileAvatar(p,'w342');
+  return avatar
+    ?'<img src="'+h(avatar)+'" alt="'+h(p.display_name||p.username||'Profil')+'">'
+    :'<span>'+h((p.display_name||p.username||'S').charAt(0).toUpperCase())+'</span>'
+}
+async function seyirAccountRequest(payload,needsAuth){
+  var headers={'Content-Type':'application/json','apikey':SEYIR_SUPABASE_KEY};
+  if(needsAuth){
+    var sessionResult=await seyirDb.auth.getSession();
+    var session=sessionResult.data&&sessionResult.data.session;
+    if(!session)throw new Error('Oturum süren dolmuş. Tekrar giriş yap.');
+    headers.Authorization='Bearer '+session.access_token
+  }
+  var response=await fetch(SEYIR_SUPABASE_URL+'/functions/v1/seyir-account',{
+    method:'POST',
+    headers:headers,
+    body:JSON.stringify(payload||{})
+  });
+  var data={};
+  try{data=await response.json()}catch(e){}
+  if(!response.ok)throw new Error(data.error||'İşlem tamamlanamadı.');
+  return data
+}
+function friendlyAuthError(err){
+  var m=String(err&&err.message||'');
+  if(/already registered|already been registered/i.test(m))return 'Bu e-posta ile zaten bir hesap var.';
+  if(/password/i.test(m)&&/6|8|least|weak/i.test(m))return 'Daha güçlü bir şifre belirle.';
+  if(/rate limit|too many/i.test(m))return 'Çok fazla deneme yapıldı. Biraz sonra tekrar dene.';
+  if(/email/i.test(m)&&/invalid/i.test(m))return 'Geçerli bir e-posta adresi gir.';
+  return m||'İşlem tamamlanamadı.'
+}
+function authInput(id,label,type,placeholder,autocomplete,extra){
+  var password=type==='password';
+  return '<label class="authField"><span>'+label+'</span><div class="authInputWrap"><input id="'+id+'" type="'+type+'" placeholder="'+placeholder+'" autocomplete="'+autocomplete+'" '+(extra||'')+' required>'+(password?'<button type="button" class="passwordToggle" data-password-target="'+id+'">Göster</button>':'')+'</div></label>'
+}
 function authModalMarkup(mode){
   var register=mode==='register';
-  return '<div class="socialModal open" id="socialAuthModal"><div class="socialModalCard authCard"><button class="socialModalClose" data-close-social>×</button><div class="socialModalKicker">SEYİR HESABI</div><h2>'+(register?'Profilini oluştur':'Tekrar hoş geldin')+'</h2><p>'+(register?'Yorum yap, diğer kullanıcılarla etkileşime geç ve kendi profilini oluştur.':'Profiline ve topluluğa giriş yap.')+'</p><div class="authSwitch"><button data-auth-mode="login" class="'+(!register?'active':'')+'">Giriş yap</button><button data-auth-mode="register" class="'+(register?'active':'')+'">Kayıt ol</button></div><form id="seyirAuthForm">'+(register?'<div class="fieldRow"><label>Kullanıcı adı<input id="authUsername" maxlength="20" autocomplete="username" placeholder="kullanici_adi" required></label><label>Görünen ad<input id="authDisplayName" maxlength="40" placeholder="Adın veya rumuzun" required></label></div>':'')+'<label>E-posta<input id="authEmail" type="email" autocomplete="email" required></label><label>Şifre<input id="authPassword" type="password" minlength="6" autocomplete="'+(register?'new-password':'current-password')+'" required></label><div id="authMessage" class="authMessage"></div><button class="primary socialSubmit" type="submit">'+(register?'Profil oluştur':'Giriş yap')+'</button></form></div></div>'
+  var fields='';
+  if(register){
+    fields+=authInput('authUsername','Kullanıcı adı','text','kullanici_adi','username','maxlength="20"');
+    fields+=authInput('authDisplayName','Görünen ad','text','Adın veya rumuzun','name','maxlength="40"');
+    fields+=authInput('authEmail','E-posta','email','ornek@eposta.com','email','');
+    fields+='<div class="authPrivacyNote">E-posta adresin profilinde gösterilmez; yalnızca hesabın ve doğrulama işlemleri için kullanılır.</div>';
+    fields+=authInput('authPassword','Şifre','password','En az 8 karakter','new-password','minlength="8"');
+    fields+=authInput('authPasswordConfirm','Şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"');
+  }else{
+    fields+=authInput('authLoginUsername','Kullanıcı adı','text','Kullanıcı adın','username','maxlength="20"');
+    fields+=authInput('authPassword','Şifre','password','Şifren','current-password','minlength="6"');
+  }
+  return '<div class="socialModal open" id="socialAuthModal"><div class="socialModalCard authCard authCardV2"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="authBrandMark"><b>S</b><span>SEYİR</span></div><div class="authIntro"><div class="socialModalKicker">'+(register?'YENİ HESAP':'HOŞ GELDİN')+'</div><h2>'+(register?'Seyir profilini oluştur':'Hesabına giriş yap')+'</h2><p>'+(register?'Puanlarını, listelerini ve yorumlarını kendi profilinle kullan.':'Kullanıcı adın ve şifrenle devam et.')+'</p></div><div class="authSwitch authSwitchV2"><button data-auth-mode="login" class="'+(!register?'active':'')+'">Giriş yap</button><button data-auth-mode="register" class="'+(register?'active':'')+'">Kayıt ol</button></div><form id="seyirAuthForm" class="authFormV2">'+fields+'<div id="authMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">'+(register?'Hesap oluştur':'Giriş yap')+'</button></form></div></div>'
 }
 function openAuthModal(mode){
   ensureSocialOverlay();
@@ -632,50 +721,81 @@ function closeSocialModal(){
 function bindSocialOverlay(){
   document.querySelectorAll('[data-close-social]').forEach(function(b){b.onclick=closeSocialModal});
   document.querySelectorAll('[data-auth-mode]').forEach(function(b){b.onclick=function(){openAuthModal(b.getAttribute('data-auth-mode'))}});
+  document.querySelectorAll('[data-password-target]').forEach(function(b){b.onclick=function(){
+    var input=document.getElementById(b.getAttribute('data-password-target'));
+    if(!input)return;
+    var show=input.type==='password';
+    input.type=show?'text':'password';
+    b.textContent=show?'Gizle':'Göster'
+  }});
   var form=document.getElementById('seyirAuthForm');
   if(form)form.onsubmit=submitSeyirAuth;
   var save=document.getElementById('saveSeyirProfileSettings');
   if(save)save.onclick=saveSeyirProfileSettings;
   var avatarFile=document.getElementById('seyirAvatarFile');
   if(avatarFile)avatarFile.onchange=uploadSeyirAvatar;
-  var chooseCharacter=document.getElementById('chooseCharacterAvatar');
-  if(chooseCharacter)chooseCharacter.onclick=function(){closeSocialModal();setTimeout(openProfileAvatarModal,30)}
+  var removeAvatar=document.getElementById('removeSeyirAvatar');
+  if(removeAvatar)removeAvatar.onclick=removeSeyirAvatar;
+  var deleteOpen=document.getElementById('openDeleteSeyirAccount');
+  if(deleteOpen)deleteOpen.onclick=openDeleteAccountModal;
+  var deleteConfirm=document.getElementById('confirmDeleteSeyirAccount');
+  if(deleteConfirm)deleteConfirm.onclick=deleteSeyirAccount;
+  var deleteInput=document.getElementById('deleteUsernameConfirm');
+  if(deleteInput&&deleteConfirm)deleteInput.oninput=function(){
+    deleteConfirm.disabled=deleteInput.value.trim()!==(currentSeyirProfile&&currentSeyirProfile.username||'')
+  }
 }
 async function submitSeyirAuth(e){
   e.preventDefault();
   if(!seyirDb)return;
   var register=!!document.getElementById('authUsername');
-  var email=document.getElementById('authEmail').value.trim();
   var password=document.getElementById('authPassword').value;
   var msg=document.getElementById('authMessage');
   var submit=e.currentTarget.querySelector('button[type="submit"]');
   submit.disabled=true;msg.textContent='';
   try{
-    var res;
     if(register){
       var username=document.getElementById('authUsername').value.trim();
       var displayName=document.getElementById('authDisplayName').value.trim();
+      var email=document.getElementById('authEmail').value.trim();
+      var confirmPassword=document.getElementById('authPasswordConfirm').value;
       if(!/^[A-Za-z0-9_]{3,20}$/.test(username))throw new Error('Kullanıcı adı 3–20 karakter olmalı; harf, rakam ve _ kullanabilirsin.');
-      res=await seyirDb.auth.signUp({email:email,password:password,options:{data:{username:username,display_name:displayName}}});
+      if(!displayName)throw new Error('Görünen adını yaz.');
+      if(password.length<8)throw new Error('Şifre en az 8 karakter olmalı.');
+      if(password!==confirmPassword)throw new Error('Şifreler birbiriyle eşleşmiyor.');
+      var exists=await seyirDb.from('seyir_profiles').select('user_id').ilike('username',username).maybeSingle();
+      if(exists.data)throw new Error('Bu kullanıcı adı kullanılıyor.');
+      var res=await seyirDb.auth.signUp({email:email,password:password,options:{data:{username:username,display_name:displayName}}});
       if(res.error)throw res.error;
       if(res.data&&res.data.session){
-        currentUser=res.data.session.user;await loadMySeyirProfile();closeSocialModal();location.hash='profile'
+        currentUser=res.data.session.user;
+        await loadMySeyirProfile();
+        closeSocialModal();
+        location.hash='profile'
       }else{
-        msg.textContent='Hesap oluşturuldu. E-postandaki doğrulama bağlantısını açıp giriş yap.'
+        msg.classList.add('success');
+        msg.textContent='Hesabın oluşturuldu. E-postandaki doğrulama bağlantısını açtıktan sonra kullanıcı adınla giriş yapabilirsin.'
       }
     }else{
-      res=await seyirDb.auth.signInWithPassword({email:email,password:password});
-      if(res.error)throw res.error;
-      currentUser=res.data.user;await loadMySeyirProfile();closeSocialModal();location.hash='profile'
+      var loginUsername=document.getElementById('authLoginUsername').value.trim();
+      if(!/^[A-Za-z0-9_]{3,20}$/.test(loginUsername))throw new Error('Kullanıcı adı veya şifre hatalı.');
+      var session=await seyirAccountRequest({action:'login',username:loginUsername,password:password},false);
+      var set=await seyirDb.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});
+      if(set.error)throw set.error;
+      currentUser=set.data.user;
+      await loadMySeyirProfile();
+      closeSocialModal();
+      location.hash='profile'
     }
   }catch(err){
-    msg.textContent=err&&err.message?err.message:'İşlem tamamlanamadı.'
+    msg.classList.remove('success');
+    msg.textContent=friendlyAuthError(err)
   }finally{submit.disabled=false}
 }
 function profileSettingsMarkup(){
   var p=currentSeyirProfile||{};
-  var avatar=socialProfileAvatar(p,'w342')||profileAvatarUrl(saved.profileAvatar,'w342');
-  return '<div class="socialModal open"><div class="socialModalCard profileSettingsCard"><button class="socialModalClose" data-close-social>×</button><div class="socialModalKicker">PROFİL AYARLARI</div><h2>Profilini düzenle</h2><div class="profilePhotoEditor"><div class="profilePhotoPreview">'+(avatar?'<img src="'+h(avatar)+'" alt="">':'<span>'+h((p.display_name||p.username||'S').charAt(0).toUpperCase())+'</span>')+'</div><div class="profilePhotoActions"><label class="secondary uploadAvatarLabel">Fotoğraf yükle<input id="seyirAvatarFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button class="secondary" id="chooseCharacterAvatar">Dizi karakteri seç</button><small>En fazla 3 MB · JPG, PNG, WEBP veya GIF</small></div></div><div class="fieldRow"><label>Görünen ad<input id="profileDisplayName" maxlength="40" value="'+h(p.display_name||'')+'"></label><label>Kullanıcı adı<input id="profileUsername" maxlength="20" value="'+h(p.username||'')+'"></label></div><label>Biyografi<textarea id="profileBio" maxlength="180" placeholder="Kendinden kısaca bahset…">'+h(p.bio||'')+'</textarea></label><div id="profileSettingsMessage" class="authMessage"></div><button id="saveSeyirProfileSettings" class="primary socialSubmit">Kaydet</button></div></div>'
+  var avatar=socialProfileAvatar(p,'w342');
+  return '<div class="socialModal open"><div class="socialModalCard profileSettingsCard profileSettingsV2"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="settingsHead"><div class="socialModalKicker">PROFİL AYARLARI</div><h2>Profilini düzenle</h2><p>Profilinde diğer kullanıcılara nasıl görüneceğini belirle.</p></div><div class="profilePhotoEditor profilePhotoEditorV2"><div class="profilePhotoPreview">'+accountAvatarMarkup(p)+'</div><div class="profilePhotoActions profilePhotoActionsV2"><label class="secondary uploadAvatarLabel">Fotoğraf seç<input id="seyirAvatarFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>'+(avatar?'<button class="profileGhostButton removePhotoButton" id="removeSeyirAvatar">Fotoğrafı kaldır</button>':'')+'</div></div><div class="settingsFields"><div class="fieldRow"><label>Görünen ad<input id="profileDisplayName" maxlength="40" value="'+h(p.display_name||'')+'"></label><label>Kullanıcı adı<input id="profileUsername" maxlength="20" value="'+h(p.username||'')+'"></label></div><label>Biyografi<textarea id="profileBio" maxlength="180" placeholder="Kendinden kısaca bahset…">'+h(p.bio||'')+'</textarea></label></div><div id="profileSettingsMessage" class="authMessage"></div><button id="saveSeyirProfileSettings" class="primary socialSubmit">Değişiklikleri kaydet</button><div class="accountDangerZone"><div><b>Hesabı sil</b><span>Profilin, yorumların ve tepkilerin kalıcı olarak silinir.</span></div><button id="openDeleteSeyirAccount" class="dangerButton">Hesabı sil</button></div></div></div>'
 }
 function openProfileSettingsModal(){
   if(!currentUser){openAuthModal('login');return}
@@ -691,31 +811,26 @@ async function saveSeyirProfileSettings(){
   var bio=document.getElementById('profileBio').value.trim();
   var msg=document.getElementById('profileSettingsMessage');
   if(!/^[A-Za-z0-9_]{3,20}$/.test(username)){msg.textContent='Kullanıcı adı 3–20 karakter olmalı.';return}
-  var r=await seyirDb.from('seyir_profiles').update({display_name:displayName||username,username:username,bio:bio}).eq('user_id',currentUser.id).select().single();
+  if(!displayName){msg.textContent='Görünen ad boş bırakılamaz.';return}
+  var r=await seyirDb.from('seyir_profiles').update({display_name:displayName,username:username,bio:bio}).eq('user_id',currentUser.id).select().single();
   if(r.error){msg.textContent=r.error.code==='23505'?'Bu kullanıcı adı kullanılıyor.':r.error.message;return}
-  currentSeyirProfile=r.data;await loadMySeyirProfile();closeSocialModal();render()
-}
-async function saveSocialAvatar(person){
-  if(!currentUser||!seyirDb)return;
-  var r=await seyirDb.from('seyir_profiles').update({
-    avatar_url:null,
-    avatar_image_path:person.image_path,
-    avatar_character:person.character||'',
-    avatar_show:person.show||''
-  }).eq('user_id',currentUser.id).select().single();
-  if(!r.error){currentSeyirProfile=r.data}
+  currentSeyirProfile=r.data;
+  await loadMySeyirProfile();
+  closeSocialModal();
+  render()
 }
 async function uploadSeyirAvatar(e){
   if(!currentUser||!seyirDb)return;
   var file=e.target.files&&e.target.files[0];
   var msg=document.getElementById('profileSettingsMessage');
   if(!file)return;
-  if(file.size>3145728){if(msg)msg.textContent='Fotoğraf 3 MB’dan küçük olmalı.';return}
+  if(file.size>3145728){if(msg)msg.textContent='Seçtiğin fotoğraf çok büyük.';return}
+  if(!/^image\/(jpeg|png|webp|gif)$/i.test(file.type)){if(msg)msg.textContent='Desteklenen bir görsel dosyası seç.';return}
   var ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
   var path=currentUser.id+'/avatar-'+Date.now()+'.'+ext;
   if(msg)msg.textContent='Fotoğraf yükleniyor…';
   var up=await seyirDb.storage.from('seyir-avatars').upload(path,file,{upsert:true,contentType:file.type});
-  if(up.error){if(msg)msg.textContent=up.error.message;return}
+  if(up.error){if(msg)msg.textContent='Fotoğraf yüklenemedi.';return}
   var pub=seyirDb.storage.from('seyir-avatars').getPublicUrl(path);
   var url=pub.data&&pub.data.publicUrl?pub.data.publicUrl:'';
   var r=await seyirDb.from('seyir_profiles').update({
@@ -724,15 +839,67 @@ async function uploadSeyirAvatar(e){
     avatar_character:null,
     avatar_show:null
   }).eq('user_id',currentUser.id).select().single();
-  if(r.error){if(msg)msg.textContent=r.error.message;return}
-  currentSeyirProfile=r.data;saved.profileAvatar=null;persist();
-  if(msg)msg.textContent='Profil fotoğrafı güncellendi.';
-  setTimeout(function(){closeSocialModal();render()},350)
+  if(r.error){if(msg)msg.textContent='Profil fotoğrafı güncellenemedi.';return}
+  currentSeyirProfile=r.data;
+  saved.profileAvatar=null;
+  persist();
+  closeSocialModal();
+  render()
+}
+async function removeSeyirAvatar(){
+  if(!currentUser||!seyirDb)return;
+  var btn=document.getElementById('removeSeyirAvatar');
+  if(btn)btn.disabled=true;
+  var msg=document.getElementById('profileSettingsMessage');
+  try{
+    await seyirAccountRequest({action:'remove_avatar'},true);
+    if(currentSeyirProfile)currentSeyirProfile.avatar_url=null;
+    saved.profileAvatar=null;
+    persist();
+    closeSocialModal();
+    render()
+  }catch(err){
+    if(msg)msg.textContent=err.message;
+    if(btn)btn.disabled=false
+  }
+}
+function deleteAccountMarkup(){
+  var username=currentSeyirProfile&&currentSeyirProfile.username||'';
+  return '<div class="socialModal open"><div class="socialModalCard deleteAccountCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="dangerIcon">!</div><div class="socialModalKicker dangerKicker">HESABI KALICI OLARAK SİL</div><h2>Bu işlem geri alınamaz</h2><p>Profilin, yorumların, yanıtların ve tepkilerin kalıcı olarak silinecek. Devam etmek için aşağıya <b>@'+h(username)+'</b> kullanıcı adını yaz.</p><label class="authField"><span>Kullanıcı adı</span><div class="authInputWrap"><input id="deleteUsernameConfirm" autocomplete="off" placeholder="'+h(username)+'"></div></label><div id="deleteAccountMessage" class="authMessage"></div><button id="confirmDeleteSeyirAccount" class="dangerPrimary" disabled>Hesabımı kalıcı olarak sil</button></div></div>'
+}
+function openDeleteAccountModal(){
+  ensureSocialOverlay();
+  document.getElementById('seyirSocialOverlay').innerHTML=deleteAccountMarkup();
+  bindSocialOverlay()
+}
+async function deleteSeyirAccount(){
+  var btn=document.getElementById('confirmDeleteSeyirAccount');
+  var msg=document.getElementById('deleteAccountMessage');
+  if(btn)btn.disabled=true;
+  try{
+    await seyirAccountRequest({action:'delete_account',username:currentSeyirProfile.username},true);
+    try{await seyirDb.auth.signOut({scope:'local'})}catch(e){}
+    currentUser=null;
+    currentSeyirProfile=null;
+    saved.profileAvatar=null;
+    saved.profileName='Seyir Kullanıcısı';
+    saved.profileBio='';
+    persist();
+    closeSocialModal();
+    updateAuthNav();
+    location.hash=''
+  }catch(err){
+    if(msg)msg.textContent=err.message;
+    if(btn)btn.disabled=false
+  }
 }
 async function logoutSeyir(){
   if(!seyirDb)return;
   await seyirDb.auth.signOut();
-  currentUser=null;currentSeyirProfile=null;updateAuthNav();location.hash=''
+  currentUser=null;
+  currentSeyirProfile=null;
+  updateAuthNav();
+  location.hash=''
 }
 
 var saved=JSON.parse(localStorage.getItem('seyir-state')||'null')||{};
@@ -1174,9 +1341,7 @@ function profileAuthLanding(){
   return '<div class="accountLanding"><div class="accountLandingGlow"></div><div class="socialModalKicker">SEYİR TOPLULUĞU</div><h1>Kendi profilini oluştur.</h1><p>Dizi ve filmler hakkında yorum yap, diğer kullanıcıların profillerini gör, yorumlara yanıt ver ve ifadelerle tepki göster.</p><div class="accountLandingActions"><button class="primary" data-open-auth="register">Kayıt ol</button><button class="secondary" data-open-auth="login">Giriş yap</button></div></div>'
 }
 function socialProfileAvatar(profile,size){
-  if(profile&&profile.avatar_url)return profile.avatar_url;
-  if(profile&&profile.avatar_image_path)return 'https://image.tmdb.org/t/p/'+(size||'w342')+profile.avatar_image_path;
-  return ''
+  return profile&&profile.avatar_url?profile.avatar_url:''
 }
 function publicProfileShell(username){
   return '<div id="publicProfilePage" class="publicProfilePage"><div class="profileEmpty">Profil yükleniyor…</div></div>'
@@ -1189,8 +1354,7 @@ async function loadPublicProfile(username){
   var profile=p.data;
   var count=await seyirDb.from('seyir_comments').select('id',{count:'exact',head:true}).eq('user_id',profile.user_id);
   var avatar=socialProfileAvatar(profile,'w500');
-  var cover=avatar?"url('"+avatar+"')":"linear-gradient(135deg,#171a20,#0d1016 58%,#171326)";
-  area.innerHTML='<section class="publicProfileHero"><div class="publicProfileCover" style="--public-cover:'+cover+'"></div><div class="publicProfileBody"><div class="publicAvatar">'+(avatar?'<img src="'+h(avatar)+'" alt="'+h(profile.display_name)+'">':'<span>'+h((profile.display_name||profile.username||'S').charAt(0).toUpperCase())+'</span>')+'</div><div><div class="socialModalKicker">@'+h(profile.username)+'</div><h1>'+h(profile.display_name||profile.username)+'</h1><p>'+h(profile.bio||'Henüz biyografi eklenmemiş.')+'</p><span class="publicProfileMeta">'+Number(count.count||0)+' yorum</span></div></div></section>'
+  area.innerHTML='<section class="publicProfileHero publicProfileHeroV2"><div class="publicProfileBodyV2"><div class="publicAvatar publicAvatarV2">'+(avatar?'<img src="'+h(avatar)+'" alt="'+h(profile.display_name||profile.username)+'">':'<span>'+h((profile.display_name||profile.username||'S').charAt(0).toUpperCase())+'</span>')+'</div><div class="publicIdentity"><span class="profileUsername">@'+h(profile.username)+'</span><h1>'+h(profile.display_name||profile.username)+'</h1><p>'+h(profile.bio||'Henüz biyografi eklenmemiş.')+'</p><span class="publicProfileMeta">'+Number(count.count||0)+' yorum</span></div></div></section>'
 }
 function socialCommentsShell(x){
   return '<section class="socialCommentsSection"><div class="socialCommentsHead"><div><div class="socialModalKicker">TOPLULUK</div><h2>Yorumlar</h2><p>'+h(x.title)+' hakkında konuş.</p></div></div>'+(currentUser?'<div class="commentComposer"><textarea id="newSocialComment" maxlength="1000" placeholder="Yorumunu yaz…"></textarea><div><span id="commentComposerCount">0 / 1000</span><button id="submitSocialComment" class="primary">Yorum yap</button></div></div>':'<div class="commentLoginPrompt"><span>Yorum yapmak ve tepkilere katılmak için profilinle giriş yap.</span><button class="secondary" data-open-auth="login">Giriş yap</button><button class="primary" data-open-auth="register">Kayıt ol</button></div>')+'<div id="socialCommentsList" class="socialCommentsList"><div class="loading">Yorumlar yükleniyor…</div></div></section>'
@@ -1232,7 +1396,7 @@ async function loadSocialComments(x){
   if(!comments.length){area.innerHTML='<div class="socialEmpty">İlk yorumu sen yap.</div>';bindCommentUI(x);return}
   var userIds=[...new Set(comments.map(function(c){return c.user_id}))];
   var ids=comments.map(function(c){return c.id});
-  var profilesRes=await seyirDb.from('seyir_profiles').select('user_id,username,display_name,bio,avatar_image_path,avatar_character,avatar_show').in('user_id',userIds);
+  var profilesRes=await seyirDb.from('seyir_profiles').select('user_id,username,display_name,bio,avatar_url').in('user_id',userIds);
   var reactionsRes=await seyirDb.from('seyir_comment_reactions').select('*').in('comment_id',ids);
   var profiles={};
   (profilesRes.data||[]).forEach(function(p){profiles[p.user_id]=p});
@@ -1292,12 +1456,8 @@ function bindCommentUI(x){
 function profile(){
   if(!currentUser)return profileAuthLanding();
   var p=currentSeyirProfile||{};
-  var editIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.25V20h2.75L17.8 8.95l-2.75-2.75L4 17.25Zm15.7-10.4a1 1 0 0 0 0-1.4l-1.15-1.15a1 1 0 0 0-1.4 0l-.9.9L19 7.95l.7-1.1Z" fill="currentColor"/></svg>';
-  var profileVisual=currentSeyirProfile&&currentSeyirProfile.avatar_url?currentSeyirProfile.avatar_url:(saved.profileAvatar&&saved.profileAvatar.image_path?'https://image.tmdb.org/t/p/w1280'+saved.profileAvatar.image_path:'');
-  var cover=profileVisual?"url('"+profileVisual+"')":"linear-gradient(135deg,#171a20,#0d1016 58%,#171326)";
-  return '<div class="profilePage"><section class="profileHeaderCard"><div class="profileCover" style="--profile-cover:'+cover+'"><div class="profileCoverShade"></div></div><div class="profileHeaderBody"><div class="profileAvatarWrap"><button id="profileAvatarButton" class="profileAvatarBig" aria-label="Profil karakterini değiştir">'+profileAvatarMarkup()+'</button><span class="profileAvatarEdit">'+editIcon+'</span></div><div class="profileHeaderText"><div class="profileNameRow"><div><h1>'+h(p.display_name||p.username||'Seyir Kullanıcısı')+'</h1><span class="profileUsername">@'+h(p.username||'')+'</span></div><div class="profileAccountActions"><button class="secondary" id="editSeyirProfile">Profili düzenle</button><button class="profileGhostButton" id="logoutSeyir">Çıkış</button></div></div><p>'+h(p.bio||'Dizi, film ve anime arşivim.')+'</p>'+(saved.profileAvatar?'<span class="profileCharacterMeta">'+h(saved.profileAvatar.character)+' · '+h(saved.profileAvatar.show)+'</span>':'<span class="profileCharacterMeta">Profil karakterini seç</span>')+'</div></div></section><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div>'+profileAvatarModalHtml()+'</div>'
+  return '<div class="profilePage"><section class="profileIdentityCard"><div class="profileIdentityAvatar">'+accountAvatarMarkup(p)+'</div><div class="profileIdentityText"><span class="profileUsername">@'+h(p.username||'')+'</span><h1>'+h(p.display_name||p.username||'Seyir Kullanıcısı')+'</h1><p>'+h(p.bio||'Henüz biyografi eklenmemiş.')+'</p></div><div class="profileIdentityActions"><button class="secondary" id="editSeyirProfile">Profili düzenle</button><button class="profileGhostButton" id="logoutSeyir">Çıkış</button></div></section><div class="profileTabs"><button class="profileTab '+(activeProfileTab==='overview'?'active':'')+'" data-profile-tab="overview">Genel Bakış</button><button class="profileTab '+(activeProfileTab==='series'?'active':'')+'" data-profile-tab="series">Dizilerim</button><button class="profileTab '+(activeProfileTab==='movies'?'active':'')+'" data-profile-tab="movies">Filmlerim</button><button class="profileTab '+(activeProfileTab==='stats'?'active':'')+'" data-profile-tab="stats">İstatistikler</button><button class="profileTab '+(activeProfileTab==='lists'?'active':'')+'" data-profile-tab="lists">Listelerim</button><button class="profileTab '+(activeProfileTab==='progress'?'active':'')+'" data-profile-tab="progress">Devam Ettiklerim</button></div><div id="profileTabContent" class="profileTabContent">'+profileTabHtml(activeProfileTab)+'</div></div>'
 }
-
 function profileSeriesGroups(){
   var groups={};
   Object.keys(saved.episodeRatings).forEach(function(key){
