@@ -893,12 +893,12 @@ function authModalMarkup(mode){
 function forgotPasswordMarkup(step){
   step=step||'email';
   if(step==='email'){
-    return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToLogin">← Girişe dön</button><div class="socialModalKicker">HESAP KURTARMA</div><h2>Şifreni yenile</h2><p>Hesabında kullandığın kurtarma e-postasını yaz. Sana şifre yenileme e-postası göndereceğiz.</p><form id="forgotPasswordForm" class="authFormV2">'+authInput('recoveryEmail','Kurtarma e-postası','email','ornek@eposta.com','email','')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Kurtarma e-postası gönder</button></form></div></div>'
+    return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToLogin">← Girişe dön</button><div class="socialModalKicker">HESAP KURTARMA</div><h2>Şifreni yenile</h2><p>Hesabında kullandığın kurtarma e-postasını yaz. Sana 6 haneli bir şifre yenileme kodu göndereceğiz.</p><form id="forgotPasswordForm" class="authFormV2">'+authInput('recoveryEmail','Kurtarma e-postası','email','ornek@eposta.com','email','')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Kod gönder</button></form></div></div>'
   }
   if(step==='password'){
     return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="socialModalKicker">YENİ ŞİFRE</div><h2>Yeni şifreni belirle</h2><p>E-posta doğrulaması tamamlandı. Hesabın için yeni bir şifre oluştur.</p><form id="directResetPasswordForm" class="authFormV2">'+authInput('directRecoveryPassword','Yeni şifre','password','En az 8 karakter','new-password','minlength="8"')+authInput('directRecoveryPasswordConfirm','Yeni şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Şifreyi değiştir</button></form></div></div>'
   }
-  return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToEmail">← E-postayı değiştir</button><div class="socialModalKicker">DOĞRULAMA KODU</div><h2>E-postanı kontrol et</h2><p><b>'+h(passwordResetEmail)+'</b> adresine gelen 6 haneli kodu yaz. E-postada bağlantı görünüyorsa ona dokunarak da devam edebilirsin.</p><form id="resetPasswordForm" class="authFormV2">'+authInput('recoveryCode','6 haneli kod','text','000000','one-time-code','inputmode="numeric" maxlength="6" pattern="[0-9]{6}"')+authInput('newRecoveryPassword','Yeni şifre','password','En az 8 karakter','new-password','minlength="8"')+authInput('newRecoveryPasswordConfirm','Yeni şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Şifreyi değiştir</button><button type="button" class="resendRecoveryCode" id="resendRecoveryCode">E-postayı tekrar gönder</button></form></div></div>'
+  return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToEmail">← E-postayı değiştir</button><div class="socialModalKicker">DOĞRULAMA KODU</div><h2>E-postanı kontrol et</h2><p><b>'+h(passwordResetEmail)+'</b> adresine gelen 6 haneli kodu yaz. E-postada bağlantı görünüyorsa ona dokunarak da devam edebilirsin.</p><form id="resetPasswordForm" class="authFormV2">'+authInput('recoveryCode','6 haneli kod','text','000000','one-time-code','inputmode="numeric" maxlength="6" pattern="[0-9]{6}"')+authInput('newRecoveryPassword','Yeni şifre','password','En az 8 karakter','new-password','minlength="8"')+authInput('newRecoveryPasswordConfirm','Yeni şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Şifreyi değiştir</button><button type="button" class="resendRecoveryCode" id="resendRecoveryCode">Kodu tekrar gönder</button></form></div></div>'
 }
 function openForgotPassword(step){
   ensureSocialOverlay();
@@ -1019,13 +1019,13 @@ async function submitSeyirAuth(e){
 async function sendRecoveryCode(email,button){
   var msg=document.getElementById('recoveryMessage');
   if(button)button.disabled=true;
-  setAuthMessage(msg,'Kurtarma e-postası gönderiliyor…','info');
+  setAuthMessage(msg,'Kod gönderiliyor…','info');
   try{
     var options={};
     try{options.redirectTo=location.origin+location.pathname}catch(e){}
     var r=await seyirDb.auth.resetPasswordForEmail(email,options);
     if(r.error)throw r.error;
-    setAuthMessage(msg,'E-posta gönderildi. Gelen kutunu kontrol et.','success');
+    setAuthMessage(msg,'Kod gönderildi. Gelen kutunu kontrol et.','success');
     if(button){
       var old=button.textContent;
       button.textContent='Gönderildi';
