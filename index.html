@@ -1016,7 +1016,7 @@ async function submitForgotPasswordRequest(e){
   passwordResetEmail=email;
   setAuthMessage(msg,'Bağlantı gönderiliyor…','info');
   try{
-    var options={redirectTo:location.origin+location.pathname};
+    var options={redirectTo:'https://seyir-app-4tez.vercel.app/'};
     var r=await seyirDb.auth.resetPasswordForEmail(email,options);
     if(r.error)throw r.error;
     setAuthMessage(msg,'Şifre yenileme bağlantısı gönderildi. E-postanı kontrol et.','success');
