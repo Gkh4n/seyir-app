@@ -772,6 +772,7 @@ var seyirRecoveryTokens={
   refresh_token:seyirRecoveryParams.get('refresh_token')||''
 };
 var seyirRecoveryLanding=seyirRecoveryParams.get('type')==='recovery'||/(?:^|[&#?])type=recovery(?:&|$)/i.test(String(location.hash||'')+String(location.search||''))||/[?&]password-recovery=1(?:&|$)/i.test(String(location.search||''));
+var seyirRecoveryError=seyirRecoveryParams.get('error_description')||seyirRecoveryParams.get('error_code')||'';
 var seyirDb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SEYIR_SUPABASE_URL,SEYIR_SUPABASE_KEY):null;
 var currentUser=null;
 var currentSeyirProfile=null;
@@ -817,6 +818,15 @@ async function showRecoveryPasswordModal(session){
     }
   }catch(e){}
 }
+function showRecoveryErrorModal(){
+  ensureSocialOverlay();
+  document.getElementById('seyirSocialOverlay').innerHTML='<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="socialModalKicker">BAĞLANTI GEÇERSİZ</div><h2>Yeni bir bağlantı iste</h2><p>Bu şifre yenileme bağlantısı kullanılmış veya süresi dolmuş. Yeni bir bağlantı gönderip sadece en son gelen e-postayı kullan.</p><button class="primary socialSubmit authSubmitV2" id="retryRecovery">Yeni bağlantı gönder</button></div></div>';
+  bindSocialOverlay();
+  var retry=document.getElementById('retryRecovery');
+  if(retry)retry.onclick=function(){openForgotPassword('email')};
+  document.body.classList.add('socialModalOpen');
+  try{history.replaceState(null,'',location.pathname)}catch(e){}
+}
 async function initSocial(){
   if(!seyirDb)return;
 
@@ -842,6 +852,10 @@ async function initSocial(){
 
   var session=null;
   try{
+    if(seyirRecoveryLanding&&seyirRecoveryError){
+      setTimeout(showRecoveryErrorModal,0);
+      return
+    }
     if(seyirRecoveryLanding&&seyirRecoveryTokens.access_token&&seyirRecoveryTokens.refresh_token){
       var restored=await seyirDb.auth.setSession({
         access_token:seyirRecoveryTokens.access_token,
@@ -866,6 +880,8 @@ async function initSocial(){
 
   if(seyirRecoveryLanding&&session){
     setTimeout(function(){showRecoveryPasswordModal(session)},0)
+  }else if(seyirRecoveryLanding){
+    setTimeout(showRecoveryErrorModal,0)
   }
 }
 function ensureSocialOverlay(){
