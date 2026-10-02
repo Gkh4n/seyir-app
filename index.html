@@ -744,6 +744,9 @@ textarea{min-height:110px;resize:vertical}
 .profileSettingsV2 .profilePhotoButton{transition:transform .16s ease}
 @media(max-width:680px){.profileIdentityActions:has(#editSeyirProfile){padding-left:97px}}
 
+
+.recoveryCard .authSubmitV2:disabled{opacity:.58;cursor:wait}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -762,6 +765,7 @@ textarea{min-height:110px;resize:vertical}
 <script>
 var SEYIR_SUPABASE_URL='https://vysddydaqjxdfoaziyrv.supabase.co';
 var SEYIR_SUPABASE_KEY='sb_publishable_3QXB59ogdtiPnVHEMpvKIw_4dFLra_e';
+var seyirRecoveryLanding=/(?:^|[&#?])type=recovery(?:&|$)/i.test(String(location.hash||'')+String(location.search||''));
 var seyirDb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SEYIR_SUPABASE_URL,SEYIR_SUPABASE_KEY):null;
 var currentUser=null;
 var currentSeyirProfile=null;
@@ -795,25 +799,27 @@ function updateAuthNav(){
   var btn=document.querySelector('.top .profile');
   if(btn)btn.textContent=currentUser?(currentSeyirProfile&&currentSeyirProfile.display_name||'Profilim'):'Giriş';
 }
+async function showRecoveryPasswordModal(session){
+  currentUser=session&&session.user?session.user:currentUser;
+  ensureSocialOverlay();
+  document.getElementById('seyirSocialOverlay').innerHTML=forgotPasswordMarkup('password');
+  bindSocialOverlay();
+  document.body.classList.add('socialModalOpen');
+  try{
+    if(location.hash&&/access_token|refresh_token|type=recovery/i.test(location.hash)){
+      history.replaceState(null,'',location.pathname+location.search)
+    }
+  }catch(e){}
+}
 async function initSocial(){
   if(!seyirDb)return;
-  try{
-    var s=await seyirDb.auth.getSession();
-    currentUser=s.data&&s.data.session?s.data.session.user:null;
-    if(currentUser)await loadMySeyirProfile()
-  }catch(e){}
-  updateAuthNav();
+
   if(!socialAuthBound){
     socialAuthBound=true;
     seyirDb.auth.onAuthStateChange(function(event,session){
       if(event==='PASSWORD_RECOVERY'){
-        setTimeout(function(){
-          currentUser=session&&session.user?session.user:null;
-          ensureSocialOverlay();
-          document.getElementById('seyirSocialOverlay').innerHTML=forgotPasswordMarkup('password');
-          bindSocialOverlay();
-          document.body.classList.add('socialModalOpen')
-        },0);
+        seyirRecoveryLanding=true;
+        setTimeout(function(){showRecoveryPasswordModal(session)},0);
         return
       }
       setTimeout(async function(){
@@ -826,6 +832,19 @@ async function initSocial(){
         if(base==='profile'||base==='user'||base==='tmdb')render()
       },0)
     })
+  }
+
+  var session=null;
+  try{
+    var s=await seyirDb.auth.getSession();
+    session=s.data&&s.data.session?s.data.session:null;
+    currentUser=session?session.user:null;
+    if(currentUser)await loadMySeyirProfile()
+  }catch(e){}
+  updateAuthNav();
+
+  if(seyirRecoveryLanding&&session){
+    setTimeout(function(){showRecoveryPasswordModal(session)},0)
   }
 }
 function ensureSocialOverlay(){
