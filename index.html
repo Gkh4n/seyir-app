@@ -477,7 +477,7 @@ textarea{min-height:110px;resize:vertical}
 .socialModalCard input,.socialModalCard textarea{width:100%;border:1px solid rgba(255,255,255,.08);background:#0b1018;color:#fff;border-radius:12px;padding:12px 13px;outline:none}
 .socialModalCard textarea{min-height:100px;resize:vertical}
 .fieldRow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.authMessage{min-height:20px;color:#ff9aa9;font-size:12px}
+.authMessage{min-height:20px;color:#7f8a9d;font-size:12px}.authMessage.error{color:#ff9aa9}.authMessage.success{color:#65d7a9}.authMessage.info{color:#9ca7ba}
 .socialSubmit{width:100%;min-height:44px}
 .accountLanding{position:relative;overflow:hidden;max-width:780px;margin:60px auto;padding:48px;border:1px solid rgba(255,255,255,.08);border-radius:28px;background:radial-gradient(circle at 85% 0,rgba(111,94,255,.18),transparent 34%),linear-gradient(145deg,#111722,#090d14);box-shadow:0 28px 80px rgba(0,0,0,.28)}
 .accountLandingGlow{position:absolute;right:-120px;top:-120px;width:320px;height:320px;border-radius:50%;background:rgba(100,88,255,.16);filter:blur(70px)}
@@ -549,7 +549,7 @@ textarea{min-height:110px;resize:vertical}
 .authInputWrap input[type=password],.authInputWrap input[type=text]{padding-right:70px}
 .passwordToggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#8175ff;font-size:10px;font-weight:800;cursor:pointer;padding:8px}
 .authPrivacyNote{margin-top:-5px;color:#667286;font-size:10px;line-height:1.5}
-.authMessage{min-height:18px}.authMessage.success{color:#65d7a9}
+.authMessage{min-height:18px;color:#7f8a9d}.authMessage.error{color:#ff9aa9}.authMessage.success{color:#65d7a9}.authMessage.info{color:#9ca7ba}
 .authSubmitV2{height:48px;margin-top:2px;border-radius:14px;font-size:13px}
 .profileIdentityCard{display:grid;grid-template-columns:118px minmax(0,1fr) auto;gap:24px;align-items:center;padding:28px;border:1px solid rgba(255,255,255,.075);border-radius:26px;background:radial-gradient(circle at 94% 0,rgba(115,98,255,.1),transparent 32%),linear-gradient(145deg,rgba(18,23,34,.96),rgba(9,13,20,.98));box-shadow:0 24px 70px rgba(0,0,0,.22)}
 .profileIdentityAvatar{width:118px;height:118px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:linear-gradient(145deg,#262c3b,#121722);border:3px solid rgba(138,125,255,.62);box-shadow:0 0 0 6px rgba(138,125,255,.06);color:#fff;font-size:38px;font-weight:850}
@@ -723,6 +723,19 @@ textarea{min-height:110px;resize:vertical}
   .commentDeleteOverlay{align-items:flex-end;padding:8px}.commentDeleteCard{border-radius:22px 22px 16px 16px;padding:20px 16px}
 }
 
+
+.forgotPasswordLink,.resendRecoveryCode,.recoveryBack{border:0;background:transparent;color:#8e84ff;font-size:10px;font-weight:800;cursor:pointer}
+.forgotPasswordLink{justify-self:end;margin-top:-5px;padding:2px 0 0}
+.resendRecoveryCode{justify-self:center;padding:8px}
+.recoveryBack{padding:0;margin:0 0 22px;color:#8692a5}
+.recoveryCard h2{margin:6px 0 8px;font-size:31px;letter-spacing:-.035em}
+.recoveryCard>p{margin:0 0 22px;color:#8793a6;line-height:1.6}
+.recoveryCard>p b{color:#dce1eb;font-weight:750}
+.authMessage.success,.authMessage.info,.authMessage.error{padding:9px 11px;border-radius:11px;border:1px solid transparent}
+.authMessage.success{background:rgba(84,211,154,.06);border-color:rgba(84,211,154,.12)}
+.authMessage.info{background:rgba(125,111,255,.06);border-color:rgba(125,111,255,.12)}
+.authMessage.error{background:rgba(255,106,126,.055);border-color:rgba(255,106,126,.1)}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -746,6 +759,7 @@ var currentUser=null;
 var currentSeyirProfile=null;
 var socialAuthBound=false;
 var socialCommentCache={};
+var passwordResetEmail='';
 
 async function loadMySeyirProfile(){
   if(!seyirDb||!currentUser){currentSeyirProfile=null;return null}
@@ -847,15 +861,29 @@ function authModalMarkup(mode){
   if(register){
     fields+=authInput('authUsername','Kullanıcı adı','text','kullanici_adi','username','maxlength="20"');
     fields+=authInput('authDisplayName','Görünen ad','text','Adın veya rumuzun','name','maxlength="40"');
-    fields+=authInput('authEmail','E-posta','email','ornek@eposta.com','email','');
-    fields+='<div class="authPrivacyNote">E-posta adresin profilinde gösterilmez; yalnızca hesabın ve doğrulama işlemleri için kullanılır.</div>';
+    fields+=authInput('authEmail','Kurtarma e-postası','email','ornek@eposta.com','email','');
+    fields+='<div class="authPrivacyNote">Doğrulama e-postası gönderilmez. Bu adres yalnızca şifreni unutursan hesabını kurtarmak için kullanılır.</div>';
     fields+=authInput('authPassword','Şifre','password','En az 8 karakter','new-password','minlength="8"');
     fields+=authInput('authPasswordConfirm','Şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"');
   }else{
     fields+=authInput('authLoginUsername','Kullanıcı adı','text','Kullanıcı adın','username','maxlength="20"');
     fields+=authInput('authPassword','Şifre','password','Şifren','current-password','minlength="6"');
+    fields+='<button type="button" class="forgotPasswordLink" id="openForgotPassword">Şifreni mi unuttun?</button>';
   }
-  return '<div class="socialModal open" id="socialAuthModal"><div class="socialModalCard authCard authCardV2"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="authBrandMark"><b>S</b><span>SEYİR</span></div><div class="authIntro"><div class="socialModalKicker">'+(register?'YENİ HESAP':'HOŞ GELDİN')+'</div><h2>'+(register?'Seyir profilini oluştur':'Hesabına giriş yap')+'</h2><p>'+(register?'Puanlarını, listelerini ve yorumlarını kendi profilinle kullan.':'Kullanıcı adın ve şifrenle devam et.')+'</p></div><div class="authSwitch authSwitchV2"><button data-auth-mode="login" class="'+(!register?'active':'')+'">Giriş yap</button><button data-auth-mode="register" class="'+(register?'active':'')+'">Kayıt ol</button></div><form id="seyirAuthForm" class="authFormV2">'+fields+'<div id="authMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">'+(register?'Hesap oluştur':'Giriş yap')+'</button></form></div></div>'
+  return '<div class="socialModal open" id="socialAuthModal"><div class="socialModalCard authCard authCardV2"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="authBrandMark"><b>S</b><span>SEYİR</span></div><div class="authIntro"><div class="socialModalKicker">'+(register?'YENİ HESAP':'HOŞ GELDİN')+'</div><h2>'+(register?'Seyir profilini oluştur':'Hesabına giriş yap')+'</h2><p>'+(register?'Hesabın anında oluşturulur; e-posta doğrulaması beklemezsin.':'Kullanıcı adın ve şifrenle devam et.')+'</p></div><div class="authSwitch authSwitchV2"><button data-auth-mode="login" class="'+(!register?'active':'')+'">Giriş yap</button><button data-auth-mode="register" class="'+(register?'active':'')+'">Kayıt ol</button></div><form id="seyirAuthForm" class="authFormV2">'+fields+'<div id="authMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">'+(register?'Hesap oluştur':'Giriş yap')+'</button></form></div></div>'
+}
+function forgotPasswordMarkup(step){
+  step=step||'email';
+  if(step==='email'){
+    return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToLogin">← Girişe dön</button><div class="socialModalKicker">HESAP KURTARMA</div><h2>Şifreni yenile</h2><p>Hesabında kullandığın kurtarma e-postasını yaz. Sana tek kullanımlık bir kod göndereceğiz.</p><form id="forgotPasswordForm" class="authFormV2">'+authInput('recoveryEmail','Kurtarma e-postası','email','ornek@eposta.com','email','')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Kod gönder</button></form></div></div>'
+  }
+  return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToEmail">← E-postayı değiştir</button><div class="socialModalKicker">DOĞRULAMA KODU</div><h2>E-postanı kontrol et</h2><p><b>'+h(passwordResetEmail)+'</b> adresine gönderilen 6 haneli kodu yaz ve yeni şifreni belirle.</p><form id="resetPasswordForm" class="authFormV2">'+authInput('recoveryCode','6 haneli kod','text','000000','one-time-code','inputmode="numeric" maxlength="6" pattern="[0-9]{6}"')+authInput('newRecoveryPassword','Yeni şifre','password','En az 8 karakter','new-password','minlength="8"')+authInput('newRecoveryPasswordConfirm','Yeni şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Şifreyi değiştir</button><button type="button" class="resendRecoveryCode" id="resendRecoveryCode">Kodu tekrar gönder</button></form></div></div>'
+}
+function openForgotPassword(step){
+  ensureSocialOverlay();
+  document.getElementById('seyirSocialOverlay').innerHTML=forgotPasswordMarkup(step||'email');
+  bindSocialOverlay();
+  document.body.classList.add('socialModalOpen')
 }
 function openAuthModal(mode){
   ensureSocialOverlay();
@@ -880,6 +908,18 @@ function bindSocialOverlay(){
   }});
   var form=document.getElementById('seyirAuthForm');
   if(form)form.onsubmit=submitSeyirAuth;
+  var forgot=document.getElementById('openForgotPassword');
+  if(forgot)forgot.onclick=function(){openForgotPassword('email')};
+  var backLogin=document.getElementById('recoveryBackToLogin');
+  if(backLogin)backLogin.onclick=function(){openAuthModal('login')};
+  var backEmail=document.getElementById('recoveryBackToEmail');
+  if(backEmail)backEmail.onclick=function(){openForgotPassword('email')};
+  var forgotForm=document.getElementById('forgotPasswordForm');
+  if(forgotForm)forgotForm.onsubmit=submitForgotPasswordRequest;
+  var resetForm=document.getElementById('resetPasswordForm');
+  if(resetForm)resetForm.onsubmit=submitPasswordReset;
+  var resend=document.getElementById('resendRecoveryCode');
+  if(resend)resend.onclick=function(){sendRecoveryCode(passwordResetEmail,resend)};
   var save=document.getElementById('saveSeyirProfileSettings');
   if(save)save.onclick=saveSeyirProfileSettings;
   var avatarFile=document.getElementById('seyirAvatarFile');
@@ -899,6 +939,12 @@ function bindSocialOverlay(){
     deleteConfirm.disabled=deleteInput.value.trim()!==(currentSeyirProfile&&currentSeyirProfile.username||'')
   }
 }
+function setAuthMessage(el,text,type){
+  if(!el)return;
+  el.classList.remove('success','error','info');
+  if(type)el.classList.add(type);
+  el.textContent=text||''
+}
 async function submitSeyirAuth(e){
   e.preventDefault();
   if(!seyirDb)return;
@@ -906,7 +952,8 @@ async function submitSeyirAuth(e){
   var password=document.getElementById('authPassword').value;
   var msg=document.getElementById('authMessage');
   var submit=e.currentTarget.querySelector('button[type="submit"]');
-  submit.disabled=true;msg.textContent='';
+  submit.disabled=true;
+  setAuthMessage(msg,'','');
   try{
     if(register){
       var username=document.getElementById('authUsername').value.trim();
@@ -917,34 +964,89 @@ async function submitSeyirAuth(e){
       if(!displayName)throw new Error('Görünen adını yaz.');
       if(password.length<8)throw new Error('Şifre en az 8 karakter olmalı.');
       if(password!==confirmPassword)throw new Error('Şifreler birbiriyle eşleşmiyor.');
-      var exists=await seyirDb.from('seyir_profiles').select('user_id').ilike('username',username).maybeSingle();
-      if(exists.data)throw new Error('Bu kullanıcı adı kullanılıyor.');
-      var res=await seyirDb.auth.signUp({email:email,password:password,options:{data:{username:username,display_name:displayName}}});
-      if(res.error)throw res.error;
-      if(res.data&&res.data.session){
-        currentUser=res.data.session.user;
+      setAuthMessage(msg,'Hesabın oluşturuluyor…','info');
+      var created=await seyirAccountRequest({action:'signup',username:username,display_name:displayName,email:email,password:password},false);
+      if(created.access_token&&created.refresh_token){
+        var set=await seyirDb.auth.setSession({access_token:created.access_token,refresh_token:created.refresh_token});
+        if(set.error)throw set.error;
+        currentUser=set.data.user;
         await loadMySeyirProfile();
-        closeSocialModal();
-        location.hash='profile'
+        setAuthMessage(msg,'Hesabın hazır. Profiline yönlendiriliyorsun…','success');
+        setTimeout(function(){closeSocialModal();location.hash='profile';render()},450)
       }else{
-        msg.classList.add('success');
-        msg.textContent='Hesabın oluşturuldu. E-postandaki doğrulama bağlantısını açtıktan sonra kullanıcı adınla giriş yapabilirsin.'
+        setAuthMessage(msg,'Hesabın oluşturuldu. Kullanıcı adınla giriş yapabilirsin.','success')
       }
     }else{
       var loginUsername=document.getElementById('authLoginUsername').value.trim();
       if(!/^[A-Za-z0-9_]{3,20}$/.test(loginUsername))throw new Error('Kullanıcı adı veya şifre hatalı.');
+      setAuthMessage(msg,'Giriş yapılıyor…','info');
       var session=await seyirAccountRequest({action:'login',username:loginUsername,password:password},false);
-      var set=await seyirDb.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});
-      if(set.error)throw set.error;
-      currentUser=set.data.user;
+      var setLogin=await seyirDb.auth.setSession({access_token:session.access_token,refresh_token:session.refresh_token});
+      if(setLogin.error)throw setLogin.error;
+      currentUser=setLogin.data.user;
       await loadMySeyirProfile();
       closeSocialModal();
       location.hash='profile'
     }
   }catch(err){
-    msg.classList.remove('success');
-    msg.textContent=friendlyAuthError(err)
+    setAuthMessage(msg,friendlyAuthError(err),'error')
   }finally{submit.disabled=false}
+}
+async function sendRecoveryCode(email,button){
+  var msg=document.getElementById('recoveryMessage');
+  if(button)button.disabled=true;
+  setAuthMessage(msg,'Kod gönderiliyor…','info');
+  try{
+    var r=await seyirDb.auth.signInWithOtp({email:email,options:{shouldCreateUser:false}});
+    if(r.error)throw r.error;
+    setAuthMessage(msg,'Kod gönderildi. E-postanı kontrol et.','success');
+    if(button){
+      var old=button.textContent;
+      button.textContent='Kod gönderildi';
+      setTimeout(function(){button.disabled=false;button.textContent=old},60000)
+    }
+    return true
+  }catch(err){
+    setAuthMessage(msg,friendlyAuthError(err),'error');
+    if(button)button.disabled=false;
+    return false
+  }
+}
+async function submitForgotPasswordRequest(e){
+  e.preventDefault();
+  var email=document.getElementById('recoveryEmail').value.trim();
+  var submit=e.currentTarget.querySelector('button[type="submit"]');
+  submit.disabled=true;
+  passwordResetEmail=email;
+  var ok=await sendRecoveryCode(email,null);
+  submit.disabled=false;
+  if(ok)setTimeout(function(){openForgotPassword('code')},500)
+}
+async function submitPasswordReset(e){
+  e.preventDefault();
+  var code=document.getElementById('recoveryCode').value.trim();
+  var password=document.getElementById('newRecoveryPassword').value;
+  var confirm=document.getElementById('newRecoveryPasswordConfirm').value;
+  var msg=document.getElementById('recoveryMessage');
+  var submit=e.currentTarget.querySelector('button[type="submit"]');
+  if(!/^\d{6}$/.test(code)){setAuthMessage(msg,'6 haneli kodu eksiksiz gir.','error');return}
+  if(password.length<8){setAuthMessage(msg,'Yeni şifre en az 8 karakter olmalı.','error');return}
+  if(password!==confirm){setAuthMessage(msg,'Yeni şifreler birbiriyle eşleşmiyor.','error');return}
+  submit.disabled=true;
+  setAuthMessage(msg,'Kod doğrulanıyor…','info');
+  try{
+    var verified=await seyirDb.auth.verifyOtp({email:passwordResetEmail,token:code,type:'email'});
+    if(verified.error)throw new Error('Kod geçersiz veya süresi dolmuş.');
+    var updated=await seyirDb.auth.updateUser({password:password});
+    if(updated.error)throw updated.error;
+    await seyirDb.auth.signOut();
+    currentUser=null;currentSeyirProfile=null;
+    setAuthMessage(msg,'Şifren değiştirildi. Giriş ekranına yönlendiriliyorsun…','success');
+    setTimeout(function(){passwordResetEmail='';openAuthModal('login')},700)
+  }catch(err){
+    setAuthMessage(msg,friendlyAuthError(err),'error');
+    submit.disabled=false
+  }
 }
 function profileSettingsMarkup(){
   var p=currentSeyirProfile||{};
