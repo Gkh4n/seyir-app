@@ -751,6 +751,22 @@ textarea{min-height:110px;resize:vertical}
 .recoveryCard .authMessage.info{color:#a9b3c5}
 .recoveryCard #recoverySubmitButton:disabled{opacity:.72;cursor:not-allowed}
 
+
+/* --- TMDB attribution footer --- */
+.homeDataFooter{margin:54px 0 8px;padding:19px 21px;display:flex;align-items:center;justify-content:space-between;gap:22px;border-top:1px solid rgba(255,255,255,.065);color:#687386}
+.homeDataBrand{display:flex;align-items:center;gap:14px;min-width:0}
+.tmdbMark{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;height:30px;padding:0 10px;border:1px solid rgba(144,131,255,.2);border-radius:9px;background:rgba(130,116,255,.055);color:#9a91ff;font-size:10px;font-weight:900;letter-spacing:.12em}
+.homeDataBrand div{min-width:0}
+.homeDataBrand b{display:block;margin-bottom:3px;color:#8d98aa;font-size:10px;font-weight:750}
+.homeDataBrand p{margin:0;max-width:680px;font-size:9px;line-height:1.55;color:#596477}
+.homeDataFooter>a{flex:0 0 auto;color:#7c8799;font-size:9px;font-weight:750;text-decoration:none;transition:.16s}
+.homeDataFooter>a:hover{color:#a49aff}
+@media(max-width:680px){
+  .homeDataFooter{margin:38px 0 74px;padding:17px 4px;align-items:flex-start;flex-direction:column;gap:10px}
+  .homeDataBrand{align-items:flex-start}
+  .homeDataFooter>a{padding-left:44px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1141,7 +1157,7 @@ async function submitForgotPasswordRequest(e){
     var raw=String(err&&err.message||'');
     if(/rate limit|too many/i.test(raw)){
       var waitUntil=setRecoveryCooldown(email,30);
-      setAuthMessage(msg,'E-posta gönderim sınırına ulaşıldı. Bu bir hesap hatası değil; Supabase’in ücretsiz gönderim sınırı. Süre dolunca yeniden deneyebilirsin.','info');
+      setAuthMessage(msg,'E-posta gönderim sınırına ulaşıldı. Bir süre sonra tekrar deneyebilirsin.','info');
       runRecoveryCooldown(email,submit,msg,waitUntil);
       return
     }
@@ -1573,7 +1589,8 @@ function homeTrendingHtml(data){
 function home(){
   var cached=getCachedHome();
   return '<div class="hero"><div class="homeHeroMain"><div class="eyebrow">✦ İzleme zevkinin haritası</div><h1>İzlediklerini değil,<br><span>zevkini keşfet.</span></h1><p>Dizi, film ve animeleri puanla; bölüm bölüm takip et. Zamanla sana ait gerçek bir seyir profili oluşsun.</p><div class="homeSearch"><input id="q" placeholder="Dizi, film veya anime ara…"><button id="searchBtn">Ara</button></div><div id="searchResults" class="searchResults"></div><div class="homeQuick"><button data-route="series">Dizileri keşfet</button><button data-route="movies">Filmleri keşfet</button><button data-route="anime">Animelere göz at</button></div></div><aside id="homeSpotlight" class="homeSpotlight">'+(cached?homeSpotlightHtml(cached):'')+'</aside></div>'+
-  '<section class="homeSection"><div class="head"><div><div class="eyebrow">Şu an konuşulanlar</div><h2>Bu hafta öne çıkanlar</h2><div class="muted">Güncel popüler yapımlar arasından seçtiklerimiz</div></div></div><div id="trendingGrid" class="grid">'+(cached?homeTrendingHtml(cached):'')+'</div></section>'
+  '<section class="homeSection"><div class="head"><div><div class="eyebrow">Şu an konuşulanlar</div><h2>Bu hafta öne çıkanlar</h2><div class="muted">Güncel popüler yapımlar arasından seçtiklerimiz</div></div></div><div id="trendingGrid" class="grid">'+(cached?homeTrendingHtml(cached):'')+'</div></section>'+
+  '<footer class="homeDataFooter"><div class="homeDataBrand"><span class="tmdbMark">TMDB</span><div><b>İçerik verileri TMDB tarafından sağlanmaktadır.</b><p>SEYİR, The Movie Database (TMDB) API\'sini kullanır ancak TMDB tarafından onaylanmış veya sertifikalandırılmış değildir.</p></div></div><a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB\'yi ziyaret et ↗</a></footer>'
 }
 function profileStats(){
   var vals=Object.keys(saved.ratings).map(function(k){return Number(saved.ratings[k])}).filter(function(n){return isFinite(n)});
