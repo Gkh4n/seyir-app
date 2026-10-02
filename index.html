@@ -892,13 +892,10 @@ function authModalMarkup(mode){
 }
 function forgotPasswordMarkup(step){
   step=step||'email';
-  if(step==='email'){
-    return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToLogin">← Girişe dön</button><div class="socialModalKicker">HESAP KURTARMA</div><h2>Şifreni yenile</h2><p>Hesabında kullandığın kurtarma e-postasını yaz. Sana 6 haneli bir şifre yenileme kodu göndereceğiz.</p><form id="forgotPasswordForm" class="authFormV2">'+authInput('recoveryEmail','Kurtarma e-postası','email','ornek@eposta.com','email','')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Kod gönder</button></form></div></div>'
-  }
   if(step==='password'){
-    return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="socialModalKicker">YENİ ŞİFRE</div><h2>Yeni şifreni belirle</h2><p>E-posta doğrulaması tamamlandı. Hesabın için yeni bir şifre oluştur.</p><form id="directResetPasswordForm" class="authFormV2">'+authInput('directRecoveryPassword','Yeni şifre','password','En az 8 karakter','new-password','minlength="8"')+authInput('directRecoveryPasswordConfirm','Yeni şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Şifreyi değiştir</button></form></div></div>'
+    return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><div class="socialModalKicker">YENİ ŞİFRE</div><h2>Yeni şifreni belirle</h2><p>E-postandaki güvenli bağlantı doğrulandı. Hesabın için yeni bir şifre oluştur.</p><form id="directResetPasswordForm" class="authFormV2">'+authInput('directRecoveryPassword','Yeni şifre','password','En az 8 karakter','new-password','minlength="8"')+authInput('directRecoveryPasswordConfirm','Yeni şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Şifreyi değiştir</button></form></div></div>'
   }
-  return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToEmail">← E-postayı değiştir</button><div class="socialModalKicker">DOĞRULAMA KODU</div><h2>E-postanı kontrol et</h2><p><b>'+h(passwordResetEmail)+'</b> adresine gelen 6 haneli kodu yaz. E-postada bağlantı görünüyorsa ona dokunarak da devam edebilirsin.</p><form id="resetPasswordForm" class="authFormV2">'+authInput('recoveryCode','6 haneli kod','text','000000','one-time-code','inputmode="numeric" maxlength="6" pattern="[0-9]{6}"')+authInput('newRecoveryPassword','Yeni şifre','password','En az 8 karakter','new-password','minlength="8"')+authInput('newRecoveryPasswordConfirm','Yeni şifreyi tekrar yaz','password','Şifreni doğrula','new-password','minlength="8"')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Şifreyi değiştir</button><button type="button" class="resendRecoveryCode" id="resendRecoveryCode">Kodu tekrar gönder</button></form></div></div>'
+  return '<div class="socialModal open"><div class="socialModalCard authCard authCardV2 recoveryCard"><button class="socialModalClose" data-close-social aria-label="Kapat">×</button><button class="recoveryBack" id="recoveryBackToLogin">← Girişe dön</button><div class="socialModalKicker">HESAP KURTARMA</div><h2>Şifreni yenile</h2><p>Hesabında kullandığın kurtarma e-postasını yaz. Sana güvenli bir şifre yenileme bağlantısı göndereceğiz.</p><form id="forgotPasswordForm" class="authFormV2">'+authInput('recoveryEmail','Kurtarma e-postası','email','ornek@eposta.com','email','')+'<div id="recoveryMessage" class="authMessage"></div><button class="primary socialSubmit authSubmitV2" type="submit">Şifre yenileme bağlantısı gönder</button></form></div></div>'
 }
 function openForgotPassword(step){
   ensureSocialOverlay();
@@ -933,16 +930,10 @@ function bindSocialOverlay(){
   if(forgot)forgot.onclick=function(){openForgotPassword('email')};
   var backLogin=document.getElementById('recoveryBackToLogin');
   if(backLogin)backLogin.onclick=function(){openAuthModal('login')};
-  var backEmail=document.getElementById('recoveryBackToEmail');
-  if(backEmail)backEmail.onclick=function(){openForgotPassword('email')};
   var forgotForm=document.getElementById('forgotPasswordForm');
   if(forgotForm)forgotForm.onsubmit=submitForgotPasswordRequest;
-  var resetForm=document.getElementById('resetPasswordForm');
-  if(resetForm)resetForm.onsubmit=submitPasswordReset;
   var directReset=document.getElementById('directResetPasswordForm');
   if(directReset)directReset.onsubmit=submitDirectPasswordReset;
-  var resend=document.getElementById('resendRecoveryCode');
-  if(resend)resend.onclick=function(){sendRecoveryCode(passwordResetEmail,resend)};
   document.querySelectorAll('[data-photo-menu]').forEach(function(b){b.onclick=openPhotoActionMenu});
   var save=document.getElementById('saveSeyirProfileSettings');
   if(save)save.onclick=saveSeyirProfileSettings;
@@ -1016,67 +1007,26 @@ async function submitSeyirAuth(e){
     setAuthMessage(msg,friendlyAuthError(err),'error')
   }finally{submit.disabled=false}
 }
-async function sendRecoveryCode(email,button){
-  var msg=document.getElementById('recoveryMessage');
-  if(button)button.disabled=true;
-  setAuthMessage(msg,'Kod gönderiliyor…','info');
-  try{
-    var options={};
-    try{options.redirectTo=location.origin+location.pathname}catch(e){}
-    var r=await seyirDb.auth.resetPasswordForEmail(email,options);
-    if(r.error)throw r.error;
-    setAuthMessage(msg,'Kod gönderildi. Gelen kutunu kontrol et.','success');
-    if(button){
-      var old=button.textContent;
-      button.textContent='Gönderildi';
-      setTimeout(function(){button.disabled=false;button.textContent=old},60000)
-    }
-    return true
-  }catch(err){
-    var raw=String(err&&err.message||'');
-    var friendly=/rate limit|too many/i.test(raw)
-      ?'Kısa süre önce bir kurtarma e-postası istendi. Gelen kutunu kontrol et veya biraz sonra tekrar dene.'
-      :friendlyAuthError(err);
-    setAuthMessage(msg,friendly,'error');
-    if(button)button.disabled=false;
-    return false
-  }
-}
 async function submitForgotPasswordRequest(e){
   e.preventDefault();
   var email=document.getElementById('recoveryEmail').value.trim();
+  var msg=document.getElementById('recoveryMessage');
   var submit=e.currentTarget.querySelector('button[type="submit"]');
   submit.disabled=true;
   passwordResetEmail=email;
-  var ok=await sendRecoveryCode(email,null);
-  submit.disabled=false;
-  if(ok)setTimeout(function(){openForgotPassword('code')},500)
-}
-async function submitPasswordReset(e){
-  e.preventDefault();
-  var code=document.getElementById('recoveryCode').value.trim();
-  var password=document.getElementById('newRecoveryPassword').value;
-  var confirm=document.getElementById('newRecoveryPasswordConfirm').value;
-  var msg=document.getElementById('recoveryMessage');
-  var submit=e.currentTarget.querySelector('button[type="submit"]');
-  if(!/^\d{6}$/.test(code)){setAuthMessage(msg,'6 haneli kodu eksiksiz gir.','error');return}
-  if(password.length<8){setAuthMessage(msg,'Yeni şifre en az 8 karakter olmalı.','error');return}
-  if(password!==confirm){setAuthMessage(msg,'Yeni şifreler birbiriyle eşleşmiyor.','error');return}
-  submit.disabled=true;
-  setAuthMessage(msg,'Kod doğrulanıyor…','info');
+  setAuthMessage(msg,'Bağlantı gönderiliyor…','info');
   try{
-    var verified=await seyirDb.auth.verifyOtp({email:passwordResetEmail,token:code,type:'recovery'});
-    if(verified.error)throw new Error('Kod geçersiz veya süresi dolmuş.');
-    var updated=await seyirDb.auth.updateUser({password:password});
-    if(updated.error)throw updated.error;
-    setAuthMessage(msg,'Şifren değiştirildi. Giriş ekranına yönlendiriliyorsun…','success');
-    setTimeout(async function(){
-      try{await seyirDb.auth.signOut()}catch(e){}
-      currentUser=null;currentSeyirProfile=null;passwordResetEmail='';
-      openAuthModal('login')
-    },650)
+    var options={redirectTo:location.origin+location.pathname};
+    var r=await seyirDb.auth.resetPasswordForEmail(email,options);
+    if(r.error)throw r.error;
+    setAuthMessage(msg,'Şifre yenileme bağlantısı gönderildi. E-postanı kontrol et.','success');
+    submit.textContent='Bağlantı gönderildi'
   }catch(err){
-    setAuthMessage(msg,friendlyAuthError(err),'error');
+    var raw=String(err&&err.message||'');
+    var friendly=/rate limit|too many/i.test(raw)
+      ?'Kısa süre önce bir bağlantı istendi. Gelen kutunu kontrol et veya biraz sonra tekrar dene.'
+      :friendlyAuthError(err);
+    setAuthMessage(msg,friendly,'error');
     submit.disabled=false
   }
 }
