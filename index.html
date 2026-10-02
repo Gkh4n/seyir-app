@@ -636,6 +636,50 @@ textarea{min-height:110px;resize:vertical}
   .profileToast{bottom:90px;max-width:calc(100vw - 30px);white-space:nowrap}
 }
 
+
+/* --- premium flat comment threads --- */
+.commentThread{display:grid;gap:10px}
+.commentThread+.commentThread{margin-top:8px}
+.flatReplies{display:grid;gap:9px;margin-left:48px;padding-left:14px;border-left:1px solid rgba(139,128,255,.13)}
+.socialComment.reply.flatReply{margin:0;padding:0;border-left:0}
+.socialComment.reply.flatReply .commentBody{width:100%}
+.socialComment.reply.flatReply .commentAvatar{width:34px;height:34px}
+.replyMention{display:inline;border:0;background:transparent;color:#9489ff;font:inherit;font-weight:750;padding:0;cursor:pointer}
+.commentActions{gap:7px}
+.reactionStrip{display:flex;align-items:center;gap:5px;padding:3px;border:1px solid rgba(255,255,255,.055);border-radius:999px;background:rgba(7,11,17,.64)}
+.reactionBtn{display:flex;align-items:center;justify-content:center;gap:4px;width:auto;min-width:31px;height:28px;padding:0 7px;border:0;border-radius:999px;background:transparent;color:#7c8799;transition:.16s ease}
+.reactionBtn:hover{background:rgba(255,255,255,.05);color:#c9d0dc}
+.reactionBtn.active{background:rgba(132,118,255,.13);color:#a79cff;box-shadow:inset 0 0 0 1px rgba(142,128,255,.2)}
+.reactionGlyph{display:grid;place-items:center;width:15px;height:15px}
+.reactionGlyph svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.reaction-love .reactionGlyph svg{fill:currentColor;stroke-width:1.5}
+.reactionCount{font-size:9px;font-weight:800;line-height:1}
+.reactionPending{opacity:.48;transform:scale(.94)}
+.replyToggle,.deleteComment{height:28px;padding:0 8px;border-radius:8px;font-size:10px}
+.replyToggle:hover{background:rgba(255,255,255,.045);color:#bcc4d1}
+.deleteComment:hover{background:rgba(255,99,123,.055)}
+.inlineReplyV2{display:grid;gap:8px;margin-top:11px;padding:11px;border-radius:13px;border:1px solid rgba(139,128,255,.12);background:#090e15}
+.replyingTo{font-size:9px;color:#6f7a8c}.replyingTo b{color:#9489ff}
+.replyComposeRow{display:flex;gap:8px;align-items:flex-end}
+.replyComposeRow textarea{min-height:54px;max-height:140px}
+.replyComposeRow button{min-width:82px;height:38px}
+.commentDeleteOverlay{position:fixed;inset:0;z-index:2700;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,4,8,.72);backdrop-filter:blur(9px)}
+.commentDeleteCard{width:min(410px,100%);padding:22px;border:1px solid rgba(255,255,255,.08);border-radius:22px;background:linear-gradient(160deg,#141a24,#090e15);box-shadow:0 28px 90px rgba(0,0,0,.52)}
+.commentDeleteIcon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;background:rgba(255,103,126,.08);color:#ff8fa1;margin-bottom:14px}
+.commentDeleteIcon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.commentDeleteCard h3{margin:0 0 6px;font-size:21px;letter-spacing:-.02em}.commentDeleteCard p{margin:0;color:#7d899b;font-size:11px;line-height:1.6}
+.commentDeleteStatus{min-height:18px;display:flex;align-items:center;gap:7px;margin-top:10px;color:#9aa5b6;font-size:10px}
+.commentDeleteActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.commentDeleteActions button{height:42px}
+.commentDeleteActions .dangerButton{background:rgba(255,95,120,.1);border-color:rgba(255,95,120,.18);color:#ff91a2}
+@media(max-width:680px){
+  .flatReplies{margin-left:22px;padding-left:9px}
+  .socialComment.reply.flatReply{grid-template-columns:30px minmax(0,1fr);gap:7px}
+  .socialComment.reply.flatReply .commentAvatar{width:30px;height:30px}
+  .reactionStrip{gap:2px;padding:2px}.reactionBtn{min-width:28px;height:27px;padding:0 6px}.reactionGlyph,.reactionGlyph svg{width:14px;height:14px}
+  .replyComposeRow{align-items:stretch;flex-direction:column}.replyComposeRow button{width:100%}
+  .commentDeleteOverlay{align-items:flex-end;padding:8px}.commentDeleteCard{border-radius:22px 22px 17px 17px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -1528,27 +1572,36 @@ function commentAvatar(profile){
   return url?'<img src="'+h(url)+'" alt="">':'<span>'+h(((profile&&profile.display_name)||(profile&&profile.username)||'S').charAt(0).toUpperCase())+'</span>'
 }
 function reactionLabel(type){
-  return {like:'👍',love:'❤️',haha:'😂',sad:'😢'}[type]||'👍'
+  return {like:'Beğen',love:'Kalp',haha:'Haha',sad:'Üzgün'}[type]||'Beğen'
 }
-function formatCommentTime(value){
-  try{
-    var d=new Date(value),diff=(Date.now()-d.getTime())/1000;
-    if(diff<60)return 'şimdi';
-    if(diff<3600)return Math.floor(diff/60)+' dk';
-    if(diff<86400)return Math.floor(diff/3600)+' sa';
-    if(diff<604800)return Math.floor(diff/86400)+' gün';
-    return d.toLocaleDateString('tr-TR')
-  }catch(e){return ''}
+function reactionIcon(type){
+  if(type==='love')return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.3 13A5.1 5.1 0 0 1 11.5 5.8L12 6.3l.5-.5A5.1 5.1 0 0 1 19.7 13L12 20.3Z"/></svg>';
+  if(type==='haha')return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.2 10c.8-.8 1.6-.8 2.4 0M13.4 10c.8-.8 1.6-.8 2.4 0M8.7 14.1c1.9 2.2 4.7 2.2 6.6 0"/></svg>';
+  if(type==='sad')return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 9.5h.01M15.5 9.5h.01M8.7 16c1.9-2.2 4.7-2.2 6.6 0"/><path d="M16.8 11.7c.8 1 .8 2 0 3"/></svg>';
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.4 20H5.8V10.7h3.6V20Zm0-9.3 3.3-6.2c.4-.7 1.5-.4 1.5.4v3.7h3.1a2 2 0 0 1 2 2.4l-1.2 6.4a2 2 0 0 1-2 1.6H9.4v-8.3Z"/></svg>'
 }
-function renderSocialCommentRow(comment,profiles,reactions,children,level){
+function flattenCommentReplies(parentId,children,out){
+  (children[parentId]||[]).forEach(function(child){
+    out.push(child);
+    flattenCommentReplies(child.id,children,out)
+  });
+  return out
+}
+function renderSocialCommentRow(comment,profiles,reactions,commentMap,isReply){
   var profile=profiles[comment.user_id]||{};
+  var parent=comment.parent_id?commentMap[comment.parent_id]:null;
+  var parentProfile=parent?(profiles[parent.user_id]||{}):null;
   var own=currentUser&&currentUser.id===comment.user_id;
   var reacts=reactions.filter(function(r){return r.comment_id===comment.id});
   var counts={like:0,love:0,haha:0,sad:0};
   reacts.forEach(function(r){if(counts[r.reaction]!=null)counts[r.reaction]++});
   var mine=currentUser?reacts.find(function(r){return r.user_id===currentUser.id}):null;
-  var replies=(children[comment.id]||[]).map(function(c){return renderSocialCommentRow(c,profiles,reactions,children,(level||0)+1)}).join('');
-  return '<article class="socialComment '+((level||0)>0?'reply':'')+'" data-comment-id="'+comment.id+'"><button class="commentAvatar" data-user-profile="'+h(profile.username||'')+'">'+commentAvatar(profile)+'</button><div class="commentBody"><div class="commentMeta"><button data-user-profile="'+h(profile.username||'')+'"><b>'+h(profile.display_name||profile.username||'Kullanıcı')+'</b><span>@'+h(profile.username||'')+'</span></button><time>'+formatCommentTime(comment.created_at)+'</time></div><p>'+h(comment.body)+'</p><div class="commentActions"><div class="reactionStrip">'+['like','love','haha','sad'].map(function(type){var n=counts[type];return '<button class="reactionBtn '+(mine&&mine.reaction===type?'active':'')+'" data-comment-react="'+comment.id+'" data-reaction="'+type+'">'+reactionLabel(type)+(n?'<span>'+n+'</span>':'')+'</button>'}).join('')+'</div>'+(currentUser?'<button class="replyToggle" data-reply-to="'+comment.id+'">Yanıtla</button>':'')+(own?'<button class="deleteComment" data-delete-comment="'+comment.id+'">Sil</button>':'')+'</div><div class="replyComposer" id="reply-'+comment.id+'"></div>'+replies+'</div></article>'
+  var mention=isReply&&parentProfile&&parentProfile.username?'<button class="replyMention" data-user-profile="'+h(parentProfile.username)+'">@'+h(parentProfile.username)+'</button> ':'';
+  var reactionHtml=['like','love','haha','sad'].map(function(type){
+    var n=counts[type];
+    return '<button class="reactionBtn reaction-'+type+' '+(mine&&mine.reaction===type?'active':'')+'" data-comment-react="'+comment.id+'" data-reaction="'+type+'" aria-label="'+reactionLabel(type)+'" title="'+reactionLabel(type)+'"><span class="reactionGlyph">'+reactionIcon(type)+'</span>'+(n?'<span class="reactionCount">'+n+'</span>':'')+'</button>'
+  }).join('');
+  return '<article class="socialComment '+(isReply?'reply flatReply':'rootComment')+'" data-comment-id="'+comment.id+'"><button class="commentAvatar" data-user-profile="'+h(profile.username||'')+'">'+commentAvatar(profile)+'</button><div class="commentBody"><div class="commentMeta"><button data-user-profile="'+h(profile.username||'')+'"><b>'+h(profile.display_name||profile.username||'Kullanıcı')+'</b><span>@'+h(profile.username||'')+'</span></button><time>'+formatCommentTime(comment.created_at)+'</time></div><p>'+mention+h(comment.body)+'</p><div class="commentActions"><div class="reactionStrip">'+reactionHtml+'</div>'+(currentUser?'<button class="replyToggle" data-reply-to="'+comment.id+'" data-reply-username="'+h(profile.username||'')+'">Yanıtla</button>':'')+(own?'<button class="deleteComment" data-delete-comment="'+comment.id+'">Sil</button>':'')+'</div><div class="replyComposer" id="reply-'+comment.id+'"></div></div></article>'
 }
 async function loadSocialComments(x){
   var area=document.getElementById('socialCommentsList');
@@ -1565,14 +1618,51 @@ async function loadSocialComments(x){
   var profiles={};
   (profilesRes.data||[]).forEach(function(p){profiles[p.user_id]=p});
   var reactions=reactionsRes.data||[];
-  var children={};
-  var roots=[];
+  var children={},commentMap={},roots=[];
+  comments.forEach(function(c){commentMap[c.id]=c});
   comments.forEach(function(c){
-    if(c.parent_id){if(!children[c.parent_id])children[c.parent_id]=[];children[c.parent_id].push(c)}
-    else roots.push(c)
+    if(c.parent_id&&commentMap[c.parent_id]){
+      if(!children[c.parent_id])children[c.parent_id]=[];
+      children[c.parent_id].push(c)
+    }else roots.push(c)
   });
-  area.innerHTML=roots.map(function(c){return renderSocialCommentRow(c,profiles,reactions,children,0)}).join('');
+  area.innerHTML=roots.map(function(root){
+    var replies=flattenCommentReplies(root.id,children,[]);
+    return '<section class="commentThread">'+renderSocialCommentRow(root,profiles,reactions,commentMap,false)+(replies.length?'<div class="flatReplies">'+replies.map(function(reply){return renderSocialCommentRow(reply,profiles,reactions,commentMap,true)}).join('')+'</div>':'')+'</section>'
+  }).join('');
   bindCommentUI(x)
+}
+function commentDeleteMarkup(){
+  return '<div class="commentDeleteOverlay" id="commentDeleteOverlay"><div class="commentDeleteCard"><div class="commentDeleteIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V5h6v2M8 10v7M12 10v7M16 10v7M7 7l1 13h8l1-13"/></svg></div><div><h3>Yorumu sil?</h3><p>Bu yorum ve ona verilen yanıtlar kalıcı olarak kaldırılacak.</p></div><div id="commentDeleteStatus" class="commentDeleteStatus"></div><div class="commentDeleteActions"><button class="secondary" id="cancelDeleteComment">Vazgeç</button><button class="dangerButton" id="confirmDeleteComment">Yorumu sil</button></div></div></div>'
+}
+function closeDeleteCommentModal(){
+  var modal=document.getElementById('commentDeleteOverlay');
+  if(modal)modal.remove()
+}
+function openDeleteCommentModal(commentId,x){
+  closeDeleteCommentModal();
+  document.body.insertAdjacentHTML('beforeend',commentDeleteMarkup());
+  var overlay=document.getElementById('commentDeleteOverlay');
+  var cancel=document.getElementById('cancelDeleteComment');
+  var confirmDelete=document.getElementById('confirmDeleteComment');
+  if(cancel)cancel.onclick=closeDeleteCommentModal;
+  if(overlay)overlay.onclick=function(e){if(e.target===overlay)closeDeleteCommentModal()};
+  if(confirmDelete)confirmDelete.onclick=async function(){
+    confirmDelete.disabled=true;
+    if(cancel)cancel.disabled=true;
+    confirmDelete.innerHTML='<span class="miniSpinner"></span> Siliniyor';
+    var status=document.getElementById('commentDeleteStatus');
+    var result=await seyirDb.from('seyir_comments').delete().eq('id',commentId);
+    if(result.error){
+      if(status)status.textContent='Yorum silinemedi. Tekrar dene.';
+      confirmDelete.disabled=false;
+      if(cancel)cancel.disabled=false;
+      confirmDelete.textContent='Yorumu sil';
+      return
+    }
+    if(status)status.innerHTML='<span class="statusCheck">✓</span> Yorum silindi';
+    setTimeout(function(){closeDeleteCommentModal();loadSocialComments(x)},280)
+  }
 }
 function bindCommentUI(x){
   document.querySelectorAll('[data-open-auth]').forEach(function(b){b.onclick=function(){openAuthModal(b.getAttribute('data-open-auth')||'login')}});
@@ -1592,29 +1682,30 @@ function bindCommentUI(x){
   };
   document.querySelectorAll('[data-reply-to]').forEach(function(b){b.onclick=function(){
     if(!currentUser){openAuthModal('login');return}
-    var id=b.getAttribute('data-reply-to'),host=document.getElementById('reply-'+id);
-    host.innerHTML='<div class="inlineReply"><textarea maxlength="1000" placeholder="Yanıtını yaz…"></textarea><button class="primary">Gönder</button></div>';
+    var id=b.getAttribute('data-reply-to'),username=b.getAttribute('data-reply-username')||'',host=document.getElementById('reply-'+id);
+    document.querySelectorAll('.replyComposer').forEach(function(el){if(el!==host)el.innerHTML=''});
+    host.innerHTML='<div class="inlineReply inlineReplyV2"><div class="replyingTo">Yanıtlanıyor <b>@'+h(username)+'</b></div><div class="replyComposeRow"><textarea maxlength="1000" placeholder="@'+h(username)+' kullanıcısına yanıt yaz…"></textarea><button class="primary">Gönder</button></div></div>';
     var input=host.querySelector('textarea'),send=host.querySelector('button');
     input.focus();
     send.onclick=async function(){
       var body=input.value.trim();if(!body)return;
       send.disabled=true;
+      send.textContent='Gönderiliyor…';
       var r=await seyirDb.from('seyir_comments').insert({user_id:currentUser.id,media_type:x.mediaType==='movie'?'movie':'tv',media_id:x.tmdbId,parent_id:id,body:body});
-      if(!r.error)loadSocialComments(x);else send.disabled=false
+      if(!r.error)loadSocialComments(x);else{send.disabled=false;send.textContent='Gönder'}
     }
   }});
   document.querySelectorAll('[data-comment-react]').forEach(function(b){b.onclick=async function(){
     if(!currentUser){openAuthModal('login');return}
     var id=b.getAttribute('data-comment-react'),reaction=b.getAttribute('data-reaction');
     var active=b.classList.contains('active');
+    b.classList.add('reactionPending');
     if(active)await seyirDb.from('seyir_comment_reactions').delete().eq('comment_id',id).eq('user_id',currentUser.id);
     else await seyirDb.from('seyir_comment_reactions').upsert({comment_id:id,user_id:currentUser.id,reaction:reaction},{onConflict:'comment_id,user_id'});
     loadSocialComments(x)
   }});
-  document.querySelectorAll('[data-delete-comment]').forEach(function(b){b.onclick=async function(){
-    if(!confirm('Yorum silinsin mi?'))return;
-    await seyirDb.from('seyir_comments').delete().eq('id',b.getAttribute('data-delete-comment'));
-    loadSocialComments(x)
+  document.querySelectorAll('[data-delete-comment]').forEach(function(b){b.onclick=function(){
+    openDeleteCommentModal(b.getAttribute('data-delete-comment'),x)
   }})
 }
 function profile(){
