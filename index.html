@@ -1060,8 +1060,13 @@ async function initSocial(){
       setTimeout(async function(){
         currentUser=session&&session.user?session.user:null;
         currentSeyirProfile=null;
-        if(currentUser){try{await loadMySeyirProfile();await loadSeyirAdminStatus()}catch(e){}}
-        else currentSeyirIsAdmin=false;
+        if(currentUser){
+          try{await loadMySeyirProfile()}catch(e){}
+          loadSeyirAdminStatus().then(function(){
+            var activeBase=location.hash.replace('#','').split('/')[0]||'home';
+            if(activeBase==='profile'||activeBase==='admin')render()
+          }).catch(function(){})
+        }else currentSeyirIsAdmin=false;
         updateAuthNav();
         ensureSocialOverlay();
         var base=location.hash.replace('#','').split('/')[0]||'home';
@@ -1094,9 +1099,18 @@ async function initSocial(){
     var s=await seyirDb.auth.getSession();
     session=s.data&&s.data.session?s.data.session:null;
     currentUser=session?session.user:null;
-    if(currentUser){await loadMySeyirProfile();await loadSeyirAdminStatus()}
+    if(currentUser){
+      await loadMySeyirProfile();
+      loadSeyirAdminStatus().then(function(){
+        var activeBase=location.hash.replace('#','').split('/')[0]||'home';
+        if(activeBase==='profile'||activeBase==='admin')render()
+      }).catch(function(){})
+    }
   }catch(e){}
   updateAuthNav();
+
+  var initBase=location.hash.replace('#','').split('/')[0]||'home';
+  if((initBase==='profile'||initBase==='admin')&&!seyirRecoveryLanding)render();
 
   if(seyirRecoveryLanding&&session){
     setTimeout(function(){showRecoveryPasswordModal(session)},0)
@@ -3076,11 +3090,13 @@ window.onhashchange=async function(){
   if(['home','series','movies','anime'].indexOf(base)>-1)await ensureRouteCache(base);
   render()
 };
-(async function boot(){
-  await initSocial();
+(function boot(){
   ensureSocialOverlay();
   render();
-  setTimeout(prefetchCoreViews,80)
+  setTimeout(prefetchCoreViews,80);
+  initSocial().catch(function(){
+    updateAuthNav()
+  })
 })();
 </script>
 <!-- deploy-retry-2026-10-02-1929 -->
