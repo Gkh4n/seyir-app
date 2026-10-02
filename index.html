@@ -1302,7 +1302,7 @@ async function deleteSeyirAccount(){
     if(btn)btn.disabled=false
   }
 }
-async async function logoutSeyir(){
+async function logoutSeyir(){
   if(!seyirDb)return;
   var btn=document.getElementById('logoutSeyirSettings');
   if(btn){btn.disabled=true;btn.textContent='Çıkış yapılıyor…'}
